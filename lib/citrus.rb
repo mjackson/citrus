@@ -21,7 +21,7 @@ module Citrus
       end
 
       def compile!
-        @rules.map! {|r| r.compile!(self) } unless compiled?
+        @rules.each_pair {|key, rule| @rules[key] = rule.compile!(self) }
         @compiled = true
       end
 
@@ -29,34 +29,53 @@ module Citrus
         !! @compiled
       end
 
+      def valid_name?(name)
+        name.respond_to?(:to_sym)
+      end
+
+      def parse(input)
+        raise "No start rule specified" if @root.nil?
+        raise "No rule named \"#{@root}\"" unless @rules.key?(@root)
+
+        compile! unless compiled?
+
+        rule = @rules[@root]
+        rule.match(input, 0)
+      end
+
       ## DSL Methods
 
-      # Sets the name of the starting rule of this grammar. Will always return
-      # the name of the starting rule, even when given no arguments.
-      def start(name=nil)
-        @start = name.to_sym if name.respond_to?(:to_sym)
-        @start
+      # Sets the name of the root rule of this grammar. Will always return
+      # the name of the root rule, even when given no arguments.
+      def root(name=nil)
+        @root = name.to_sym if valid_name?(name)
+        @root
       end
 
       def rule(name)
-        raise ArgumentError, "Rule names must be Symbols" unless name.respond_to?(:to_sym)
+        raise "Invalid rule name \"#{name.inspect}\"" unless valid_name?(name)
         sym = name.to_sym
         if block_given?
           rule = Rule.create(instance_eval(&Proc.new))
-          rule.name = name unless Symbol === rule
+          rule.name = name
           @rules[sym] = rule
           @compiled = false
         end
         @rules[sym]
       end
 
-      def all(*rules)
-        Sequence.new(rules)
+      def ignore
       end
 
-      def any(*rules)
+      def sequence(*rules)
+        Sequence.new(rules)
+      end
+      alias :all :sequence
+
+      def choice(*rules)
         Choice.new(rules)
       end
+      alias :any :choice
 
       def repeat(rule, min=1, max=Infinity)
         Repeat.new(rule, min, max)
@@ -74,16 +93,6 @@ module Citrus
         repeat(rule, 0, 1)
       end
     end
-
-    def grammar; self.class end
-    def rules; grammar.rules end
-    def start; grammar.start end
-
-    def parse(input)
-      raise RuntimeError, "No start rule specified" if start.nil?
-      grammar.compile!
-      start.match(input, 0)
-    end
   end
 
   class Rule
@@ -96,9 +105,9 @@ module Citrus
       when Array          then Sequence.new(obj)
       when Range          then Choice.new(obj.to_a)
       when Symbol
-        # Symbols are names of other rules and are resolved at parse time, not
-        # when they are created.
-        obj
+        # Symbols are names of other rules and are resolved at compile time,
+        # not when they are created.
+        Proxy.new(obj)
       else
         raise ArgumentError, "Unable to create rule for #{obj.inspect}"
       end
@@ -120,8 +129,12 @@ module Citrus
       is_a? Terminal
     end
 
-    # Returns +true+ if this Rule should be enclosed in parentheses when it is
-    # augmented by some other rule.
+    def compile!(grammar)
+      self
+    end
+
+    # Returns +true+ if the string representation of this Rule should be
+    # enclosed in parentheses when it is augmented by some other rule.
     def paren?
       false
     end
@@ -157,13 +170,12 @@ module Citrus
   # notation is any sequence of characters enclosed in either single or double
   # quotes, e.g.:
   #
-  #     'expr'
-  #     "expr"
+  #   'expr'
+  #   "expr"
   #
   class FixedWidth < Terminal
-    def match(input, offset=0, grammar=nil)
-      result = input[offset, @rule.length] == @rule
-      Match.new(@rule.dup) if result
+    def match(input, offset=0)
+      Match.new(@rule.dup) if input[offset, @rule.length] == @rule
     end
   end
 
@@ -182,55 +194,12 @@ module Citrus
   #
   # The PEG notation is identical to Ruby's regular expression notation, e.g.:
   #
-  #     /expr/
+  #   /expr/
   #
   class Expression < Terminal
-    def match(input, offset=0, grammar=nil)
+    def match(input, offset=0)
       result = input[offset, input.length - offset].match(@rule)
       Match.new(result) if result
-    end
-  end
-
-  # A Nonterminal is a Rule that may augment the behavior of another (or many
-  # other) rule. Subclasses of Nonterminal should yield this rule(s) to the
-  # block given to #each and should record matches when they are passed to
-  # #match!. A call to #match should return the Match object if this Rule was
-  # able to match and calls to #reset! should reset the internal pointer so
-  # the rule is able to be iterated over again.
-  class Nonterminal < Rule
-    def initialize
-      reset!
-    end
-
-    def match(input, offset, grammar)
-      pos = 0
-
-      each do |rule|
-        if Symbol === rule
-          r = grammar.rule(rule)
-          raise RuntimeError, "Unknown rule \"#{rule}\"" unless r
-          rule = r
-        end
-        m = rule.match(input, offset + pos, grammar)
-        break unless match!(m)
-        pos += (m.length + m.offset)
-      end
-
-      m = get_match
-      reset!
-      m
-    end
-
-    def match!(m=nil)
-      @matches << Match.new(m) unless m.nil?
-    end
-
-    def get_match
-      Match.new(@matches)
-    end
-
-    def reset!
-      @matches = []
     end
   end
 
@@ -239,20 +208,31 @@ module Citrus
   # providing a predictable traversal. The PEG notation is a list of expressions
   # separated by a space, e.g.:
   #
-  #     expr expr
+  #   expr expr
   #
-  class Sequence < Nonterminal
-    def initialize(rules)
-      super()
+  class Sequence < Rule
+    def initialize(rules=[])
       @rules = rules.map {|r| Rule.create(r) }
     end
 
-    def each
-      @rules.each {|r| yield r }
+    def match(input, offset=0)
+      pos, matches = 0, []
+      @rules.each do |rule|
+        m = rule.match(input, offset + pos)
+        break unless m
+        matches << m
+        pos += (m.length + m.offset)
+      end
+      Match.new(matches) if matches.length == @rules.length
     end
 
-    def get_match
-      super if @matches.length == @rules.length
+    def compile!(grammar)
+      @rules.map! {|r| r.compile!(grammar) }
+      self
+    end
+
+    def paren?
+      @rules.length > 1
     end
 
     def to_s
@@ -262,25 +242,33 @@ module Citrus
         s
       }.join(' ')
     end
-
-    def paren?
-      @rules.length > 1
-    end
   end
 
   # A Choice is a Sequence where only one Rule must match. The PEG notation is
   # a list of expressions separated by a backslash character, e.g.:
   #
-  #     expr / expr
+  #   expr / expr
   #
-  class Choice < Sequence
-    def match!(m=nil)
-      return nil if @matches.any?
-      super(m) || true
+  class Choice < Rule
+    def initialize(rules=[])
+      @rules = rules.map {|r| Rule.create(r) }
     end
 
-    def get_match
-      @matches.first if @matches.any?
+    def match(input, offset=0)
+      @rules.each do |rule|
+        m = rule.match(input, offset)
+        return m if m
+      end
+      nil
+    end
+
+    def compile!(grammar)
+      @rules.map! {|r| r.compile!(grammar) }
+      self
+    end
+
+    def paren?
+      @rules.length > 1
     end
 
     def to_s
@@ -297,7 +285,7 @@ module Citrus
   # is an integer, <n>, followed by an asterisk, followed by another integer,
   # <m>, all of which follow any other expression, e.g.:
   #
-  #     expr<n>*<m>
+  #   expr<n>*<m>
   #
   # In this notation <n> specifies the minimum number of times the preceeding
   # expression must match and <m> specifies the maximum. If <n> is ommitted, it
@@ -308,23 +296,29 @@ module Citrus
   # The shorthand notation `+` and `?` may be used for the common cases of `1*`
   # and `*1` respectively, e.g.:
   #
-  #     expr+
-  #     expr?
+  #   expr+
+  #   expr?
   #
-  class Repeat < Nonterminal
+  class Repeat < Rule
     def initialize(rule, min=1, max=1)
       raise ArgumentError, "Min cannot be greater than max" if min > max
-      super()
-      @rule = Rule.create(rule)
-      @min, @max = min, max
+      @rule, @min, @max = Rule.create(rule), min, max
     end
 
-    def each
-      yield @rule while @matches.length < @max
+    def match(input, offset=0)
+      pos, matches = 0, []
+      while matches.length < @max
+        m = @rule.match(input, offset + pos)
+        break unless m
+        matches << m
+        pos += (m.length + m.offset)
+      end
+      Match.new(matches) if matches.length >= @min && matches.length <= @max
     end
 
-    def get_match
-      super if @matches.length >= @min && @matches.length <= @max
+    def compile!(grammar)
+      @rule = @rule.compile!(grammar)
+      self
     end
 
     def to_s
@@ -339,6 +333,18 @@ module Citrus
       s = @rule.to_s
       s = '(' + s + ')' if @rule.paren?
       s + m
+    end
+  end
+
+  class Proxy < Rule
+    def initialize(name)
+      self.name = name
+    end
+
+    def compile!(grammar)
+      rule = grammar.rule(@name)
+      raise "No rule named \"#{@name}\"" unless Rule === rule
+      rule
     end
   end
 

@@ -5,7 +5,9 @@ module Citrus
   # A grammar for simple maths.
   class Calc < Grammar
 
-    start :expr
+    ignore /[ \t\s\n]+/
+
+    root :expr
 
     rule(:digit)        { 0..9 }
     rule(:num)          { one_or_more digit }
