@@ -5,23 +5,35 @@ class ChoiceTest < Test::Unit::TestCase
   include Citrus
 
   def test_terminal?
-    rule = Choice.new
+    rule = Choice.new([])
     assert_equal(false, rule.terminal?)
   end
 
   def test_match
     rule = Choice.new(%w<a b>)
 
-    match = rule.match('')
+    input = Input.new('')
+    match = rule.match(input)
     assert_equal(nil, match)
 
-    match = rule.match('c')
+    input = Input.new('c')
+    match = rule.match(input)
     assert_equal(nil, match)
 
-    match = rule.match('a')
+    input = Input.new('ab')
+    match = rule.match(input)
     assert(match)
     assert_equal('a', match.value)
     assert_equal(1, match.length)
+
+    assert_equal(false, input.done?)
+
+    match = rule.match(input)
+    assert(match)
+    assert_equal('b', match.value)
+    assert_equal(1, match.length)
+
+    assert(input.done?)
   end
 
   def test_to_s

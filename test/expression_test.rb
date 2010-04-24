@@ -11,19 +11,14 @@ class ExpressionTest < Test::Unit::TestCase
 
   def test_match
     rule = Expression.new(/\d+/)
-    match = rule.match('123 456', 0)
+
+    input = Input.new('123 456')
+    match = rule.match(input)
     assert_equal('123', match.value)
     assert_equal(3, match.length)
-    match = rule.match('123 456', 1)
-    assert_equal('23', match.value)
-    assert_equal(2, match.length)
-    match = rule.match('123 456', 3)
-    assert_equal(1, match.offset)
-    assert_equal('456', match.value)
-    assert_equal(3, match.length)
 
-    rule = Expression.new(/^\d+/)
-    match = rule.match(' 456', 0)
+    input = Input.new(' 456')
+    match = rule.match(input)
     assert_equal(nil, match)
   end
 

@@ -5,23 +5,28 @@ class SequenceTest < Test::Unit::TestCase
   include Citrus
 
   def test_terminal?
-    rule = Sequence.new
+    rule = Sequence.new([])
     assert_equal(false, rule.terminal?)
   end
 
   def test_match
     rule = Sequence.new(%w<a b>)
 
-    match = rule.match('')
+    input = Input.new('')
+    match = rule.match(input)
     assert_equal(nil, match)
 
-    match = rule.match('a')
+    input = Input.new('a')
+    match = rule.match(input)
     assert_equal(nil, match)
 
-    match = rule.match('ab')
+    input = Input.new('ab')
+    match = rule.match(input)
     assert(match)
     assert_equal('ab', match.value)
     assert_equal(2, match.length)
+
+    assert(input.done?)
   end
 
   def test_to_s

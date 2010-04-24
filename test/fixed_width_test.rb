@@ -11,11 +11,23 @@ class FixedWidthTest < Test::Unit::TestCase
 
   def test_match
     rule = FixedWidth.new('hello')
-    match = rule.match('hello world', 0)
+
+    input = Input.new('hello world')
+    match = rule.match(input)
+    assert(match)
     assert_equal('hello', match.value)
     assert_equal(5, match.length)
-    match = rule.match('hello world', 1)
+
+    match = rule.match(input)
     assert_equal(nil, match)
+
+    rule = FixedWidth.new(' world')
+    match = rule.match(input)
+    assert(match)
+    assert_equal(' world', match.value)
+    assert_equal(6, match.length)
+
+    assert(input.done?)
   end
 
   def test_to_s

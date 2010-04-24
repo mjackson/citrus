@@ -14,12 +14,14 @@ class RepeatTest < Test::Unit::TestCase
   def test_match_zero_or_one
     rule = Repeat.new('a', 0, 1)
 
-    match = rule.match('')
+    input = Input.new('')
+    match = rule.match(input)
     assert(match)
     assert_equal('', match.value)
     assert_equal(0, match.length)
 
-    match = rule.match('a')
+    input = Input.new('a')
+    match = rule.match(input)
     assert(match)
     assert_equal('a', match.value)
     assert_equal(1, match.length)
@@ -28,15 +30,18 @@ class RepeatTest < Test::Unit::TestCase
   def test_match_one_or_more
     rule = Repeat.new('a', 1, Infinity)
 
-    match = rule.match('')
+    input = Input.new('')
+    match = rule.match(input)
     assert_equal(nil, match)
 
-    match = rule.match('a')
+    input = Input.new('a')
+    match = rule.match(input)
     assert(match)
     assert_equal('a', match.value)
     assert_equal(1, match.length)
 
-    match = rule.match('a' * 200)
+    input = Input.new('a' * 200)
+    match = rule.match(input)
     assert(match)
     assert_equal('a' * 200, match.value)
     assert_equal(200, match.length)
@@ -45,10 +50,12 @@ class RepeatTest < Test::Unit::TestCase
   def test_match_one
     rule = Repeat.new('a', 1, 1)
 
-    match = rule.match('')
+    input = Input.new('')
+    match = rule.match(input)
     assert_equal(nil, match)
 
-    match = rule.match('a')
+    input = Input.new('a')
+    match = rule.match(input)
     assert(match)
     assert_equal('a', match.value)
     assert_equal(1, match.length)
