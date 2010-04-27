@@ -16,23 +16,50 @@ class ChoiceTest < Test::Unit::TestCase
     match = rule.match(input)
     assert_equal(nil, match)
 
-    input = Input.new('c')
-    match = rule.match(input)
-    assert_equal(nil, match)
-
-    input = Input.new('ab')
+    input = Input.new('a')
     match = rule.match(input)
     assert(match)
     assert_equal('a', match.value)
     assert_equal(1, match.length)
+  end
 
+  def test_match_multi
+    input = Input.new('ab')
+    rule = Choice.new(%w<a b>)
+
+    match = rule.match(input)
+    assert(match)
+    assert_equal('a', match.value)
+    assert_equal(1, match.length)
     assert_equal(false, input.done?)
 
     match = rule.match(input)
     assert(match)
     assert_equal('b', match.value)
     assert_equal(1, match.length)
+    assert(input.done?)
+  end
 
+  def test_match_embed
+    input = Input.new('1+2')
+    rule = Choice.new([ /\d+/, Choice.new(%w<+ ->) ])
+
+    match = rule.match(input)
+    assert(match)
+    assert_equal('1', match.value)
+    assert_equal(1, match.length)
+    assert_equal(false, input.done?)
+
+    match = rule.match(input)
+    assert(match)
+    assert_equal('+', match.value)
+    assert_equal(1, match.length)
+    assert_equal(false, input.done?)
+
+    match = rule.match(input)
+    assert(match)
+    assert_equal('2', match.value)
+    assert_equal(1, match.length)
     assert(input.done?)
   end
 

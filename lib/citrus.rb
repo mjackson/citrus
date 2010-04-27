@@ -22,91 +22,56 @@ module Citrus
         rules.key?(sym) ? rules[sym] : sym
       end
 
-      def compile!
-        @ignore = @ignore.compile!(self) if @ignore
-        @rules.each_pair {|key, rule| @rules[key] = rule.compile!(self) }
-        @compiled = true
-      end
-
-      def compiled?
-        !! @compiled
-      end
-
-      def valid_name?(name)
-        name.respond_to?(:to_sym)
-      end
-
-      def parse(string)
+      # Parses the given +string+ according to the rules of this grammar.
+      def parse(string, offset=0, consume_all=true)
         raise "No root rule specified" if root.nil?
         raise "No rule named \"#{root}\"" unless rules.key?(root)
 
-        compile! unless compiled?
+        input = Input.new(string, offset)
+        input.grammar = self
 
-        input = Input.new(string, ignore)
-
-        # Skip any leading ignored tokens before attempting to match.
-        input.skip
-
-        root_rule = rules[root]
-        matches = []
-        last_offset = -1
-        until input.done?
-          # If no progress has been made since last time then we may assume
-          # that we cannot consume any more of this input.
-          return nil if last_offset == input.offset
-          last_offset = input.offset
-          matches << root_rule.match(input)
-        end
-        matches
+        m = input.match(rules[root])
+        return nil if consume_all && !input.done?
+        m
       end
 
       ## DSL Methods
 
-      # Defines a rule that may match between any two Terminal tokens in the
-      # input and will be ignored. Will always return the ignore rule.
-      def ignore(rule=nil)
-        @ignore = Rule.create(rule) if rule
-        @ignore
+      # Copies all rules from the given +grammar+ into this grammar,
+      # overwriting any existing rule that may have the same name.
+      def copy(grammar)
+        grammar.rules.each_pair {|name, obj| rule(name, obj) }
       end
 
-      # Sets the name of the root rule of this grammar. Will always return
-      # the name of the root rule.
+      # Sets the name of the root rule of this grammar. Returns the name of the
+      # root rule.
       def root(name=nil)
-        @root = name.to_sym if valid_name?(name)
+        @root = name.to_sym if name.respond_to?(:to_sym)
         @root
       end
 
-      def rule(name, *args)
-        raise "Invalid rule name \"#{name.inspect}\"" unless valid_name?(name)
+      def rule(name, rule=nil)
+        raise "Invalid name \"#{name.inspect}\"" unless name.respond_to?(:to_sym)
         sym = name.to_sym
-        unless args.empty?
-          rule = Rule.create(args.length == 1 ? args.first : args)
-          rule.name = name
-          @rules[sym] = rule
-          @compiled = false
+        if rule
+          r = Rule.create(rule)
+          r.name = sym
+          @rules[sym] = r
+          # The first rule in a grammar is the default root.
+          @root ||= sym
         end
         @rules[sym]
       end
 
-      def sequence(*rules)
-        Sequence.new(rules)
-      end
-      alias :all :sequence
-
-      def choice(*rules)
-        Choice.new(rules)
-      end
-      alias :any :choice
-
       def and_predicate(rule)
         AndPredicate.new(rule)
       end
-      alias :and :and_predicate
+      alias and and_predicate
 
       def not_predicate(rule)
         NotPredicate.new(rule)
       end
-      alias :not :not_predicate
+      alias not not_predicate
 
       def repeat(rule, min=1, max=Infinity)
         Repeat.new(rule, min, max)
@@ -123,6 +88,16 @@ module Citrus
       def zero_or_one(rule)
         repeat(rule, 0, 1)
       end
+
+      def sequence(*rules)
+        Sequence.new(rules)
+      end
+      alias all sequence
+
+      def choice(*rules)
+        Choice.new(rules)
+      end
+      alias any choice
     end
   end
 
@@ -130,25 +105,39 @@ module Citrus
     extend Forwardable
 
     attr_accessor :offset
-
-    def initialize(string, ignore=nil)
-      @offset = 0
-      @string, @ignore = string, ignore
-    end
+    attr_reader :string, :cache, :cache_hits
+    attr_writer :grammar
 
     def_delegators :@string, :[], :length
 
-    def rest
-      self[offset, length - offset]
+    def initialize(string, offset=0)
+      @string, @offset = string, offset
+      @cache = {}
+      @cache_hits = 0
     end
 
-    def skip
-      @ignore.match(self) if @ignore
+    def match(rule)
+      # TODO: Figure out a cleaner way to resolve Proxy rules to the Rule
+      # objects they represent. Input objects should probably be able to
+      # operate independent of the grammar.
+      if Proxy === rule
+        rule = @grammar.rule(rule.name)
+        raise "No rule named \"#{name}\"" unless Rule === rule
+      end
+
+      @cache[rule.id] ||= {}
+
+      if @cache[rule.id].key?(offset)
+        @cache_hits += 1
+        @cache[rule.id][offset]
+      else
+        @cache[rule.id][offset] = rule.match(self)
+      end
     end
 
     def consume(match)
       @offset += match.length
-      skip
+      match
     end
 
     def done?
@@ -165,9 +154,9 @@ module Citrus
       when Symbol   then Proxy.new(obj)
       when String   then FixedWidth.new(obj)
       when Regexp   then Expression.new(obj)
-      when Numeric  then FixedWidth.new(obj.to_s)
       when Array    then Sequence.new(obj)
       when Range    then Choice.new(obj.to_a)
+      when Numeric  then FixedWidth.new(obj.to_s)
       else
         raise ArgumentError, "Unable to create rule for #{obj.inspect}"
       end
@@ -179,10 +168,8 @@ module Citrus
       @name = name.to_sym
     end
 
-    # By default a Rule will return itself when compiled. The only exceptions
-    # are Proxy objects.
-    def compile!(grammar)
-      self
+    def id
+      named? ? name.to_s : (terminal? ? to_s : object_id.to_s)
     end
 
     # Returns +true+ if this rule is a Terminal.
@@ -210,26 +197,23 @@ module Citrus
     def inspect
       to_s
     end
+
+  private
+
+    def create_match(match)
+      Match.new(match)
+    end
   end
 
-  # A Proxy is a Rule that resolves to another Rule when compiled. It is used
-  # in grammar definitions when a rule uses some other rule that has not yet
-  # been defined. In these cases, a Proxy is returned which merely wraps the
-  # name of the yet-to-be-defined rule in an object and returns the real Rule
-  # object at compile time. The PEG notation is simply the name of a rule
-  # without any other punctuation, e.g.:
+  # A Proxy is a Rule that is a facade for another rule. It is used in grammar
+  # definitions when a rule uses some other rule by name. The PEG notation is
+  # simply the name of a rule without any other punctuation, e.g.:
   #
-  #   expr
+  #     expr
   #
   class Proxy < Rule
     def initialize(name)
       self.name = name
-    end
-
-    def compile!(grammar)
-      rule = grammar.rule(name)
-      raise "No rule named \"#{name}\"" unless Rule === rule
-      rule
     end
 
     def to_s
@@ -251,60 +235,51 @@ module Citrus
     end
   end
 
-  # A FixedWidth is a terminal Rule that matches based on its length. The PEG
+  # A FixedWidth is a Terminal that matches based on its length. The PEG
   # notation is any sequence of characters enclosed in either single or double
   # quotes, e.g.:
   #
-  #   'expr'
-  #   "expr"
+  #     'expr'
+  #     "expr"
   #
   class FixedWidth < Terminal
     def match(input)
-      if rule == input[input.offset, rule.length]
-        m = Match.new(rule.dup)
-        input.consume(m)
-        m
-      end
+      result = rule == input[input.offset, rule.length]
+      input.consume(create_match(rule.dup)) if result
     end
   end
 
-  # An Expression is a terminal Rule that has the same semantics as a regular
-  # expression in Ruby. It matches by calling Regexp#match on the input stream
-  # at the current offset. If the regular expression matches at the beginning
-  # of the stream (i.e. index 0) the rule succeeds. The PEG notation is
-  # identical to Ruby's regular expression notation, e.g.:
+  # An Expression is a Terminal that has the same semantics as a regular
+  # expression in Ruby. The expression must match at the beginning of the input
+  # (index 0). The PEG notation is identical to Ruby's regular expression
+  # notation, e.g.:
   #
-  #   /expr/
-  #
-  # In order to maintain compatibility with some other PEG implementations,
-  # character classes may be denoted by one or more characters or character
-  # ranges enclosed in square brackets, e.g.:
-  #
-  #   [a-zA-Z_]
+  #     /expr/
   #
   class Expression < Terminal
     def match(input)
-      result = input.rest.match(rule)
-      if result && result.begin(0) == 0
-        m = Match.new(result)
-        input.consume(m)
-        m
-      end
+      result = input[input.offset, input.length - input.offset].match(rule)
+      input.consume(create_match(result)) if result && result.begin(0) == 0
+    end
+  end
+
+  class Nonterminal < Rule
+    attr_reader :rules
+
+    def initialize(rules)
+      @rules = rules.map {|r| Rule.create(r) }
     end
   end
 
   # A Predicate is a non-terminal Rule that augments the matching behavior of
   # one other rule.
-  class Predicate < Rule
-    attr_reader :rule
-
+  class Predicate < Nonterminal
     def initialize(rule)
-      @rule = Rule.create(rule)
+      super([ rule ])
     end
 
-    def compile!(grammar)
-      @rule = @rule.compile!(grammar)
-      self
+    def rule
+      rules[0]
     end
   end
 
@@ -312,14 +287,14 @@ module Citrus
   # However, no input is consumed. The PEG notation is any expression
   # preceeded by an ampersand, e.g.:
   #
-  #   &expr
+  #     &expr
   #
   class AndPredicate < Predicate
     def match(input)
       offset = input.offset
-      m = rule.match(input)
+      m = input.match(rule)
       input.offset = offset
-      Match.new('') if m
+      create_match('') if m
     end
 
     def to_s
@@ -331,14 +306,14 @@ module Citrus
   # No input is consumed. The PEG notation is any expression preceeded by an
   # exclamation point, e.g.:
   #
-  #   !expr
+  #     !expr
   #
   class NotPredicate < Predicate
     def match(input)
       offset = input.offset
-      m = rule.match(input)
+      m = input.match(rule)
       input.offset = offset
-      Match.new('') unless m
+      create_match('') unless m
     end
 
     def to_s
@@ -351,7 +326,7 @@ module Citrus
   # asterisk, followed by another integer, +<m>+, all of which follow any other
   # expression, e.g.:
   #
-  #   expr<n>*<m>
+  #     expr<n>*<m>
   #
   # In this notation +<n>+ specifies the minimum number of times the preceeding
   # expression must match and +<m>+ specifies the maximum. If +<n>+ is ommitted,
@@ -362,8 +337,8 @@ module Citrus
   # The shorthand notation <tt>+</tt> and <tt>?</tt> may be used for the common
   # cases of <tt>1*</tt> and <tt>*1</tt> respectively, e.g.:
   #
-  #   expr+
-  #   expr?
+  #     expr+
+  #     expr?
   #
   class Repeat < Predicate
     def initialize(rule, min=1, max=Infinity)
@@ -376,11 +351,11 @@ module Citrus
       offset = input.offset
       matches = []
       while matches.length < @range.end
-        m = rule.match(input)
+        m = input.match(rule)
         break unless m
         matches << m
       end
-      return Match.new(matches) if @range.include?(matches.length)
+      return create_match(matches) if @range.include?(matches.length)
       input.offset = offset
       nil
     end
@@ -401,39 +376,29 @@ module Citrus
   end
 
   # A List is a non-terminal Rule that contains any number of other rules and
-  # augments their matching behavior in some way.
-  class List < Rule
-    attr_reader :rules
-
-    def initialize(rules)
-      @rules = rules.map {|r| Rule.create(r) }
-    end
-
-    def compile!(grammar)
-      @rules.map! {|r| r.compile!(grammar) }
-      self
-    end
-
+  # augments their collective matching behavior. Rules that are part of a List
+  # are always tested for matches in sequential order.
+  class List < Nonterminal
     def paren?
       rules.length > 1
     end
   end
 
-  # A Sequence is a List where all rules must match in sequential order. The
-  # PEG notation is a list of expressions separated by a space, e.g.:
+  # A Sequence is a List where all rules must match. The PEG notation is two or
+  # more expressions separated by a space, e.g.:
   #
-  #   expr expr
+  #     expr expr
   #
   class Sequence < List
     def match(input)
       offset = input.offset
       matches = []
       rules.each do |r|
-        m = r.match(input)
+        m = input.match(r)
         break unless m
         matches << m
       end
-      return Match.new(matches) if matches.length == rules.length
+      return create_match(matches) if matches.length == rules.length
       input.offset = offset
       nil
     end
@@ -443,17 +408,16 @@ module Citrus
     end
   end
 
-  # A Choice is a List where only one rule must match. Rules that are part of a
-  # Choice are tested in sequential order. The PEG notation is a list of
-  # expressions separated by a forward slash, e.g.:
+  # A Choice is a List where only one rule must match. The PEG notation is two
+  # or more expressions separated by a forward slash, e.g.:
   #
-  #   expr / expr
+  #     expr / expr
   #
   class Choice < List
     def match(input)
       offset = input.offset
       rules.each do |r|
-        m = r.match(input)
+        m = input.match(r)
         return m if m
         input.offset = offset
       end

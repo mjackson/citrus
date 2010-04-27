@@ -25,7 +25,22 @@ class SequenceTest < Test::Unit::TestCase
     assert(match)
     assert_equal('ab', match.value)
     assert_equal(2, match.length)
+    assert(input.done?)
 
+    input = Input.new('1+2')
+    rule = Sequence.new([/\d+/, '+', /\d+/])
+    match = rule.match(input)
+    assert(match)
+    assert_equal('1+2', match.value)
+    assert_equal(3, match.length)
+    assert(input.done?)
+
+    input = Input.new('1+2')
+    rule = Sequence.new([/[0-9]+/, Choice.new(%w<+ ->), /\d+/])
+    match = rule.match(input)
+    assert(match)
+    assert_equal('1+2', match.value)
+    assert_equal(3, match.length)
     assert(input.done?)
   end
 
