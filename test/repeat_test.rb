@@ -61,6 +61,20 @@ class RepeatTest < Test::Unit::TestCase
     assert_equal(1, match.length)
   end
 
+  def test_operator
+    rule = Repeat.new('', 0, Infinity)
+    assert_equal('*', rule.operator)
+
+    rule = Repeat.new('', 0, 1)
+    assert_equal('?', rule.operator)
+
+    rule = Repeat.new('', 1, Infinity)
+    assert_equal('+', rule.operator)
+
+    rule = Repeat.new('', 1, 2)
+    assert_equal('1*2', rule.operator)
+  end
+
   def test_to_s
     rule = Repeat.new('a', 0, Infinity)
     assert_equal('"a"*', rule.to_s)
@@ -71,11 +85,8 @@ class RepeatTest < Test::Unit::TestCase
     rule = Repeat.new('a', 1, Infinity)
     assert_equal('"a"+', rule.to_s)
 
-    rule = Repeat.new('a', 1, 2)
-    assert_equal('"a"1*2', rule.to_s)
-
-    rule = Repeat.new(Choice.new(%w<a b>), 0, 1)
-    assert_equal('("a" / "b")?', rule.to_s)
+    rule = Repeat.new(/a/, 1, 2)
+    assert_equal('/a/1*2', rule.to_s)
   end
 
 end

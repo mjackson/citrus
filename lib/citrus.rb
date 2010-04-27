@@ -360,18 +360,21 @@ module Citrus
       nil
     end
 
-    def to_s
+    def operator
       m = [@range.begin, @range.end].map do |n|
         n == 0 || n == Infinity ? '' : n.to_s
       end
       if m[0] == '' && m[1] == '1'
-        m = '?'
+        '?'
       elsif m[0] == '1' && m[1] == ''
-        m = '+'
+        '+'
       else
-        m = m.join('*')
+        m.join('*')
       end
-      rule.embed + m
+    end
+
+    def to_s
+      rule.embed + operator
     end
   end
 
