@@ -7,9 +7,7 @@ require 'citrus'
 class Test::Unit::TestCase
   include Citrus
 
-  def parser(str='')
-    p = Parser.new
-    p.instance_eval { @string = str }
-    p
+  def input(str='')
+    Input.new(str)
   end
 end

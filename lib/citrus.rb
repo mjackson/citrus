@@ -14,8 +14,7 @@ module Citrus
     # will be called with the new Grammar as its first argument if its +arity+
     # is 1 or +instance_eval+'d in the context of the new Grammar otherwise.
     #
-    # See http://blog.grayproductions.net/articles/dsl_block_styles for more
-    # information.
+    # See http://blog.grayproductions.net/articles/dsl_block_styles
     def self.new(&block)
       mod = Module.new { include Grammar }
       (block.arity == 1 ? block[self] : mod.instance_eval(&block)) if block
@@ -64,14 +63,16 @@ module Citrus
       rule_names.inject({}) {|m, sym| m[sym] = rule(sym); m }
     end
 
-    # Returns a Parser for this grammar.
-    def parser
-      @parser ||= Parser.new(self)
-    end
+    # Parses the given +string+ from the given +offset+. If +consume_all+ is
+    # true, will return +nil+ unless the entire string can be consumed.
+    def parse(string, offset=0, consume_all=true)
+      raise "No root rule specified" unless root
+      raise "No rule named \"#{root}\"" unless has_rule?(root)
 
-    # Alias for this grammar's +parser+'s #parse method.
-    def parse(*args)
-      parser.parse(*args)
+      input = Input.new(string)
+
+      m = input.match(rule(root), offset)
+      m unless consume_all && m && m.length != string.length
     end
   end
 
@@ -154,36 +155,27 @@ module Citrus
     end
   end
 
-  class Parser
+  # The core of the packrat parsing algorithm, this class wraps a string that
+  # is to be parsed and keeps track of matches for all rules at any given
+  # offset.
+  #
+  # See http://en.wikipedia.org/wiki/Parsing_expression_grammar
+  class Input
     extend Forwardable
 
-    attr_reader :grammar, :cache, :cache_hits, :string
+    attr_reader :string, :cache, :cache_hits
 
     def_delegators :@string, :[], :length
 
-    def initialize(grammar=Grammar.new)
-      @grammar = grammar
-      @cache_hits = 0
-    end
-
-    def cache
-      @cache ||= {}
-    end
-
-    def parse(string, offset=0, consume_all=true)
-      raise "No root rule specified" if grammar.root.nil?
-      raise "No rule named \"#{root}\"" unless grammar.has_rule?(grammar.root)
-
-      cache.clear
-      @cache_hits = 0
+    def initialize(string)
       @string = string
-
-      m = match(grammar.rule(grammar.root), offset)
-      m unless consume_all && m && m.length != string.length
+      @cache = {}
+      @cache_hits = 0
     end
 
+    # Returns the match for a given +rule+ at a given +offset+.
     def match(rule, offset=0)
-      c = cache[rule.id] ||= {}
+      c = @cache[rule.id] ||= {}
 
       if c.key?(offset)
         @cache_hits += 1
@@ -312,8 +304,8 @@ module Citrus
       super
     end
 
-    def match(parser, offset=0)
-      result = rule == parser[offset, rule.length]
+    def match(input, offset=0)
+      result = rule == input[offset, rule.length]
       create_match(rule.dup) if result
     end
   end
@@ -331,8 +323,8 @@ module Citrus
       super
     end
 
-    def match(parser, offset=0)
-      result = parser[offset, parser.length - offset].match(rule)
+    def match(input, offset=0)
+      result = input[offset, input.length - offset].match(rule)
       create_match(result) if result && result.begin(0) == 0
     end
   end
@@ -372,8 +364,8 @@ module Citrus
   #     &expr
   #
   class AndPredicate < Predicate
-    def match(parser, offset=0)
-      create_match('') if parser.match(rule, offset)
+    def match(input, offset=0)
+      create_match('') if input.match(rule, offset)
     end
 
     def to_s
@@ -388,8 +380,8 @@ module Citrus
   #     !expr
   #
   class NotPredicate < Predicate
-    def match(parser, offset=0)
-      create_match('') unless parser.match(rule, offset)
+    def match(input, offset=0)
+      create_match('') unless input.match(rule, offset)
     end
 
     def to_s
@@ -423,10 +415,10 @@ module Citrus
       @range = Range.new(min, max)
     end
 
-    def match(parser, offset=0)
+    def match(input, offset=0)
       matches = []
       while matches.length < @range.end
-        m = parser.match(rule, offset)
+        m = input.match(rule, offset)
         break unless m
         matches << m
         offset += m.length
@@ -458,16 +450,35 @@ module Citrus
     end
   end
 
+  # A Choice is a List where only one rule must match. The PEG notation is two
+  # or more expressions separated by a forward slash, e.g.:
+  #
+  #     expr / expr
+  #
+  class Choice < List
+    def match(input, offset=0)
+      rules.each do |rule|
+        m = input.match(rule, offset)
+        return m if m
+      end
+      nil
+    end
+
+    def to_s
+      rules.map {|r| r.embed }.join(' / ')
+    end
+  end
+
   # A Sequence is a List where all rules must match. The PEG notation is two or
   # more expressions separated by a space, e.g.:
   #
   #     expr expr
   #
   class Sequence < List
-    def match(parser, offset=0)
+    def match(input, offset=0)
       matches = []
       rules.each do |rule|
-        m = parser.match(rule, offset)
+        m = input.match(rule, offset)
         break unless m
         matches << m
         offset += m.length
@@ -477,25 +488,6 @@ module Citrus
 
     def to_s
       rules.map {|r| r.embed }.join(' ')
-    end
-  end
-
-  # A Choice is a List where only one rule must match. The PEG notation is two
-  # or more expressions separated by a forward slash, e.g.:
-  #
-  #     expr / expr
-  #
-  class Choice < List
-    def match(parser, offset=0)
-      rules.each do |rule|
-        m = parser.match(rule, offset)
-        return m if m
-      end
-      nil
-    end
-
-    def to_s
-      rules.map {|r| r.embed }.join(' / ')
     end
   end
 

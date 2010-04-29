@@ -10,10 +10,10 @@ class NotPredicateTest < Test::Unit::TestCase
   def test_match
     rule = NotPredicate.new('a')
 
-    match = rule.match(parser('a'))
+    match = rule.match(input('a'))
     assert_equal(nil, match)
 
-    match = rule.match(parser('b'))
+    match = rule.match(input('b'))
     assert(match)
     assert_equal('', match.value)
     assert_equal(0, match.length)

@@ -10,13 +10,13 @@ class SequenceTest < Test::Unit::TestCase
   def test_match
     rule = Sequence.new(%w<a b>)
 
-    match = rule.match(parser(''))
+    match = rule.match(input(''))
     assert_equal(nil, match)
 
-    match = rule.match(parser('a'))
+    match = rule.match(input('a'))
     assert_equal(nil, match)
 
-    match = rule.match(parser('ab'))
+    match = rule.match(input('ab'))
     assert(match)
     assert_equal('ab', match.value)
     assert_equal(2, match.length)
@@ -24,7 +24,7 @@ class SequenceTest < Test::Unit::TestCase
 
   def test_match_mixed
     rule = Sequence.new([/\d+/, '+', /\d+/])
-    match = rule.match(parser('1+2'))
+    match = rule.match(input('1+2'))
     assert(match)
     assert_equal('1+2', match.value)
     assert_equal(3, match.length)
@@ -32,7 +32,7 @@ class SequenceTest < Test::Unit::TestCase
 
   def test_match_embed
     rule = Sequence.new([/[0-9]+/, Choice.new(%w<+ ->), /\d+/])
-    match = rule.match(parser('1+2'))
+    match = rule.match(input('1+2'))
     assert(match)
     assert_equal('1+2', match.value)
     assert_equal(3, match.length)

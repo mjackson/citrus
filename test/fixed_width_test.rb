@@ -9,7 +9,7 @@ class FixedWidthTest < Test::Unit::TestCase
 
   def test_match
     rule = FixedWidth.new('abc')
-    match = rule.match(parser('abc'))
+    match = rule.match(input('abc'))
     assert(match)
     assert_equal('abc', match.value)
     assert_equal(3, match.length)
@@ -17,13 +17,13 @@ class FixedWidthTest < Test::Unit::TestCase
 
   def test_match_short
     rule = FixedWidth.new('abc')
-    match = rule.match(parser('ab'))
+    match = rule.match(input('ab'))
     assert_equal(nil, match)
   end
 
   def test_match_long
     rule = FixedWidth.new('abc')
-    match = rule.match(parser('abcd'))
+    match = rule.match(input('abcd'))
     assert(match)
     assert_equal('abc', match.value)
     assert_equal(3, match.length)

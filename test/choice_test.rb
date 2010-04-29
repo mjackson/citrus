@@ -10,10 +10,10 @@ class ChoiceTest < Test::Unit::TestCase
   def test_match
     rule = Choice.new(%w<a b>)
 
-    match = rule.match(parser(''))
+    match = rule.match(input(''))
     assert_equal(nil, match)
 
-    match = rule.match(parser('a'))
+    match = rule.match(input('a'))
     assert(match)
     assert_equal('a', match.value)
     assert_equal(1, match.length)
@@ -22,12 +22,12 @@ class ChoiceTest < Test::Unit::TestCase
   def test_match_multi
     rule = Choice.new(%w<a b>)
 
-    match = rule.match(parser('ab'))
+    match = rule.match(input('ab'))
     assert(match)
     assert_equal('a', match.value)
     assert_equal(1, match.length)
 
-    match = rule.match(parser('ba'))
+    match = rule.match(input('ba'))
     assert(match)
     assert_equal('b', match.value)
     assert_equal(1, match.length)
@@ -36,12 +36,12 @@ class ChoiceTest < Test::Unit::TestCase
   def test_match_embed
     rule = Choice.new([ /\d+/, Choice.new(%w<+ ->) ])
 
-    match = rule.match(parser('1+'))
+    match = rule.match(input('1+'))
     assert(match)
     assert_equal('1', match.value)
     assert_equal(1, match.length)
 
-    match = rule.match(parser('+1'))
+    match = rule.match(input('+1'))
     assert(match)
     assert_equal('+', match.value)
     assert_equal(1, match.length)

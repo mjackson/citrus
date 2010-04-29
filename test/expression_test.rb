@@ -9,7 +9,7 @@ class ExpressionTest < Test::Unit::TestCase
 
   def test_match
     rule = Expression.new(/\d+/)
-    match = rule.match(parser('123 456'))
+    match = rule.match(input('123 456'))
     assert(match)
     assert_equal('123', match.value)
     assert_equal(3, match.length)
@@ -17,7 +17,7 @@ class ExpressionTest < Test::Unit::TestCase
 
   def test_match_failure
     rule = Expression.new(/\d+/)
-    match = rule.match(parser(' 456'))
+    match = rule.match(input(' 456'))
     assert_equal(nil, match)
   end
 
