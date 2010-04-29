@@ -1,36 +1,18 @@
 require 'citrus'
 
-# Permits definition of a Citrus grammar using the global +grammar+ "keyword"
-# instead of manually creating a new class that inherits Citrus::Grammar. For
-# example:
-#
-#     class Calc < Citrus::Grammar
-#     end
-#
-# can now be written as
-#
-#     Calc = grammar {
-#     }
-#
-def grammar
-  klass = Class.new(Citrus::Grammar)
-  klass.class_eval(&Proc.new) if block_given?
-  klass
-end
-
 # Permits the +/+ operator to be used with instances of Citrus::Rule, String,
-# Regexp, Symbol, Range, and Array to create a new Citrus::Choice rule as is
+# Regexp, Range, Array, and Symbol to create a new Citrus::Choice rule as is
 # common in PEG syntax. For example:
 #
-#     choice(/[0-9]+/, expr)
+#     choice(/[0-9]+/, :val)
 #
 # can now be written as
 #
-#     /[0-9]+/ / expr
+#     /[0-9]+/ / :val
 #
 # The notable exception is Numeric which of course already has a +/+ operator
 # that should not be overridden.
-[Citrus::Rule, String, Regexp, Symbol, Range, Array].each do |klass|
+[Citrus::Rule, String, Regexp, Range, Array, Symbol].each do |klass|
   klass.class_eval {
     def /(rule)
       Citrus::Choice.new([self, rule])
@@ -38,54 +20,22 @@ end
   }
 end
 
-# Permits square brackets to be omitted when passing arrays to the following
-# DSL methods as a single Sequence argument:
+# Permits rule names embedded within other rules to be written plainly, without
+# a colon in front. For example:
 #
-#   - rule
-#   - and_predicate / and
-#   - not_predicate / not
-#   - one_or_more
-#   - zero_or_more
-#   - zero_or_one
-#
-# This hack works by overriding the original DSL methods with versions of each
-# that convert all (trailing) arguments to arrays and then invoke the original
-# with only the first element if only one is given or all elements if there are
-# many. For example:
-#
-#     rule :prod,       [ val, one_or_more([ num, val ]) ]
+#     sequence(:alpha, :num)
 #
 # can now be written as
 #
-#     rule :prod,       val, one_or_more(num, val)
+#     sequence(alpha, num)
 #
-# The notable exception is the +repeat+ method which already has trailing
-# arguments and thus requires the first argument to be an explicit array in
-# order to specify a Sequence.
-class Citrus::Grammar
-  module SugarMethods
-    def rule(name, *args)
-      super(name, args.length == 1 ? args[0] : args)
-    end
-
-    %w<
-    and_predicate
-    and
-    not_predicate
-    not
-    one_or_more
-    zero_or_more
-    zero_or_one
-    >.each do |method|
-      class_eval(<<-CODE.gsub(/^        /, ''), __FILE__, __LINE__ + 1)
-        def #{method}(*args)
-          super(args.length == 1 ? args[0] : args)
-        end
-      CODE
-    end
-  end
-
-  class << self
-    include SugarMethods
+# This hack works by adding a +method_missing+ catch-all to the grammar DSL so
+# that when methods are called that do not already exist the method name is
+# returned as a symbol. The only caveat is that this will not work with names
+# of methods that are already defined in the DSL or the class methods (e.g.
+# "root", "rule", etc.).
+module Citrus::GrammarDSL
+  def method_missing(sym, *args)
+    sym
   end
 end

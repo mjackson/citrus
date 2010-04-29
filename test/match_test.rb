@@ -2,8 +2,6 @@ require File.dirname(__FILE__) + '/helper'
 
 class MatchTest < Test::Unit::TestCase
 
-  include Citrus
-
   def test_string
     match = Match.new('0')
     assert_equal('0', match.value)

@@ -1,7 +1,6 @@
 require 'forwardable'
 
 module Citrus
-
   VERSION = [0, 1, 0]
 
   def self.version
@@ -10,138 +9,188 @@ module Citrus
 
   Infinity = 1.0 / 0
 
-  class Grammar
-    class << self
-      attr_reader :rules
+  module Grammar
+    # Creates a new Grammar as an anonymous module. If a block is provided, it
+    # will be called with the new Grammar as its first argument if its +arity+
+    # is 1 or +instance_eval+'d in the context of the new Grammar otherwise.
+    #
+    # See http://blog.grayproductions.net/articles/dsl_block_styles for more
+    # information.
+    def self.new(&block)
+      mod = Module.new { include Grammar }
+      (block.arity == 1 ? block[self] : mod.instance_eval(&block)) if block
+      mod
+    end
 
-      def inherited(sub)
-        sub.instance_variable_set(:@rules, {})
+    def self.included(base)
+      class << base
+        include GrammarMethods
+        include GrammarDSL
       end
-
-      def method_missing(sym, *args)
-        rules.key?(sym) ? rules[sym] : sym
-      end
-
-      # Parses the given +string+ according to the rules of this grammar.
-      def parse(string, offset=0, consume_all=true)
-        raise "No root rule specified" if root.nil?
-        raise "No rule named \"#{root}\"" unless rules.key?(root)
-
-        input = Input.new(string, offset)
-        input.grammar = self
-
-        m = input.match(rules[root])
-        return nil if consume_all && !input.done?
-        m
-      end
-
-      ## DSL Methods
-
-      # Copies all rules from the given +grammar+ into this grammar,
-      # overwriting any existing rule that may have the same name.
-      def copy(grammar)
-        grammar.rules.each_pair {|name, obj| rule(name, obj) }
-      end
-
-      # Sets the name of the root rule of this grammar. Returns the name of the
-      # root rule.
-      def root(name=nil)
-        @root = name.to_sym if name.respond_to?(:to_sym)
-        @root
-      end
-
-      def rule(name, rule=nil)
-        raise "Invalid name \"#{name.inspect}\"" unless name.respond_to?(:to_sym)
-        sym = name.to_sym
-        if rule
-          r = Rule.create(rule)
-          r.name = sym
-          @rules[sym] = r
-          # The first rule in a grammar is the default root.
-          @root ||= sym
-        end
-        @rules[sym]
-      end
-
-      def and_predicate(rule)
-        AndPredicate.new(rule)
-      end
-      alias and and_predicate
-
-      def not_predicate(rule)
-        NotPredicate.new(rule)
-      end
-      alias not not_predicate
-
-      def repeat(rule, min=1, max=Infinity)
-        Repeat.new(rule, min, max)
-      end
-
-      def one_or_more(rule)
-        repeat(rule)
-      end
-
-      def zero_or_more(rule)
-        repeat(rule, 0)
-      end
-
-      def zero_or_one(rule)
-        repeat(rule, 0, 1)
-      end
-
-      def sequence(*rules)
-        Sequence.new(rules)
-      end
-      alias all sequence
-
-      def choice(*rules)
-        Choice.new(rules)
-      end
-      alias any choice
     end
   end
 
-  class Input
+  module Invoke
+    def instance
+      mod = self
+      @instance ||= (Class.new { include mod }).new
+    end
+
+    def invoke(sym, *args)
+      instance.__send__(sym, *args)
+    end
+  end
+
+  module GrammarMethods
+    # Returns the name of this grammar as a String.
+    def name
+      super.to_s
+    end
+
+    # Returns all names of rules of this grammar as Symbols in an Array.
+    # Rules are ordered in the same way they were defined in the grammar.
+    def rule_names
+      instance_methods
+    end
+
+    # Returns +true+ if this grammar contains a rule with the given +name+.
+    def has_rule?(name)
+      rule_names.include?(name.to_sym)
+    end
+
+    # Returns a map of the names of all rules in this grammar to their
+    # respective Rule objects. Useful when debugging grammars.
+    def rules
+      rule_names.inject({}) {|m, sym| m[sym] = rule(sym); m }
+    end
+
+    # Returns a Parser for this grammar.
+    def parser
+      @parser ||= Parser.new(self)
+    end
+
+    # Alias for this grammar's +parser+'s #parse method.
+    def parse(*args)
+      parser.parse(*args)
+    end
+  end
+
+  module GrammarDSL
+    include Invoke
+
+    # Gets/sets the Rule object with the given +name+. If a block is given,
+    # will use the return value of the block as the primitive value to pass to
+    # Rule#create. All rules are stored as instance methods of the grammar
+    # module so that grammars may be composed naturally as Ruby modules.
+    def rule(name, &block)
+      sym = name.to_sym
+
+      # The first rule in a grammar is the default root.
+      @root ||= sym
+
+      # Keep track of the name of the rule currently being defined so we can
+      # use it if #sup is called without an explicit name.
+      @current_name = sym
+
+      if block
+        rule = Rule.create(block.call)
+        rule.name = name
+        rule.grammar = self
+        define_method(sym) { rule }
+      end
+
+      invoke(sym) if has_rule?(name)
+    end
+
+    # Gets/sets the name of the root rule of this grammar.
+    def root(name=nil)
+      @root = name.to_sym if name
+      @root
+    end
+
+    # Works like Ruby's +super+, but for rules. When defining a grammar, this
+    # will return the Rule object from the most recently included grammar with
+    # a rule of the same +name+. If +name+ is not supplied it defaults to the
+    # name of the rule currently being defined.
+    def sup(name=@current_name)
+      grammars = included_modules.select {|mod| mod.include?(Grammar) }
+      grammars.each do |grammar|
+        return grammar.rule(name) if grammar.has_rule?(name)
+      end
+      raise ArgumentError, "Cannot use super. No rule named \"#{name}\" " +
+       "found in inheritance hierarchy"
+    end
+
+    def and(obj)
+      AndPredicate.new(obj)
+    end
+
+    def not(obj)
+      NotPredicate.new(obj)
+    end
+
+    def rep(obj, min=1, max=Infinity)
+      Repeat.new(obj, min, max)
+    end
+
+    def one_or_more(obj)
+      rep(obj)
+    end
+
+    def zero_or_more(obj)
+      rep(obj, 0)
+    end
+
+    def zero_or_one(obj)
+      rep(obj, 0, 1)
+    end
+
+    def all(*args)
+      Sequence.new(args)
+    end
+
+    def any(*args)
+      Choice.new(args)
+    end
+  end
+
+  class Parser
     extend Forwardable
 
-    attr_accessor :offset
-    attr_reader :string, :cache, :cache_hits
-    attr_writer :grammar
+    attr_reader :grammar, :cache, :cache_hits, :string
 
     def_delegators :@string, :[], :length
 
-    def initialize(string, offset=0)
-      @string, @offset = string, offset
-      @cache = {}
+    def initialize(grammar=Grammar.new)
+      @grammar = grammar
       @cache_hits = 0
     end
 
-    def match(rule)
-      # TODO: Figure out a cleaner way to resolve Proxy rules to the Rule
-      # objects they represent. Input objects should probably be able to
-      # operate independent of the grammar.
-      if Proxy === rule
-        rule = @grammar.rule(rule.name)
-        raise "No rule named \"#{name}\"" unless Rule === rule
-      end
+    def cache
+      @cache ||= {}
+    end
 
-      @cache[rule.id] ||= {}
+    def parse(string, offset=0, consume_all=true)
+      raise "No root rule specified" if grammar.root.nil?
+      raise "No rule named \"#{root}\"" unless grammar.has_rule?(grammar.root)
 
-      if @cache[rule.id].key?(offset)
+      cache.clear
+      @cache_hits = 0
+      @string = string
+
+      m = match(grammar.rule(grammar.root), offset)
+      m unless consume_all && m && m.length != string.length
+    end
+
+    def match(rule, offset=0)
+      c = cache[rule.id] ||= {}
+
+      if c.key?(offset)
         @cache_hits += 1
-        @cache[rule.id][offset]
+        c[offset]
       else
-        @cache[rule.id][offset] = rule.match(self)
+        c[offset] = rule.match(self, offset)
       end
-    end
-
-    def consume(match)
-      @offset += match.length
-      match
-    end
-
-    def done?
-      offset == length
     end
   end
 
@@ -162,14 +211,11 @@ module Citrus
       end
     end
 
-    attr_reader :name
+    attr_reader :name, :grammar
+    attr_writer :grammar
 
     def name=(name)
       @name = name.to_sym
-    end
-
-    def id
-      named? ? name.to_s : (terminal? ? to_s : object_id.to_s)
     end
 
     # Returns +true+ if this rule is a Terminal.
@@ -186,6 +232,10 @@ module Citrus
     # being augmented.
     def paren?
       false
+    end
+
+    def id
+      named? ? name.to_s : (terminal? ? to_s : object_id.to_s)
     end
 
     # Returns a string version of this rule that is suitable to be used as part
@@ -216,6 +266,20 @@ module Citrus
       self.name = name
     end
 
+    def rule
+      unless @rule
+        rule = grammar.rule(name)
+        raise RuntimeError, "No rule named \"#{name}\" in grammar " +
+          grammar.name unless rule
+        @rule = rule
+      end
+      @rule
+    end
+
+    def method_missing(sym, *args)
+      rule.__send__(sym, *args)
+    end
+
     def to_s
       name.to_s
     end
@@ -243,9 +307,14 @@ module Citrus
   #     "expr"
   #
   class FixedWidth < Terminal
-    def match(input)
-      result = rule == input[input.offset, rule.length]
-      input.consume(create_match(rule.dup)) if result
+    def initialize(rule='')
+      raise ArgumentError, "FixedWidth must be a String" unless String === rule
+      super
+    end
+
+    def match(parser, offset=0)
+      result = rule == parser[offset, rule.length]
+      create_match(rule.dup) if result
     end
   end
 
@@ -257,24 +326,37 @@ module Citrus
   #     /expr/
   #
   class Expression < Terminal
-    def match(input)
-      result = input[input.offset, input.length - input.offset].match(rule)
-      input.consume(create_match(result)) if result && result.begin(0) == 0
+    def initialize(rule=/^$/)
+      raise ArgumentError, "Expression must be a Regexp" unless Regexp === rule
+      super
+    end
+
+    def match(parser, offset=0)
+      result = parser[offset, parser.length - offset].match(rule)
+      create_match(result) if result && result.begin(0) == 0
     end
   end
 
+  # A Nonterminal is a Rule that augments the matching behavior of one or more
+  # other rules. Nonterminals may not match directly on the input, but instead
+  # invoke the rule(s) they contain to determine if a match can be made from
+  # the collective result.
   class Nonterminal < Rule
     attr_reader :rules
 
-    def initialize(rules)
+    def initialize(rules=[])
       @rules = rules.map {|r| Rule.create(r) }
+    end
+
+    def grammar=(grammar)
+      @rules.each {|r| r.grammar = grammar }
+      super
     end
   end
 
-  # A Predicate is a non-terminal Rule that augments the matching behavior of
-  # one other rule.
+  # A Predicate is a Nonterminal that contains one other rule.
   class Predicate < Nonterminal
-    def initialize(rule)
+    def initialize(rule='')
       super([ rule ])
     end
 
@@ -290,11 +372,8 @@ module Citrus
   #     &expr
   #
   class AndPredicate < Predicate
-    def match(input)
-      offset = input.offset
-      m = input.match(rule)
-      input.offset = offset
-      create_match('') if m
+    def match(parser, offset=0)
+      create_match('') if parser.match(rule, offset)
     end
 
     def to_s
@@ -309,11 +388,8 @@ module Citrus
   #     !expr
   #
   class NotPredicate < Predicate
-    def match(input)
-      offset = input.offset
-      m = input.match(rule)
-      input.offset = offset
-      create_match('') unless m
+    def match(parser, offset=0)
+      create_match('') unless parser.match(rule, offset)
     end
 
     def to_s
@@ -341,35 +417,31 @@ module Citrus
   #     expr?
   #
   class Repeat < Predicate
-    def initialize(rule, min=1, max=Infinity)
+    def initialize(rule='', min=1, max=Infinity)
       super(rule)
       raise ArgumentError, "Min cannot be greater than max" if min > max
       @range = Range.new(min, max)
     end
 
-    def match(input)
-      offset = input.offset
+    def match(parser, offset=0)
       matches = []
       while matches.length < @range.end
-        m = input.match(rule)
+        m = parser.match(rule, offset)
         break unless m
         matches << m
+        offset += m.length
       end
-      return create_match(matches) if @range.include?(matches.length)
-      input.offset = offset
-      nil
+      create_match(matches) if @range.include?(matches.length)
     end
 
     def operator
       m = [@range.begin, @range.end].map do |n|
         n == 0 || n == Infinity ? '' : n.to_s
       end
-      if m[0] == '' && m[1] == '1'
-        '?'
-      elsif m[0] == '1' && m[1] == ''
-        '+'
-      else
-        m.join('*')
+      case m
+      when ['', '1'] then '?'
+      when ['1', ''] then '+'
+      else m.join('*')
       end
     end
 
@@ -378,9 +450,8 @@ module Citrus
     end
   end
 
-  # A List is a non-terminal Rule that contains any number of other rules and
-  # augments their collective matching behavior. Rules that are part of a List
-  # are always tested for matches in sequential order.
+  # A List is a Nonterminal that contains any number of other rules and tests
+  # them for matches in sequential order.
   class List < Nonterminal
     def paren?
       rules.length > 1
@@ -393,17 +464,15 @@ module Citrus
   #     expr expr
   #
   class Sequence < List
-    def match(input)
-      offset = input.offset
+    def match(parser, offset=0)
       matches = []
-      rules.each do |r|
-        m = input.match(r)
+      rules.each do |rule|
+        m = parser.match(rule, offset)
         break unless m
         matches << m
+        offset += m.length
       end
-      return create_match(matches) if matches.length == rules.length
-      input.offset = offset
-      nil
+      create_match(matches) if matches.length == rules.length
     end
 
     def to_s
@@ -417,12 +486,10 @@ module Citrus
   #     expr / expr
   #
   class Choice < List
-    def match(input)
-      offset = input.offset
-      rules.each do |r|
-        m = input.match(r)
+    def match(parser, offset=0)
+      rules.each do |rule|
+        m = parser.match(rule, offset)
         return m if m
-        input.offset = offset
       end
       nil
     end
@@ -462,5 +529,4 @@ module Citrus
 
     alias :to_s :value
   end
-
 end

@@ -2,37 +2,36 @@ require File.dirname(__FILE__) + '/helper'
 
 class FixedWidthTest < Test::Unit::TestCase
 
-  include Citrus
-
   def test_terminal?
-    rule = FixedWidth.new('')
+    rule = FixedWidth.new
     assert(rule.terminal?)
   end
 
   def test_match
-    rule = FixedWidth.new('hello')
-
-    input = Input.new('hello world')
-    match = rule.match(input)
+    rule = FixedWidth.new('abc')
+    match = rule.match(parser('abc'))
     assert(match)
-    assert_equal('hello', match.value)
-    assert_equal(5, match.length)
+    assert_equal('abc', match.value)
+    assert_equal(3, match.length)
+  end
 
-    match = rule.match(input)
+  def test_match_short
+    rule = FixedWidth.new('abc')
+    match = rule.match(parser('ab'))
     assert_equal(nil, match)
+  end
 
-    rule = FixedWidth.new(' world')
-    match = rule.match(input)
+  def test_match_long
+    rule = FixedWidth.new('abc')
+    match = rule.match(parser('abcd'))
     assert(match)
-    assert_equal(' world', match.value)
-    assert_equal(6, match.length)
-
-    assert(input.done?)
+    assert_equal('abc', match.value)
+    assert_equal(3, match.length)
   end
 
   def test_to_s
-    rule = FixedWidth.new('a')
-    assert_equal('"a"', rule.to_s)
+    rule = FixedWidth.new('abc')
+    assert_equal('"abc"', rule.to_s)
   end
 
 end

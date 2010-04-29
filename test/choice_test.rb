@@ -2,71 +2,57 @@ require File.dirname(__FILE__) + '/helper'
 
 class ChoiceTest < Test::Unit::TestCase
 
-  include Citrus
-
   def test_terminal?
-    rule = Choice.new([])
+    rule = Choice.new
     assert_equal(false, rule.terminal?)
   end
 
   def test_match
     rule = Choice.new(%w<a b>)
 
-    input = Input.new('')
-    match = rule.match(input)
+    match = rule.match(parser(''))
     assert_equal(nil, match)
 
-    input = Input.new('a')
-    match = rule.match(input)
+    match = rule.match(parser('a'))
     assert(match)
     assert_equal('a', match.value)
     assert_equal(1, match.length)
   end
 
   def test_match_multi
-    input = Input.new('ab')
     rule = Choice.new(%w<a b>)
 
-    match = rule.match(input)
+    match = rule.match(parser('ab'))
     assert(match)
     assert_equal('a', match.value)
     assert_equal(1, match.length)
-    assert_equal(false, input.done?)
 
-    match = rule.match(input)
+    match = rule.match(parser('ba'))
     assert(match)
     assert_equal('b', match.value)
     assert_equal(1, match.length)
-    assert(input.done?)
   end
 
   def test_match_embed
-    input = Input.new('1+2')
     rule = Choice.new([ /\d+/, Choice.new(%w<+ ->) ])
 
-    match = rule.match(input)
+    match = rule.match(parser('1+'))
     assert(match)
     assert_equal('1', match.value)
     assert_equal(1, match.length)
-    assert_equal(false, input.done?)
 
-    match = rule.match(input)
+    match = rule.match(parser('+1'))
     assert(match)
     assert_equal('+', match.value)
     assert_equal(1, match.length)
-    assert_equal(false, input.done?)
-
-    match = rule.match(input)
-    assert(match)
-    assert_equal('2', match.value)
-    assert_equal(1, match.length)
-    assert(input.done?)
   end
 
   def test_to_s
     rule = Choice.new(%w<a b>)
     assert_equal('"a" / "b"', rule.to_s)
+  end
 
+  def test_to_s_embed
     rule1 = Choice.new(%w<a b>)
     rule2 = Choice.new(%w<c d>)
     rule = Choice.new([rule1, rule2])
