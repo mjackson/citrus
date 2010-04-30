@@ -1,6 +1,7 @@
 require 'forwardable'
 
 module Citrus
+
   VERSION = [0, 1, 0]
 
   def self.version
@@ -8,6 +9,18 @@ module Citrus
   end
 
   Infinity = 1.0 / 0
+
+  # Allows module-level methods to call instance methods on a blank instance.
+  module Invoke
+    def instance
+      mod = self
+      @instance ||= (Class.new { include mod }).new
+    end
+
+    def invoke(sym, *args)
+      instance.__send__(sym, *args)
+    end
+  end
 
   module Grammar
     # Creates a new Grammar as an anonymous module. If a block is provided, it
@@ -23,17 +36,6 @@ module Citrus
 
     def self.included(base)
       base.extend(GrammarMethods)
-    end
-  end
-
-  module Invoke
-    def instance
-      mod = self
-      @instance ||= (Class.new { include mod }).new
-    end
-
-    def invoke(sym, *args)
-      instance.__send__(sym, *args)
     end
   end
 
@@ -58,8 +60,14 @@ module Citrus
       super.to_s
     end
 
-    # Returns all names of rules of this grammar as Symbols in an Array.
-    # Rules are ordered in the same way they were defined in the grammar.
+    # Returns an Array of all Grammar modules that have been included in this
+    # grammar in the reverse order they were included.
+    def included_grammars
+      included_modules.select {|mod| mod.include?(Grammar) }
+    end
+
+    # Returns all names of rules of this grammar as Symbols in an Array
+    # ordered in the same way they were defined in the grammar.
     def rule_names
       @rule_names ||= []
     end
@@ -99,10 +107,8 @@ module Citrus
       # The first rule in a grammar is the default root.
       @root ||= sym
 
-      # Keep track of the name of the rule currently being defined so we can
-      # use it if #sup is called without an explicit name.
-      @current_name = sym
-
+      # Keep track of rule names that have been added to this grammar in the
+      # order they are added.
       rule_names << sym
 
       if block
@@ -125,9 +131,8 @@ module Citrus
     # will return the Rule object from the most recently included grammar with
     # a rule of the same +name+. If +name+ is not supplied it defaults to the
     # name of the rule currently being defined.
-    def sup(name=@current_name)
-      grammars = included_modules.select {|mod| mod.include?(Grammar) }
-      grammars.each do |grammar|
+    def sup(name=rule_names.last)
+      included_grammars.each do |grammar|
         return grammar.rule(name) if grammar.has_rule?(name)
       end
       raise ArgumentError, "Cannot use super. No rule named \"#{name}\" " +
@@ -198,7 +203,38 @@ module Citrus
     end
   end
 
-  # A Rule is an object that is used by the parser to match on the input.
+  class Match
+    attr_reader :result, :captures
+
+    def initialize(result, ext=nil)
+      case result
+      when String, Array
+        @result = result
+        @captures = []
+      when MatchData
+        @result = result[0]
+        @captures = result.captures
+      else
+        raise ArgumentError, "Invalid match result: #{result.inspect}"
+      end
+
+      extend(ext) if Module === ext
+    end
+
+    def value
+      @value ||= Array === @result ?
+        @result.inject('') {|m, v| m << v.value } : @result
+    end
+
+    def length
+      @length ||= Array === @result ?
+        @result.inject(0) {|m, v| m + v.length } : value.length
+    end
+
+    alias :to_s :value
+  end
+
+  # A Rule is an object that is used during parsing to match on the Input.
   class Rule
     # Automatically creates a rule depending on the type of object given.
     def self.create(obj)
@@ -224,7 +260,7 @@ module Citrus
 
     # Returns +true+ if this rule is a Terminal.
     def terminal?
-      is_a? Terminal
+      is_a?(Terminal)
     end
 
     # Returns +true+ if this rule has a name.
@@ -271,6 +307,8 @@ module Citrus
       self.name = name
     end
 
+    # Returns the underlying Rule object for this Proxy. Lazily evaluated so
+    # we can create Proxy objects before we know what the Rule object is.
     def rule
       unless @rule
         rule = grammar.rule(name)
@@ -281,10 +319,11 @@ module Citrus
       @rule
     end
 
-    def id
-      rule.id
-    end
+    # These methods should be handled by this proxy's #rule.
+    undef terminal?
+    undef id
 
+    # Send any missing methods to this proxy's #rule.
     def method_missing(sym, *args)
       rule.__send__(sym, *args)
     end
@@ -507,34 +546,4 @@ module Citrus
     end
   end
 
-  class Match
-    attr_reader :result, :captures
-
-    def initialize(result, ext=nil)
-      case result
-      when String, Array
-        @result = result
-        @captures = []
-      when MatchData
-        @result = result[0]
-        @captures = result.captures
-      else
-        raise ArgumentError, "Invalid match result: #{result.inspect}"
-      end
-
-      extend(ext) if Module === ext
-    end
-
-    def value
-      @value ||= Array === @result ?
-        @result.inject('') {|m, v| m << v.value } : @result
-    end
-
-    def length
-      @length ||= Array === @result ?
-        @result.inject(0) {|m, v| m + v.length } : value.length
-    end
-
-    alias :to_s :value
-  end
 end

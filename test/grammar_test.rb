@@ -2,14 +2,8 @@ require File.dirname(__FILE__) + '/helper'
 
 class GrammarTest < Test::Unit::TestCase
 
-  TestGrammar = Grammar.new {
-    rule(:num)      { /[0-9]+/ }
-    rule(:alpha)    { /[a-z]+/i }
-    rule(:alphanum) { any(:alpha, :num) }
-  }
-
   def test_name
-    assert_equal("GrammarTest::TestGrammar", TestGrammar.name)
+    assert_equal("Test::Unit::TestCase::TestGrammar", TestGrammar.name)
   end
 
   def test_no_name
