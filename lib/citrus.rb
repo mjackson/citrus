@@ -49,7 +49,7 @@ module Citrus
     # Returns all names of rules of this grammar as Symbols in an Array.
     # Rules are ordered in the same way they were defined in the grammar.
     def rule_names
-      instance_methods
+      @rule_names ||= []
     end
 
     # Returns +true+ if this grammar contains a rule with the given +name+.
@@ -92,6 +92,10 @@ module Citrus
       # Keep track of the name of the rule currently being defined so we can
       # use it if #sup is called without an explicit name.
       @current_name = sym
+
+      # Need to explicitly keep track of all rule names for Ruby 1.8's sake.
+      # 1.9 can just use #instance_methods.
+      rule_names << sym
 
       if block
         rule = Rule.create(block.call)
@@ -305,8 +309,7 @@ module Citrus
     end
 
     def match(input, offset=0)
-      result = rule == input[offset, rule.length]
-      create_match(rule.dup) if result
+      create_match(rule.dup) if rule == input[offset, rule.length]
     end
   end
 
