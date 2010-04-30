@@ -12,7 +12,7 @@ class GrammarTest < Test::Unit::TestCase
   end
 
   def test_rule_names
-    assert_equal([:num, :alpha, :alphanum], TestGrammar.rule_names)
+    assert_equal([:alpha, :num, :alphanum], TestGrammar.rule_names)
   end
 
   def test_rule_names_inherit
@@ -23,7 +23,7 @@ class GrammarTest < Test::Unit::TestCase
       rule(:three)  { '' }
     }
 
-    assert_equal([:num, :alpha, :alphanum, :one, :two, :three], grammar.rule_names)
+    assert_equal([:alpha, :num, :alphanum, :one, :two, :three], grammar.rule_names)
   end
 
   def test_has_name?
@@ -41,7 +41,7 @@ class GrammarTest < Test::Unit::TestCase
     }
     match = grammar.parse('abc')
     assert(match)
-    assert_equal('abc', match.value)
+    assert_equal('abc', match.text)
     assert_equal(3, match.length)
   end
 
@@ -51,7 +51,7 @@ class GrammarTest < Test::Unit::TestCase
     }
     match = grammar.parse('abc')
     assert(match)
-    assert_equal('abc', match.value)
+    assert_equal('abc', match.text)
     assert_equal(3, match.length)
   end
 
@@ -61,7 +61,7 @@ class GrammarTest < Test::Unit::TestCase
     }
     match = grammar.parse('123')
     assert(match)
-    assert_equal('123', match.value)
+    assert_equal('123', match.text)
     assert_equal(3, match.length)
   end
 
@@ -88,12 +88,12 @@ class GrammarTest < Test::Unit::TestCase
 
     match = grammar.parse('a')
     assert(match)
-    assert_equal('a', match.value)
+    assert_equal('a', match.text)
     assert_equal(1, match.length)
 
     match = grammar.parse('1')
     assert(match)
-    assert_equal('1', match.value)
+    assert_equal('1', match.text)
     assert_equal(1, match.length)
   end
 
@@ -112,18 +112,18 @@ class GrammarTest < Test::Unit::TestCase
 
     match = grammar.parse('a')
     assert(match)
-    assert_equal('a', match.value)
+    assert_equal('a', match.text)
     assert_equal(1, match.length)
 
     match = grammar.parse('((a))')
     assert(match)
-    assert('((a))', match.value)
+    assert('((a))', match.text)
     assert(5, match.length)
 
     str = ('(' * 200) + 'a' + (')' * 200)
     match = grammar.parse(str)
     assert(match)
-    assert(str, match.value)
+    assert(str, match.text)
     assert(str.length, match.length)
   end
 
@@ -135,17 +135,17 @@ class GrammarTest < Test::Unit::TestCase
 
     match = grammar.parse('1')
     assert(match)
-    assert_equal('1', match.value)
+    assert_equal('1', match.text)
     assert_equal(1, match.length)
 
     match = grammar.parse('1+2')
     assert(match)
-    assert_equal('1+2', match.value)
+    assert_equal('1+2', match.text)
     assert_equal(3, match.length)
 
     match = grammar.parse('1+2+3')
     assert(match)
-    assert_equal('1+2+3', match.value)
+    assert_equal('1+2+3', match.text)
     assert_equal(5, match.length)
   end
 
@@ -159,22 +159,22 @@ class GrammarTest < Test::Unit::TestCase
 
     match = grammar.parse('1')
     assert(match)
-    assert_equal('1', match.value)
+    assert_equal('1', match.text)
     assert_equal(1, match.length)
 
     match = grammar.parse('1+2')
     assert(match)
-    assert_equal('1+2', match.value)
+    assert_equal('1+2', match.text)
     assert_equal(3, match.length)
 
     match = grammar.parse('1+2*3')
     assert(match)
-    assert_equal('1+2*3', match.value)
+    assert_equal('1+2*3', match.text)
     assert_equal(5, match.length)
 
     match = grammar.parse('1+2*(3/4)')
     assert(match)
-    assert_equal('1+2*(3/4)', match.value)
+    assert_equal('1+2*(3/4)', match.text)
     assert_equal(9, match.length)
   end
 
@@ -190,12 +190,12 @@ class GrammarTest < Test::Unit::TestCase
 
     match = grammar2.parse('b')
     assert(match)
-    assert('b', match.value)
+    assert('b', match.text)
     assert(1, match.length)
 
     match = grammar2.parse('a')
     assert(match)
-    assert('a', match.value)
+    assert('a', match.text)
     assert(1, match.length)
   end
 

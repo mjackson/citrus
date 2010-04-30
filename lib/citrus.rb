@@ -47,7 +47,7 @@ module Citrus
     def include(*args)
       super
       args.each do |mod|
-        if Module === mod && mod.include?(Grammar)
+        if mod.include?(Grammar)
           mod.rule_names.each do |name|
             rule_names << name unless has_rule?(name)
           end
@@ -109,7 +109,7 @@ module Citrus
 
       # Keep track of rule names that have been added to this grammar in the
       # order they are added.
-      rule_names << sym
+      rule_names << sym unless has_rule?(sym)
 
       if block
         rule = Rule.create(block.call)
@@ -137,6 +137,23 @@ module Citrus
       end
       raise ArgumentError, "Cannot use super. No rule named \"#{name}\" " +
        "found in inheritance hierarchy"
+    end
+
+    def mod(obj, ext=nil)
+      rule = Rule.create(obj)
+      if Class === ext
+        rule.match_class = ext
+      else
+        ext = Proc.new if block_given?
+        rule.match_ext = ext
+      end
+      rule
+    end
+
+    def label(name, obj)
+      rule = Rule.create(obj)
+      rule.match_name = name
+      rule
     end
 
     def and(obj)
@@ -204,37 +221,57 @@ module Citrus
   end
 
   class Match
-    attr_reader :result, :captures
+    attr_reader :matches, :captures
 
-    def initialize(result, ext=nil)
+    def initialize(result, rule=nil)
+      @matches = []
+      @captures = []
+
       case result
-      when String, Array
-        @result = result
-        @captures = []
+      when String
+        @text = result
       when MatchData
-        @result = result[0]
+        @text = result[0]
         @captures = result.captures
+      when Array
+        @matches = result
       else
         raise ArgumentError, "Invalid match result: #{result.inspect}"
       end
 
-      extend(ext) if Module === ext
+      if rule
+        extend(rule.match_ext) if rule.match_ext
+        @rule = rule
+      end
     end
 
-    def value
-      @value ||= Array === @result ?
-        @result.inject('') {|m, v| m << v.value } : @result
+    def name
+      @rule.match_name if @rule
     end
+
+    def terminal?
+      !!@rule && @rule.terminal?
+    end
+
+    def text
+      @text ||= @matches.inject('') {|s, m| s << m.text }
+    end
+
+    alias to_s text
 
     def length
-      @length ||= Array === @result ?
-        @result.inject(0) {|m, v| m + v.length } : value.length
+      text.length
     end
 
-    alias :to_s :value
+    def method_missing(sym, *args)
+      @matches.each {|m| return m if sym == m.name }
+      raise NameError, "No match named \"#{sym}\" in #{self}"
+    end
   end
 
-  # A Rule is an object that is used during parsing to match on the Input.
+  # A Rule is an object that is used during parsing to match on the Input. This
+  # class serves as an abstract base for all other rule classes and should
+  # never be directly instantiated.
   class Rule
     # Automatically creates a rule depending on the type of object given.
     def self.create(obj)
@@ -251,11 +288,41 @@ module Citrus
       end
     end
 
-    attr_reader :name, :grammar
-    attr_writer :grammar
+    attr_accessor :grammar
+    attr_reader :name, :match_ext
+
+    # Returns a String id that is unique to this Rule object.
+    def id
+      object_id.to_s
+    end
 
     def name=(name)
       @name = name.to_sym
+    end
+
+    def match_name=(name)
+      @match_name = name.to_sym
+    end
+
+    def match_name
+      @match_name || name
+    end
+
+    def match_class=(cls)
+      raise ArgumentError, "Match class must subclass " +
+        "Citrus::Match" unless cls < Match
+      @match_class = cls
+    end
+
+    def match_class
+      @match_class || Match
+    end
+
+    def match_ext=(mod)
+      mod = Module.new(&mod) if Proc === mod
+      raise ArgumentError, "Match extension must be a " +
+        "Module" unless Module === mod
+      @match_ext = mod
     end
 
     # Returns +true+ if this rule is a Terminal.
@@ -263,26 +330,16 @@ module Citrus
       is_a?(Terminal)
     end
 
-    # Returns +true+ if this rule has a name.
-    def named?
-      !! @name
-    end
-
     # Returns +true+ if this rule needs to be surrounded by parentheses when
-    # being augmented.
+    # using #embed.
     def paren?
       false
-    end
-
-    # Returns a String id that is unique to this Rule.
-    def id
-      terminal? ? to_s : object_id.to_s
     end
 
     # Returns a string version of this rule that is suitable to be used as part
     # of some other rule.
     def embed
-      named? ? name.to_s : (paren? ? '(%s)' % to_s : to_s)
+      name ? name.to_s : (paren? ? '(%s)' % to_s : to_s)
     end
 
     def inspect
@@ -291,8 +348,8 @@ module Citrus
 
   private
 
-    def create_match(match)
-      Match.new(match)
+    def create_match(result)
+      match_class.new(result, self)
     end
   end
 

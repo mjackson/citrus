@@ -12,12 +12,12 @@ class RepeatTest < Test::Unit::TestCase
 
     match = rule.match(input(''))
     assert(match)
-    assert_equal('', match.value)
+    assert_equal('', match.text)
     assert_equal(0, match.length)
 
     match = rule.match(input('a'))
     assert(match)
-    assert_equal('a', match.value)
+    assert_equal('a', match.text)
     assert_equal(1, match.length)
   end
 
@@ -29,12 +29,12 @@ class RepeatTest < Test::Unit::TestCase
 
     match = rule.match(input('a'))
     assert(match)
-    assert_equal('a', match.value)
+    assert_equal('a', match.text)
     assert_equal(1, match.length)
 
     match = rule.match(input('a' * 200))
     assert(match)
-    assert_equal('a' * 200, match.value)
+    assert_equal('a' * 200, match.text)
     assert_equal(200, match.length)
   end
 
@@ -46,7 +46,7 @@ class RepeatTest < Test::Unit::TestCase
 
     match = rule.match(input('a'))
     assert(match)
-    assert_equal('a', match.value)
+    assert_equal('a', match.text)
     assert_equal(1, match.length)
   end
 

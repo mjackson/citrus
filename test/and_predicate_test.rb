@@ -15,7 +15,7 @@ class AndPredicateTest < Test::Unit::TestCase
 
     match = rule.match(input('a'))
     assert(match)
-    assert_equal('', match.value)
+    assert_equal('', match.text)
     assert_equal(0, match.length)
   end
 

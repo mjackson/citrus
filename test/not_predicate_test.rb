@@ -15,7 +15,7 @@ class NotPredicateTest < Test::Unit::TestCase
 
     match = rule.match(input('b'))
     assert(match)
-    assert_equal('', match.value)
+    assert_equal('', match.text)
     assert_equal(0, match.length)
   end
 

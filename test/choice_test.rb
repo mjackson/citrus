@@ -15,7 +15,7 @@ class ChoiceTest < Test::Unit::TestCase
 
     match = rule.match(input('a'))
     assert(match)
-    assert_equal('a', match.value)
+    assert_equal('a', match.text)
     assert_equal(1, match.length)
   end
 
@@ -24,12 +24,12 @@ class ChoiceTest < Test::Unit::TestCase
 
     match = rule.match(input('ab'))
     assert(match)
-    assert_equal('a', match.value)
+    assert_equal('a', match.text)
     assert_equal(1, match.length)
 
     match = rule.match(input('ba'))
     assert(match)
-    assert_equal('b', match.value)
+    assert_equal('b', match.text)
     assert_equal(1, match.length)
   end
 
@@ -38,12 +38,12 @@ class ChoiceTest < Test::Unit::TestCase
 
     match = rule.match(input('1+'))
     assert(match)
-    assert_equal('1', match.value)
+    assert_equal('1', match.text)
     assert_equal(1, match.length)
 
     match = rule.match(input('+1'))
     assert(match)
-    assert_equal('+', match.value)
+    assert_equal('+', match.text)
     assert_equal(1, match.length)
   end
 
