@@ -20,21 +20,21 @@ require 'citrus'
   }
 end
 
-# Permits rule names embedded within other rules to be written plainly, without
-# a colon in front. For example:
-#
-#     all(:alpha, :num)
-#
-# can now be written as
-#
-#     all(alpha, num)
-#
-# This hack works by adding a +method_missing+ catch-all to the grammar DSL so
-# that when methods are called that do not already exist the method name is
-# returned as a symbol. The only caveat is that this will not work with names
-# of methods that are already defined in Citrus::GrammarMethods (i.e. "root",
-# "rule", "parse", etc.).
 module Citrus::GrammarMethods
+  # Permits rule names embedded within other rules to be written plainly,
+  # without a colon in front. For example:
+  #
+  #     all(:alpha, :num)
+  #
+  # can now be written as
+  #
+  #     all(alpha, num)
+  #
+  # This hack works by adding a +method_missing+ catch-all to the grammar DSL so
+  # that when methods are called that do not already exist the method name is
+  # returned as a symbol. The only caveat is that this will not work with names
+  # of methods that are already defined in Citrus::GrammarMethods (i.e. "root",
+  # "rule", "parse", etc.).
   def method_missing(sym, *args)
     sym
   end
