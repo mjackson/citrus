@@ -21,6 +21,17 @@ class GrammarTest < Test::Unit::TestCase
     assert_equal([:num, :alpha, :alphanum], TestGrammar.rule_names)
   end
 
+  def test_rule_names_inherit
+    grammar = Grammar.new {
+      include GrammarTest::TestGrammar
+      rule(:one)    { '' }
+      rule(:two)    { '' }
+      rule(:three)  { '' }
+    }
+
+    assert_equal([:num, :alpha, :alphanum, :one, :two, :three], grammar.rule_names)
+  end
+
   def test_has_name?
     assert(TestGrammar.has_rule?('alpha'))
     assert(TestGrammar.has_rule?(:alpha))

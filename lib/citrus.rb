@@ -22,10 +22,7 @@ module Citrus
     end
 
     def self.included(base)
-      class << base
-        include GrammarMethods
-        include GrammarDSL
-      end
+      base.extend(GrammarMethods)
     end
   end
 
@@ -41,6 +38,21 @@ module Citrus
   end
 
   module GrammarMethods
+    include Invoke
+
+    # Need to manage the +rule_names+ manually when including another Grammar.
+    # Otherwise, functions just like Module#include.
+    def include(*args)
+      super
+      args.each do |mod|
+        if Module === mod && mod.include?(Grammar)
+          mod.rule_names.each do |name|
+            rule_names << name unless has_rule?(name)
+          end
+        end
+      end
+    end
+
     # Returns the name of this grammar as a String.
     def name
       super.to_s
@@ -74,10 +86,8 @@ module Citrus
       m = input.match(rule(root), offset)
       m unless consume_all && m && m.length != string.length
     end
-  end
 
-  module GrammarDSL
-    include Invoke
+    ### DSL Methods
 
     # Gets/sets the Rule object with the given +name+. If a block is given,
     # will use the return value of the block as the primitive value to pass to
@@ -93,8 +103,6 @@ module Citrus
       # use it if #sup is called without an explicit name.
       @current_name = sym
 
-      # Need to explicitly keep track of all rule names for Ruby 1.8's sake.
-      # 1.9 can just use #instance_methods.
       rule_names << sym
 
       if block
@@ -230,8 +238,9 @@ module Citrus
       false
     end
 
+    # Returns a String id that is unique to this Rule.
     def id
-      named? ? name.to_s : (terminal? ? to_s : object_id.to_s)
+      terminal? ? to_s : object_id.to_s
     end
 
     # Returns a string version of this rule that is suitable to be used as part
@@ -270,6 +279,10 @@ module Citrus
         @rule = rule
       end
       @rule
+    end
+
+    def id
+      rule.id
     end
 
     def method_missing(sym, *args)
