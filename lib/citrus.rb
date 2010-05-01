@@ -221,9 +221,10 @@ module Citrus
   end
 
   class Match
+    attr_accessor :name, :terminal
     attr_reader :matches, :captures
 
-    def initialize(result, rule=nil)
+    def initialize(result)
       @matches = []
       @captures = []
 
@@ -238,19 +239,6 @@ module Citrus
       else
         raise ArgumentError, "Invalid match result: #{result.inspect}"
       end
-
-      if rule
-        extend(rule.match_ext) if rule.match_ext
-        @rule = rule
-      end
-    end
-
-    def name
-      @rule.match_name if @rule
-    end
-
-    def terminal?
-      !!@rule && @rule.terminal?
     end
 
     def text
@@ -262,6 +250,17 @@ module Citrus
     def length
       text.length
     end
+
+    def terminal?
+      !! @terminal
+    end
+
+    # Checks equality by comparing this match's text value to +obj+.
+    def ==(obj)
+      text == obj
+    end
+
+    alias eql? ==
 
     def method_missing(sym, *args)
       @matches.each {|m| return m if sym == m.name }
@@ -348,8 +347,16 @@ module Citrus
 
   private
 
+    def extend_match!(match)
+      match.name = match_name
+      match.extend(match_ext) if match_ext
+      match
+    end
+
     def create_match(result)
-      match_class.new(result, self)
+      match = match_class.new(result)
+      match.terminal = terminal?
+      extend_match!(match)
     end
   end
 
@@ -571,7 +578,7 @@ module Citrus
     def match(input, offset=0)
       rules.each do |rule|
         m = input.match(rule, offset)
-        return m if m
+        return extend_match!(m) if m
       end
       nil
     end

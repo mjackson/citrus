@@ -16,12 +16,12 @@ class Test::Unit::TestCase
   end
 
   class EqualRule < Rule
-    def initialize(string)
-      @string = string
+    def initialize(value)
+      @value = value
     end
 
     def match(input, offset=0)
-      create_match(@string) if @string == input.string
+      create_match(@value.to_s.dup) if @value.to_s == input.string
     end
   end
 

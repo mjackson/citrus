@@ -127,57 +127,6 @@ class GrammarTest < Test::Unit::TestCase
     assert(str.length, match.length)
   end
 
-  def test_parse_sum
-    grammar = Grammar.new {
-      rule(:sum) { any([:dec, '+', :sum], :dec) }
-      rule(:dec) { /[0-9]+/ }
-    }
-
-    match = grammar.parse('1')
-    assert(match)
-    assert_equal('1', match.text)
-    assert_equal(1, match.length)
-
-    match = grammar.parse('1+2')
-    assert(match)
-    assert_equal('1+2', match.text)
-    assert_equal(3, match.length)
-
-    match = grammar.parse('1+2+3')
-    assert(match)
-    assert_equal('1+2+3', match.text)
-    assert_equal(5, match.length)
-  end
-
-  def test_parse_calc
-    grammar = Grammar.new {
-      rule(:add) { any([ :mul, any('+', '-'), :add ], :mul) }
-      rule(:mul) { any([ :pri, any('*', '/'), :mul ], :pri) }
-      rule(:pri) { any([ '(', :add, ')' ], :num) }
-      rule(:num) { /[0-9]+/ }
-    }
-
-    match = grammar.parse('1')
-    assert(match)
-    assert_equal('1', match.text)
-    assert_equal(1, match.length)
-
-    match = grammar.parse('1+2')
-    assert(match)
-    assert_equal('1+2', match.text)
-    assert_equal(3, match.length)
-
-    match = grammar.parse('1+2*3')
-    assert(match)
-    assert_equal('1+2*3', match.text)
-    assert_equal(5, match.length)
-
-    match = grammar.parse('1+2*(3/4)')
-    assert(match)
-    assert_equal('1+2*(3/4)', match.text)
-    assert_equal(9, match.length)
-  end
-
   def test_sup
     grammar1 = Grammar.new {
       rule(:value) { 'a' }
