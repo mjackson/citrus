@@ -1,4 +1,5 @@
 require 'forwardable'
+require 'builder'
 
 module Citrus
 
@@ -265,6 +266,38 @@ module Citrus
     def method_missing(sym, *args)
       @matches.each {|m| return m if sym == m.name }
       raise NameError, "No match named \"#{sym}\" in #{self}"
+    end
+
+    # Creates a Builder::XmlMarkup object from this match. Useful when
+    # inspecting a nested match.
+    def to_markup(xml=nil)
+      if xml.nil?
+        xml = Builder::XmlMarkup.new(:indent => 2)
+        xml.instruct!
+      end
+
+      attrs = { "name" => name, "text" => text, "terminal" => terminal }
+
+      if matches.empty?
+        xml.match(attrs)
+      else
+        xml.match(attrs) {
+          matches.each do |match|
+            match.to_markup(xml)
+          end
+        }
+      end
+
+      xml
+    end
+
+    # Returns the result of #to_markup as a string.
+    def to_xml
+      to_markup.target!
+    end
+
+    def inspect
+      to_xml
     end
   end
 
