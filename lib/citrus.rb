@@ -2,7 +2,6 @@ require 'forwardable'
 require 'builder'
 
 module Citrus
-
   VERSION = [0, 1, 0]
 
   def self.version
@@ -113,7 +112,11 @@ module Citrus
       rule_names << sym unless has_rule?(sym)
 
       if block
-        rule = Rule.create(block.call)
+        begin
+          rule = Rule.create(block.call)
+        rescue ArgumentError => e
+          raise "Cannot create rule #{name}: " + e.message
+        end
         rule.name = name
         rule.grammar = self
         define_method(sym) { rule }
@@ -158,11 +161,11 @@ module Citrus
     end
 
     def and(obj)
-      AndPredicate.new(obj)
+      And.new(obj)
     end
 
     def not(obj)
-      NotPredicate.new(obj)
+      Not.new(obj)
     end
 
     def rep(obj, min=1, max=Infinity)
@@ -242,29 +245,43 @@ module Citrus
       end
     end
 
+    # Returns the raw text value of this match, which may simply be an
+    # aggregate of the text of all sub-matches if this match is not #terminal?.
     def text
       @text ||= @matches.inject('') {|s, m| s << m.text }
     end
 
     alias to_s text
 
+    # Returns the length of this match's #text value as an Integer.
     def length
       text.length
     end
 
+    # Returns the first sub-match of this match with the given +name+.
+    def match(name)
+      sym = name.to_sym
+      @matches.select {|m| sym == m.name }.first
+    end
+
+    # Returns +true+ if this match was created from a Terminal, +false+
+    # otherwise.
     def terminal?
       !! @terminal
     end
 
-    # Checks equality by comparing this match's text value to +obj+.
+    # Checks equality by comparing this match's #text value to +obj+.
     def ==(obj)
       text == obj
     end
 
     alias eql? ==
 
+    # Uses #match to allow sub-matches of this match to be called by name as
+    # instance methods.
     def method_missing(sym, *args)
-      @matches.each {|m| return m if sym == m.name }
+      m = match(sym)
+      return m if m
       raise NameError, "No match named \"#{sym}\" in #{self}"
     end
 
@@ -281,11 +298,9 @@ module Citrus
       if matches.empty?
         xml.match(attrs)
       else
-        xml.match(attrs) {
-          matches.each do |match|
-            match.to_markup(xml)
-          end
-        }
+        xml.match(attrs) do
+          matches.each {|m| m.to_markup(xml) }
+        end
       end
 
       xml
@@ -316,7 +331,7 @@ module Citrus
       when Range    then Choice.new(obj.to_a)
       when Numeric  then FixedWidth.new(obj.to_s)
       else
-        raise ArgumentError, "Unable to create rule for #{obj.inspect}"
+        raise ArgumentError, "Invalid rule object: #{obj.inspect}"
       end
     end
 
@@ -509,13 +524,13 @@ module Citrus
     end
   end
 
-  # An AndPredicate is a Predicate that contains a rule that must match.
-  # However, no input is consumed. The PEG notation is any expression
-  # preceeded by an ampersand, e.g.:
+  # An And is a Predicate that contains a rule that must match. Upon success an
+  # empty match is returned and no input is consumed. The PEG notation is any
+  # expression preceeded by an ampersand, e.g.:
   #
   #     &expr
   #
-  class AndPredicate < Predicate
+  class And < Predicate
     def match(input, offset=0)
       create_match('') if input.match(rule, offset)
     end
@@ -525,13 +540,13 @@ module Citrus
     end
   end
 
-  # A NotPredicate is a Predicate that contains a rule that must not match.
-  # No input is consumed. The PEG notation is any expression preceeded by an
-  # exclamation point, e.g.:
+  # A Not is a Predicate that contains a rule that must not match. Upon success
+  # an empty match is returned and no input is consumed. The PEG notation is any
+  # expression preceeded by an exclamation point, e.g.:
   #
   #     !expr
   #
-  class NotPredicate < Predicate
+  class Not < Predicate
     def match(input, offset=0)
       create_match('') unless input.match(rule, offset)
     end
@@ -642,5 +657,4 @@ module Citrus
       rules.map {|r| r.embed }.join(' ')
     end
   end
-
 end
