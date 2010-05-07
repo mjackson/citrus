@@ -1,5 +1,5 @@
 require 'forwardable'
-require 'builder'
+require 'rexml/text'
 
 # Citrus is a compact and powerful parsing library for Ruby that combines the
 # elegance and expressiveness of the language with the simplicity and power of
@@ -819,35 +819,101 @@ module Citrus
       raise "No match named \"#{sym}\" in #{self}"
     end
 
-    # Creates a Builder::XmlMarkup object from this match. Useful when
-    # inspecting a nested match. The +xml+ argument may be a Hash of
-    # Builder::XmlMarkup options.
-    def to_markup(xml={})
-      if xml.is_a?(Hash)
-        opt = { :indent => 2 }.merge(xml)
-        xml = Builder::XmlMarkup.new(opt)
-        xml.instruct!
-      end
-
-      if matches.empty?
-        xml.match("name" => name, "text" => text)
-      else
-        xml.match("name" => name, "text" => text) do
-          matches.each {|m| m.to_markup(xml) }
-        end
-      end
-
-      xml
-    end
-
     # Returns the result of #to_markup as a String (unless an alternate target
     # was specified).
-    def to_xml(opt={})
-      to_markup(opt).target!
+    def to_xml(indent='  ', level=0)
+      margin = indent * level
+      eol = indent == '' ? '' : "\n"
+      xml = level == 0 ? "<?xml version=\"1.0\"?>\n" : ''
+
+      attrs = %w< name text >.map {|attr|
+        "#{attr}=\"%s\"" % XChar.escape(__send__(attr.to_sym).to_s)
+      }.join(' ')
+
+      xml << margin + "<match #{attrs}"
+
+      if matches.empty?
+        xml << "/>"
+      else
+        xml << ">" + eol
+        matches.each {|m| xml << m.to_xml(indent, level + 1) + eol }
+        xml << margin + "</match>"
+      end
     end
 
     def inspect # :nodoc:
       to_xml
+    end
+  end
+
+  # XML Character converter, from Sam Ruby.
+  # http://intertwingly.net/stories/2005/09/28/xchar.rb
+  module XChar # :nodoc:
+    # http://intertwingly.net/stories/2004/04/14/i18n.html#CleaningWindows
+    CP1252 = { # :nodoc:
+      128 => 8364,  # euro sign
+      130 => 8218,  # single low-9 quotation mark
+      131 =>  402,  # latin small letter f with hook
+      132 => 8222,  # double low-9 quotation mark
+      133 => 8230,  # horizontal ellipsis
+      134 => 8224,  # dagger
+      135 => 8225,  # double dagger
+      136 =>  710,  # modifier letter circumflex accent
+      137 => 8240,  # per mille sign
+      138 =>  352,  # latin capital letter s with caron
+      139 => 8249,  # single left-pointing angle quotation mark
+      140 =>  338,  # latin capital ligature oe
+      142 =>  381,  # latin capital letter z with caron
+      145 => 8216,  # left single quotation mark
+      146 => 8217,  # right single quotation mark
+      147 => 8220,  # left double quotation mark
+      148 => 8221,  # right double quotation mark
+      149 => 8226,  # bullet
+      150 => 8211,  # en dash
+      151 => 8212,  # em dash
+      152 =>  732,  # small tilde
+      153 => 8482,  # trade mark sign
+      154 =>  353,  # latin small letter s with caron
+      155 => 8250,  # single right-pointing angle quotation mark
+      156 =>  339,  # latin small ligature oe
+      158 =>  382,  # latin small letter z with caron
+      159 =>  376,  # latin capital letter y with diaeresis
+    }
+
+    # http://www.w3.org/TR/REC-xml/#dt-chardata
+    PREDEFINED = {
+      38 => '&amp;',  # ampersand
+      60 => '&lt;',   # left angle bracket
+      62 => '&gt;',   # right angle bracket
+    }
+
+    # http://www.w3.org/TR/REC-xml/#charsets
+    VALID = [
+      0x9, 0xA, 0xD,
+      (0x20..0xD7FF),
+      (0xE000..0xFFFD),
+      (0x10000..0x10FFFF)
+    ]
+
+    # XML escaped version of Fixnum#chr for +n+. When +esc+ is set to false the
+    # CP1252 fix is still applied but utf-8 characters are not converted to
+    # character entities.
+    def self.xchr(n, esc=true)
+      n = XChar::CP1252[n] || n
+      case n when *XChar::VALID
+        XChar::PREDEFINED[n] or (n < 128 ? n.chr : (esc ? "&##{n};" : [n].pack('U*')))
+      else
+        '*'
+      end
+    end
+
+    # XML escaped version of String#to_s for +s+. When +esc+ is set to false the
+    # CP1252 fix is still applied but utf-8 characters are not converted to
+    # character entities.
+    def self.escape(s, esc=true)
+      s.unpack('U*').map {|n| xchr(n, esc) }.join # ASCII, UTF-8
+    rescue
+      s.unpack('C*').map {|n| xchr(n) }.join # ISO-8859-1, WIN-1252
     end
   end
 end
