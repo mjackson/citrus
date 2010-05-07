@@ -1,0 +1,3 @@
+rule int
+  [0-9]+
+end

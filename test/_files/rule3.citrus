@@ -1,0 +1,7 @@
+rule int
+  [0-9]+ {
+    def value
+      text.to_i
+    end
+  }
+end
