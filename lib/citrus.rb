@@ -25,7 +25,7 @@ module Citrus
       super(message)
     end
 
-    def message
+    def message # :nodoc:
       c = consumed
       s = [0, c.length - 40].max
       msg  = "Failed to parse input at offset %d" % (max_offset + 1)
@@ -82,15 +82,9 @@ module Citrus
     #
     def self.new(&block)
       mod = Module.new { include Grammar }
-
       if block
-        if block.arity == 1
-          block[self]
-        else
-          mod.instance_eval(&block)
-        end
+        block.arity == 1 ? block[self] : mod.instance_eval(&block)
       end
-
       mod
     end
 
@@ -372,12 +366,12 @@ module Citrus
     end
 
     # Returns a string version of this rule that is suitable to be used as part
-    # of some other rule.
+    # of the string representation of some other rule.
     def embed
       name ? name.to_s : (paren? ? '(%s)' % to_s : to_s)
     end
 
-    def inspect
+    def inspect # :nodoc:
       to_s
     end
 
@@ -418,14 +412,22 @@ module Citrus
       @rule
     end
 
+    # Raises an error if the user tries to set a module for matches from this
+    # proxy. The reason for this is that proxy objects do not create matches
+    # like all other rules do. Instead, they simply pass the call to #match
+    # along to #rule and return the result. This is to make them as transparent
+    # as possible in the resulting match tree.
     def match_module=(*args)
       raise "Proxy objects may not modify a match"
     end
 
+    # Returns the Match for this rule on +input+ at the given +offset+, +nil+ if
+    # no match can be made.
     def match(input, offset=0)
       input.match(rule, offset)
     end
 
+    # Returns the PEG notation of this rule as a string.
     def to_s
       rule_name.to_s
     end
@@ -438,8 +440,10 @@ module Citrus
       @rule = rule
     end
 
+    # The actual String or Regexp object this rule uses to match.
     attr_reader :rule
 
+    # Returns the PEG notation of this rule as a string.
     def to_s
       rule.inspect
     end
@@ -458,6 +462,8 @@ module Citrus
       super
     end
 
+    # Returns the Match for this rule on +input+ at the given +offset+, +nil+ if
+    # no match can be made.
     def match(input, offset=0)
       create_match(rule.dup) if rule == input[offset, rule.length]
     end
@@ -482,6 +488,8 @@ module Citrus
       super
     end
 
+    # Returns the Match for this rule on +input+ at the given +offset+, +nil+ if
+    # no match can be made.
     def match(input, offset=0)
       result = input[offset, input.length - offset].match(rule)
       create_match(result) if result && result.begin(0) == 0
@@ -497,6 +505,7 @@ module Citrus
       @rules = rules.map {|r| Rule.create(r) }
     end
 
+    # An array of the actual Rule objects this rule uses to match.
     attr_reader :rules
 
     def grammar=(grammar)
@@ -511,6 +520,7 @@ module Citrus
       super([ rule ])
     end
 
+    # Returns the Rule object this rule uses to match.
     def rule
       rules[0]
     end
@@ -523,10 +533,13 @@ module Citrus
   #     &expr
   #
   class AndPredicate < Predicate
+    # Returns the Match for this rule on +input+ at the given +offset+, +nil+ if
+    # no match can be made.
     def match(input, offset=0)
       create_match('') if input.match(rule, offset)
     end
 
+    # Returns the PEG notation of this rule as a string.
     def to_s
       '&' + rule.embed
     end
@@ -539,18 +552,22 @@ module Citrus
   #     !expr
   #
   class NotPredicate < Predicate
+    # Returns the Match for this rule on +input+ at the given +offset+, +nil+ if
+    # no match can be made.
     def match(input, offset=0)
       create_match('') unless input.match(rule, offset)
     end
 
+    # Returns the PEG notation of this rule as a string.
     def to_s
       '!' + rule.embed
     end
   end
 
   # A Label is a Predicate that applies a new name to any matches made by its
-  # rule. The PEG notation is any sequence of alphanumeric characters (i.e.
-  # [a-zA-Z0-9_]) followed by a colon, followed by any other expression, e.g.:
+  # rule. The PEG notation is any sequence of word characters (i.e.
+  # <tt>[a-zA-Z0-9_]</tt>) followed by a colon, followed by any other
+  # expression, e.g.:
   #
   #     label:expr
   #
@@ -560,8 +577,12 @@ module Citrus
       super(rule)
     end
 
+    # The string this rule uses to re-name all its matches.
     attr_reader :label
 
+    # Returns the Match for this rule on +input+ at the given +offset+, +nil+ if
+    # no match can be made. When a Label makes a match, it re-names the match to
+    # the value of its label.
     def match(input, offset=0)
       m = rule.match(input, offset)
       if m
@@ -571,21 +592,22 @@ module Citrus
       end
     end
 
+    # Returns the PEG notation of this rule as a string.
     def to_s
       label + ':' + rule.embed
     end
   end
 
   # A Repeat is a Predicate that specifies a minimum and maximum number of times
-  # its rule must match. The PEG notation is an integer, +<n>+, followed by an
-  # asterisk, followed by another integer, +<m>+, all of which follow any other
+  # its rule must match. The PEG notation is an integer, +N+, followed by an
+  # asterisk, followed by another integer, +M+, all of which follow any other
   # expression, e.g.:
   #
-  #     expr<n>*<m>
+  #     expr N*M
   #
-  # In this notation +<n>+ specifies the minimum number of times the preceeding
-  # expression must match and +<m>+ specifies the maximum. If +<n>+ is ommitted,
-  # it is assumed to be 0. Likewise, if +<m>+ is omitted, it is assumed to be
+  # In this notation +N+ specifies the minimum number of times the preceeding
+  # expression must match and +M+ specifies the maximum. If +N+ is ommitted,
+  # it is assumed to be 0. Likewise, if +M+ is omitted, it is assumed to be
   # infinity (no maximum). Thus, an expression followed by only an asterisk may
   # match any number of times, including zero.
   #
@@ -602,6 +624,8 @@ module Citrus
       super(rule)
     end
 
+    # Returns the Match for this rule on +input+ at the given +offset+, +nil+ if
+    # no match can be made.
     def match(input, offset=0)
       matches = []
       while matches.length < @range.end
@@ -613,8 +637,8 @@ module Citrus
       create_match(matches) if @range.include?(matches.length)
     end
 
-    # Returns the operator this rule uses as a string. Will be one of "+", "?",
-    # or <n>*<m>.
+    # Returns the operator this rule uses as a string. Will be one of
+    # <tt>+</tt>, <tt>?</tt>, or <tt>N*M</tt>.
     def operator
       unless @operator
         m = [@range.begin, @range.end].map do |n|
@@ -629,6 +653,7 @@ module Citrus
       @operator
     end
 
+    # Returns the PEG notation of this rule as a string.
     def to_s
       rule.embed + operator
     end
@@ -648,6 +673,8 @@ module Citrus
   #     expr | expr
   #
   class Choice < List
+    # Returns the Match for this rule on +input+ at the given +offset+, +nil+ if
+    # no match can be made.
     def match(input, offset=0)
       rules.each do |rule|
         m = input.match(rule, offset)
@@ -656,6 +683,7 @@ module Citrus
       nil
     end
 
+    # Returns the PEG notation of this rule as a string.
     def to_s
       rules.map {|r| r.embed }.join(' | ')
     end
@@ -667,6 +695,8 @@ module Citrus
   #     expr expr
   #
   class Sequence < List
+    # Returns the Match for this rule on +input+ at the given +offset+, +nil+ if
+    # no match can be made.
     def match(input, offset=0)
       matches = []
       rules.each do |rule|
@@ -678,6 +708,7 @@ module Citrus
       create_match(matches) if matches.length == rules.length
     end
 
+    # Returns the PEG notation of this rule as a string.
     def to_s
       rules.map {|r| r.embed }.join(' ')
     end
@@ -801,7 +832,7 @@ module Citrus
       to_markup(opt).target!
     end
 
-    def inspect
+    def inspect # :nodoc:
       to_xml
     end
   end
