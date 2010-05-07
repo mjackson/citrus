@@ -1,9 +1,15 @@
 require 'citrus'
 
 # A grammar for mathematical formulas that apply the basic four operations to
-# non-negative numbers (integers and floats).
+# non-negative numbers (integers and floats), respecting operator precedence.
 module Calc
   include Citrus::Grammar
+
+  module FirstValue
+    def value
+      first.value
+    end
+  end
 
   root :add
 
@@ -16,7 +22,7 @@ module Calc
   end
 
   rule :float do
-    mod([ :int, '.', :int ]) {
+    all(:int, '.', :int) {
       def value
         text.to_f
       end
@@ -24,7 +30,7 @@ module Calc
   end
 
   rule :num do
-    any(:float, :int)
+    mod(any(:float, :int), FirstValue)
   end
 
   rule :add_op do
@@ -36,26 +42,26 @@ module Calc
   end
 
   rule :add do
-    any(mod([ :mul, :add_op, :add ]) {
+    mod(any(all(:mul, :add_op, :add) {
       def value
         add_op == '+' ? (mul.value + add.value) : (mul.value - add.value)
       end
-    }, :mul)
+    }, :mul), FirstValue)
   end
 
   rule :mul do
-    any(mod([ :pri, :mul_op, :mul ]) {
+    mod(any(all(:pri, :mul_op, :mul) {
       def value
         mul_op == '*' ? (pri.value * mul.value) : (pri.value / mul.value)
       end
-    }, :pri)
+    }, :pri), FirstValue)
   end
 
   rule :pri do
-    any(mod([ '(', :add, ')' ]) {
+    mod(any(all('(', :add, ')') {
       def value
         add.value
       end
-    }, :num)
+    }, :num), FirstValue)
   end
 end
