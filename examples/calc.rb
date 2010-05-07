@@ -1,7 +1,8 @@
 require 'citrus'
 
 # A grammar for mathematical formulas that apply the basic four operations to
-# non-negative numbers (integers and floats), respecting operator precedence.
+# non-negative numbers (integers and floats), respecting operator precedence and
+# ignoring whitespace.
 module Calc
   include Citrus::Grammar
 
@@ -11,57 +12,98 @@ module Calc
     end
   end
 
-  root :add
+  # If "additive" were not already the first rule declared in this grammar, we
+  # could use the following line to make it the root rule.
+  #root :additive
 
-  rule :int do
-    mod(/[0-9]+/) {
+  rule :additive do
+    mod(any(:multitive_additive, :multitive), FirstValue)
+  end
+
+  rule :multitive_additive do
+    all(:multitive, :additive_op, :additive) {
       def value
-        text.to_i
+        if additive_op == '+'
+          multitive.value + additive.value
+        else
+          multitive.value - additive.value
+        end
       end
     }
+  end
+
+  rule :multitive do
+    mod(any(:primary_multitive, :primary), FirstValue)
+  end
+
+  rule :primary_multitive do
+    all(:primary, :multitive_op, :multitive) {
+      def value
+        if multitive_op == '*'
+          primary.value * multitive.value
+        else
+          primary.value / multitive.value
+        end
+      end
+    }
+  end
+
+  rule :primary do
+    mod(any(:additive_paren, :number), FirstValue)
+  end
+
+  rule :additive_paren do
+    all(:lparen, :additive, :rparen) {
+      def value
+        additive.value
+      end
+    }
+  end
+
+  rule :additive_op do
+    any(:plus, :minus) {
+      def ==(other)
+        text.strip == other
+      end
+    }
+  end
+
+  rule :multitive_op do
+    any(:star, :slash) {
+      def ==(other)
+        text.strip == other
+      end
+    }
+  end
+
+  rule :number do
+    mod(any(:float, :integer), FirstValue)
   end
 
   rule :float do
-    all(:int, '.', :int) {
+    all(/[0-9]+/, '.', /[0-9]+/, :space) {
       def value
-        text.to_f
+        text.strip.to_f
       end
     }
   end
 
-  rule :num do
-    mod(any(:float, :int), FirstValue)
-  end
-
-  rule :add_op do
-    any('+', '-')
-  end
-
-  rule :mul_op do
-    any('*', '/')
-  end
-
-  rule :add do
-    mod(any(all(:mul, :add_op, :add) {
+  rule :integer do
+    all(/[0-9]+/, :space) {
       def value
-        add_op == '+' ? (mul.value + add.value) : (mul.value - add.value)
+        text.strip.to_i
       end
-    }, :mul), FirstValue)
+    }
   end
 
-  rule :mul do
-    mod(any(all(:pri, :mul_op, :mul) {
-      def value
-        mul_op == '*' ? (pri.value * mul.value) : (pri.value / mul.value)
-      end
-    }, :pri), FirstValue)
-  end
+  rule(:lparen) { ['(', :space] }
+  rule(:rparen) { [')', :space] }
+  rule(:plus)   { ['+', :space] }
+  rule(:minus)  { ['-', :space] }
+  rule(:star)   { ['*', :space] }
+  rule(:slash)  { ['/', :space] }
 
-  rule :pri do
-    mod(any(all('(', :add, ')') {
-      def value
-        add.value
-      end
-    }, :num), FirstValue)
+  rule :space do
+    /[ \t\n\r]*/
   end
 end

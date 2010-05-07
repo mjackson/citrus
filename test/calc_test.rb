@@ -92,4 +92,10 @@ class CalcTest < Test::Unit::TestCase
     assert_equal(33.25, match.value)
   end
 
+  def test_complex_spaced
+    match = Calc.parse!('7 * 4 + 3.5 * (4.5 / 3)')
+    assert(match)
+    assert_equal(33.25, match.value)
+  end
+
 end
