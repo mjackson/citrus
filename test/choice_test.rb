@@ -49,14 +49,14 @@ class ChoiceTest < Test::Unit::TestCase
 
   def test_to_s
     rule = Choice.new(%w<a b>)
-    assert_equal('"a" / "b"', rule.to_s)
+    assert_equal('"a" | "b"', rule.to_s)
   end
 
   def test_to_s_embed
     rule1 = Choice.new(%w<a b>)
     rule2 = Choice.new(%w<c d>)
     rule = Choice.new([rule1, rule2])
-    assert_equal('("a" / "b") / ("c" / "d")', rule.to_s)
+    assert_equal('("a" | "b") | ("c" | "d")', rule.to_s)
   end
 
 end

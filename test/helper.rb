@@ -10,9 +10,21 @@ class Test::Unit::TestCase
   module TestGrammar
     include Citrus::Grammar
 
-    rule(:alpha)    { /[a-z]+/i }
-    rule(:num)      { /[0-9]+/ }
-    rule(:alphanum) { any(:alpha, :num) }
+    rule :alpha do
+      /[a-zA-Z]/
+    end
+
+    rule :num do
+      mod(/[0-9]/) {
+        def value
+          text.to_i
+        end
+      }
+    end
+
+    rule :alphanum do
+      any(:alpha, :num)
+    end
   end
 
   class EqualRule < Rule

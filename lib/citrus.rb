@@ -1,49 +1,112 @@
 require 'forwardable'
 require 'builder'
 
+# Citrus is a compact and powerful parsing library for Ruby that combines the
+# elegance and expressiveness of the language with the simplicity and power of
+# parsing expression grammars.
+#
+# http://mjijackson.com/citrus
 module Citrus
   VERSION = [0, 1, 0]
 
+  # Returns the current version of Citrus as a string.
   def self.version
     VERSION.join('.')
   end
 
   Infinity = 1.0 / 0
 
-  # Allows module-level methods to call instance methods on a blank instance.
+  # This error is raised whenever a parse fails.
+  class ParseError < Exception
+    extend Forwardable
+
+    def initialize(input)
+      @input = input
+      super(message)
+    end
+
+    def message
+      c = consumed
+      s = [0, c.length - 40].max
+      msg  = "Failed to parse input at offset %d" % (max_offset + 1)
+      msg += ", just\n    after %s" % c[s, c.length].inspect + "\n"
+      msg
+    end
+
+    # The Input object that was used for the parse.
+    attr_reader :input
+
+    def_delegators :@input, :string, :length, :max_offset
+
+    # Returns the portion of the input string that was successfully consumed
+    # before the parse failed.
+    def consumed
+      input[0, max_offset]
+    end
+  end
+
+  # May be extended by another Module in order to give it the ability to call
+  # its own instance-level methods without using Module#module_function.
   module Invoke
+    # Returns a blank instance of a Class that includes this module.
     def instance
       mod = self
       @instance ||= (Class.new { include mod }).new
     end
 
+    # Invokes the instance-level method with the given name on a blank
+    # #instance.
     def invoke(sym, *args)
       instance.__send__(sym, *args)
     end
   end
 
+  # This module should be included in all grammars. Although it does not provide
+  # any methods, constants, or variables to modules that include it, the mere
+  # act of inclusion provides a useful lookup mechanism to determine if a module
+  # is in fact a grammar.
+  #
+  # The instance-level of included modules is left untouched so that it provides
+  # a clean slate for grammars to define their rules in.
   module Grammar
     # Creates a new Grammar as an anonymous module. If a block is provided, it
     # will be called with the new Grammar as its first argument if its +arity+
     # is 1 or +instance_eval+'d in the context of the new Grammar otherwise.
+    # See http://blog.grayproductions.net/articles/dsl_block_styles for the
+    # rationale behind this decision.
     #
-    # See http://blog.grayproductions.net/articles/dsl_block_styles
+    # Grammars created with this method may be assigned a name by being assigned
+    # to some constant, e.g.:
+    #
+    #     Calc = Grammar.new {}
+    #
     def self.new(&block)
       mod = Module.new { include Grammar }
-      (block.arity == 1 ? block[self] : mod.instance_eval(&block)) if block
+
+      if block
+        if block.arity == 1
+          block[self]
+        else
+          mod.instance_eval(&block)
+        end
+      end
+
       mod
     end
 
+    # Extends all modules that +include Grammar+ with the GrammarDSL.
     def self.included(base)
-      base.extend(GrammarMethods)
+      base.extend(GrammarDSL)
     end
   end
 
-  module GrammarMethods
+  # Contains methods that should be available to Grammar modules at the class
+  # level.
+  module GrammarDSL
     include Invoke
 
-    # Need to manage the +rule_names+ manually when including another Grammar.
-    # Otherwise, functions just like Module#include.
+    # Functions just like Module#include except that we need to collect any
+    # rule names from included grammars.
     def include(*args)
       super
       args.each do |mod|
@@ -60,14 +123,14 @@ module Citrus
       super.to_s
     end
 
-    # Returns an Array of all Grammar modules that have been included in this
-    # grammar in the reverse order they were included.
+    # Returns an array of all grammars that have been included in this grammar
+    # in the reverse order they were included.
     def included_grammars
       included_modules.select {|mod| mod.include?(Grammar) }
     end
 
-    # Returns all names of rules of this grammar as Symbols in an Array
-    # ordered in the same way they were defined in the grammar.
+    # Returns an array of all names of rules in this grammar as symbols ordered
+    # in the same way they were defined.
     def rule_names
       @rule_names ||= []
     end
@@ -77,58 +140,59 @@ module Citrus
       rule_names.include?(name.to_sym)
     end
 
-    # Returns a map of the names of all rules in this grammar to their
-    # respective Rule objects. Useful when debugging grammars.
+    # Returns a hash of the names of all rules in this grammar to their
+    # respective Rule objects.
     def rules
       rule_names.inject({}) {|m, sym| m[sym] = rule(sym); m }
     end
 
-    # Parses the given +string+ from the given +offset+. If +consume_all+ is
-    # true, will return +nil+ unless the entire string can be consumed.
-    def parse(string, offset=0, consume_all=true)
+    # Parses the given +string+ from the given +offset+. A ParseError is raised
+    # if there is no match made or if +consume_all+ is +true+ and the entire
+    # input +string+ cannot be consumed.
+    def parse!(string, offset=0, consume_all=true)
       raise "No root rule specified" unless root
       raise "No rule named \"#{root}\"" unless has_rule?(root)
 
       input = Input.new(string)
+      match = input.match(rule(root), offset)
 
-      m = input.match(rule(root), offset)
-      m unless consume_all && m && m.length != string.length
+      if !match || (consume_all && match.length != string.length)
+        raise ParseError.new(input)
+      end
+
+      match
     end
 
-    ### DSL Methods
-
     # Gets/sets the Rule object with the given +name+. If a block is given,
-    # will use the return value of the block as the primitive value to pass to
+    # will use the return value of the block as the object to pass to
     # Rule#create. All rules are stored as instance methods of the grammar
-    # module so that grammars may be composed naturally as Ruby modules.
+    # module so that grammars may be composed using Ruby's modules inclusion
+    # mechanism.
     def rule(name, &block)
       sym = name.to_sym
-
-      # The first rule in a grammar is the default root.
-      @root ||= sym
 
       # Keep track of rule names that have been added to this grammar in the
       # order they are added.
       rule_names << sym unless has_rule?(sym)
 
       if block
-        begin
-          rule = Rule.create(block.call)
-        rescue ArgumentError => e
-          raise "Cannot create rule #{name}: " + e.message
-        end
+        rule = Rule.create(block.call)
+        raise "Rule may not be a Proxy object" if Proxy === rule
         rule.name = name
         rule.grammar = self
         define_method(sym) { rule }
       end
 
       invoke(sym) if has_rule?(name)
+    rescue => e
+      raise "Cannot create rule \"#{name}\": " + e.message
     end
 
     # Gets/sets the name of the root rule of this grammar.
     def root(name=nil)
       @root = name.to_sym if name
-      @root
+      # The first rule in a grammar is the default root.
+      @root || rule_names.first
     end
 
     # Works like Ruby's +super+, but for rules. When defining a grammar, this
@@ -143,77 +207,103 @@ module Citrus
        "found in inheritance hierarchy"
     end
 
-    def mod(obj, ext=nil)
-      rule = Rule.create(obj)
-      if Class === ext
-        rule.match_class = ext
-      else
-        ext = Proc.new if block_given?
-        rule.match_ext = ext
-      end
+    # Specifies a Module that will be used to extend all matches created with
+    # the given +rule+. A block may also be given that will be used to create
+    # an anonymous module. See Rule#match_module=.
+    def mod(rule, ext=nil)
+      rule = Rule.create(rule)
+      ext = Proc.new if block_given?
+      rule.match_module = ext if ext
       rule
     end
 
-    def label(name, obj)
-      rule = Rule.create(obj)
-      rule.match_name = name
-      rule
+    # Creates a new AndPredicate using the given +rule+. A block may be provided
+    # to specify semantic behavior (via #mod).
+    def andp(rule, &block)
+      mod(AndPredicate.new(rule), block)
     end
 
-    def and(obj)
-      And.new(obj)
+    # Creates a new NotPredicate using the given +rule+. A block may be provided
+    # to specify semantic behavior (via #mod).
+    def notp(rule, &block)
+      mod(NotPredicate.new(rule), block)
     end
 
-    def not(obj)
-      Not.new(obj)
+    # Creates a new Label using the given +rule+ and +label+.
+    def label(rule, label, &block)
+      mod(Label.new(label, rule), block)
     end
 
-    def rep(obj, min=1, max=Infinity)
-      Repeat.new(obj, min, max)
+    # Creates a new Repeat using the given +rule+. +min+ and +max+ specify the
+    # minimum and maximum number of times the rule must match. A block may be
+    # provided to specify semantic behavior (via #mod).
+    def rep(rule, min=1, max=Infinity, &block)
+      mod(Repeat.new(min, max, rule), block)
     end
 
-    def one_or_more(obj)
-      rep(obj)
+    # An alias for #rep.
+    def one_or_more(rule, &block)
+      rep(rule, &block)
     end
 
-    def zero_or_more(obj)
-      rep(obj, 0)
+    # An alias for #rep with a minimum of 0.
+    def zero_or_more(rule, &block)
+      rep(rule, 0, &block)
     end
 
-    def zero_or_one(obj)
-      rep(obj, 0, 1)
+    # An alias for #rep with a minimum of 0 and a maximum of 1.
+    def zero_or_one(rule, &block)
+      rep(rule, 0, 1, &block)
     end
 
-    def all(*args)
-      Sequence.new(args)
+    # Creates a new Sequence using all arguments. A block may be provided to
+    # specify semantic behavior (via #mod).
+    def all(*args, &block)
+      mod(Sequence.new(args), block)
     end
 
-    def any(*args)
-      Choice.new(args)
+    # Creates a new Choice using all arguments. A block may be provided to
+    # specify semantic behavior (via #mod).
+    def any(*args, &block)
+      mod(Choice.new(args), block)
     end
   end
 
   # The core of the packrat parsing algorithm, this class wraps a string that
-  # is to be parsed and keeps track of matches for all rules at any given
-  # offset.
-  #
-  # See http://en.wikipedia.org/wiki/Parsing_expression_grammar
+  # is to be parsed and keeps a cache of matches for all rules at any given
+  # offset. See http://pdos.csail.mit.edu/~baford/packrat/icfp02/ for more
+  # information on packrat parsing.
   class Input
     extend Forwardable
-
-    attr_reader :string, :cache, :cache_hits
-
-    def_delegators :@string, :[], :length
 
     def initialize(string)
       @string = string
       @cache = {}
       @cache_hits = 0
+      @max_offset = 0
     end
 
-    # Returns the match for a given +rule+ at a given +offset+.
+    def_delegators :@string, :[], :length
+
+    # The input string.
+    attr_reader :string
+
+    # A two-level hash of rule id's and offsets to their respective matches.
+    attr_reader :cache
+
+    # The number of times the cache was hit.
+    attr_reader :cache_hits
+
+    # The maximum offset that has been achieved.
+    attr_reader :max_offset
+
+    # Returns the match for a given +rule+ at a given +offset+. If no such match
+    # exists in the cache, the rule is executed and the result is cached before
+    # returning.
     def match(rule, offset=0)
       c = @cache[rule.id] ||= {}
+
+      @max_offset = offset if offset > @max_offset
 
       if c.key?(offset)
         @cache_hits += 1
@@ -224,103 +314,11 @@ module Citrus
     end
   end
 
-  class Match
-    attr_accessor :name, :terminal
-    attr_reader :matches, :captures
-
-    def initialize(result)
-      @matches = []
-      @captures = []
-
-      case result
-      when String
-        @text = result
-      when MatchData
-        @text = result[0]
-        @captures = result.captures
-      when Array
-        @matches = result
-      else
-        raise ArgumentError, "Invalid match result: #{result.inspect}"
-      end
-    end
-
-    # Returns the raw text value of this match, which may simply be an
-    # aggregate of the text of all sub-matches if this match is not #terminal?.
-    def text
-      @text ||= @matches.inject('') {|s, m| s << m.text }
-    end
-
-    alias to_s text
-
-    # Returns the length of this match's #text value as an Integer.
-    def length
-      text.length
-    end
-
-    # Returns the first sub-match of this match with the given +name+.
-    def match(name)
-      sym = name.to_sym
-      @matches.select {|m| sym == m.name }.first
-    end
-
-    # Returns +true+ if this match was created from a Terminal, +false+
-    # otherwise.
-    def terminal?
-      !! @terminal
-    end
-
-    # Checks equality by comparing this match's #text value to +obj+.
-    def ==(obj)
-      text == obj
-    end
-
-    alias eql? ==
-
-    # Uses #match to allow sub-matches of this match to be called by name as
-    # instance methods.
-    def method_missing(sym, *args)
-      m = match(sym)
-      return m if m
-      raise NameError, "No match named \"#{sym}\" in #{self}"
-    end
-
-    # Creates a Builder::XmlMarkup object from this match. Useful when
-    # inspecting a nested match.
-    def to_markup(xml=nil)
-      if xml.nil?
-        xml = Builder::XmlMarkup.new(:indent => 2)
-        xml.instruct!
-      end
-
-      attrs = { "name" => name, "text" => text, "terminal" => terminal }
-
-      if matches.empty?
-        xml.match(attrs)
-      else
-        xml.match(attrs) do
-          matches.each {|m| m.to_markup(xml) }
-        end
-      end
-
-      xml
-    end
-
-    # Returns the result of #to_markup as a string.
-    def to_xml
-      to_markup.target!
-    end
-
-    def inspect
-      to_xml
-    end
-  end
-
   # A Rule is an object that is used during parsing to match on the Input. This
   # class serves as an abstract base for all other rule classes and should
-  # never be directly instantiated.
+  # not be directly instantiated.
   class Rule
-    # Automatically creates a rule depending on the type of object given.
+    # Returns a new Rule object depending on the type of object given.
     def self.create(obj)
       case obj
       when Rule     then obj
@@ -335,42 +333,32 @@ module Citrus
       end
     end
 
+    # The grammar this rule belongs to.
     attr_accessor :grammar
-    attr_reader :name, :match_ext
 
     # Returns a String id that is unique to this Rule object.
     def id
       object_id.to_s
     end
 
+    # Sets the name of this rule.
     def name=(name)
       @name = name.to_sym
     end
 
-    def match_name=(name)
-      @match_name = name.to_sym
-    end
+    # The name of this rule.
+    attr_reader :name
 
-    def match_name
-      @match_name || name
-    end
-
-    def match_class=(cls)
-      raise ArgumentError, "Match class must subclass " +
-        "Citrus::Match" unless cls < Match
-      @match_class = cls
-    end
-
-    def match_class
-      @match_class || Match
-    end
-
-    def match_ext=(mod)
+    # Specifies a module that will be used to extend all Match objects that
+    # result from this rule. If +mod+ is a Proc, it will be used to create an
+    # anonymous module.
+    def match_module=(mod)
       mod = Module.new(&mod) if Proc === mod
-      raise ArgumentError, "Match extension must be a " +
-        "Module" unless Module === mod
-      @match_ext = mod
+      @match_module = mod
     end
+
+    # The module this rule uses to extend new matches.
+    attr_reader :match_module
 
     # Returns +true+ if this rule is a Terminal.
     def terminal?
@@ -395,64 +383,62 @@ module Citrus
 
   private
 
-    def extend_match!(match)
-      match.name = match_name
-      match.extend(match_ext) if match_ext
-      match
-    end
-
     def create_match(result)
-      match = match_class.new(result)
-      match.terminal = terminal?
-      extend_match!(match)
+      result = [result] if Match === result
+      match = Match.new(result)
+      match.extend(match_module) if match_module
+      match.name = name
+      match
     end
   end
 
-  # A Proxy is a Rule that is a facade for another rule. It is used in grammar
-  # definitions when a rule uses some other rule by name. The PEG notation is
-  # simply the name of a rule without any other punctuation, e.g.:
+  # A Proxy is a Rule that is a placeholder for another rule. It is used in
+  # grammar definitions when a rule calls some other rule by name. The PEG
+  # notation is simply the name of a rule without any other punctuation, e.g.:
   #
-  #     expr
+  #     name
   #
   class Proxy < Rule
-    def initialize(name)
-      self.name = name
+    def initialize(name='')
+      @rule_name = name.to_sym
     end
 
+    # The name of the rule this rule is proxy for.
+    attr_reader :rule_name
+
     # Returns the underlying Rule object for this Proxy. Lazily evaluated so
-    # we can create Proxy objects before we know what the Rule object is.
+    # we can create Proxy objects before we know what the actual rule looks
+    # like.
     def rule
-      unless @rule
-        rule = grammar.rule(name)
-        raise RuntimeError, "No rule named \"#{name}\" in grammar " +
-          grammar.name unless rule
-        @rule = rule
-      end
+      @rule = grammar.rule(rule_name)
+      raise RuntimeError, "No rule named \"#{rule_name}\" in grammar " +
+        grammar.name unless @rule
+      # Dynamically redefine #rule for a small speed-up on future calls.
+      instance_eval('def rule; @rule end')
       @rule
     end
 
-    # These methods should be handled by this proxy's #rule.
-    undef terminal?
-    undef id
+    def match_module=(*args)
+      raise "Proxy objects may not modify a match"
+    end
 
-    # Send any missing methods to this proxy's #rule.
-    def method_missing(sym, *args)
-      rule.__send__(sym, *args)
+    def match(input, offset=0)
+      input.match(rule, offset)
     end
 
     def to_s
-      name.to_s
+      rule_name.to_s
     end
   end
 
   # A Terminal is a Rule that matches directly on the input stream and may not
   # contain any other rule.
   class Terminal < Rule
-    attr_reader :rule
-
     def initialize(rule)
       @rule = rule
     end
+
+    attr_reader :rule
 
     def to_s
       rule.inspect
@@ -484,8 +470,14 @@ module Citrus
   #
   #     /expr/
   #
+  # Character classes and the dot symbol may also be used in PEG notation for
+  # compatibility with other PEG implementations, e.g.:
+  #
+  #     [a-zA-Z]
+  #     .
+  #
   class Expression < Terminal
-    def initialize(rule=/^$/)
+    def initialize(rule=/^/)
       raise ArgumentError, "Expression must be a Regexp" unless Regexp === rule
       super
     end
@@ -501,11 +493,11 @@ module Citrus
   # invoke the rule(s) they contain to determine if a match can be made from
   # the collective result.
   class Nonterminal < Rule
-    attr_reader :rules
-
     def initialize(rules=[])
       @rules = rules.map {|r| Rule.create(r) }
     end
+
+    attr_reader :rules
 
     def grammar=(grammar)
       @rules.each {|r| r.grammar = grammar }
@@ -524,13 +516,13 @@ module Citrus
     end
   end
 
-  # An And is a Predicate that contains a rule that must match. Upon success an
-  # empty match is returned and no input is consumed. The PEG notation is any
-  # expression preceeded by an ampersand, e.g.:
+  # An AndPredicate is a Predicate that contains a rule that must match. Upon
+  # success an empty match is returned and no input is consumed. The PEG
+  # notation is any expression preceeded by an ampersand, e.g.:
   #
   #     &expr
   #
-  class And < Predicate
+  class AndPredicate < Predicate
     def match(input, offset=0)
       create_match('') if input.match(rule, offset)
     end
@@ -540,19 +532,47 @@ module Citrus
     end
   end
 
-  # A Not is a Predicate that contains a rule that must not match. Upon success
-  # an empty match is returned and no input is consumed. The PEG notation is any
-  # expression preceeded by an exclamation point, e.g.:
+  # A NotPredicate is a Predicate that contains a rule that must not match. Upon
+  # success an empty match is returned and no input is consumed. The PEG
+  # notation is any expression preceeded by an exclamation mark, e.g.:
   #
   #     !expr
   #
-  class Not < Predicate
+  class NotPredicate < Predicate
     def match(input, offset=0)
       create_match('') unless input.match(rule, offset)
     end
 
     def to_s
       '!' + rule.embed
+    end
+  end
+
+  # A Label is a Predicate that applies a new name to any matches made by its
+  # rule. The PEG notation is any sequence of alphanumeric characters (i.e.
+  # [a-zA-Z0-9_]) followed by a colon, followed by any other expression, e.g.:
+  #
+  #     label:expr
+  #
+  class Label < Predicate
+    def initialize(label='', rule='')
+      @label = label.to_s
+      super(rule)
+    end
+
+    attr_reader :label
+
+    def match(input, offset=0)
+      m = rule.match(input, offset)
+      if m
+        m = create_match(m)
+        m.name = label
+        m
+      end
+    end
+
+    def to_s
+      label + ':' + rule.embed
     end
   end
 
@@ -576,10 +596,10 @@ module Citrus
   #     expr?
   #
   class Repeat < Predicate
-    def initialize(rule='', min=1, max=Infinity)
-      super(rule)
+    def initialize(min=1, max=Infinity, rule='')
       raise ArgumentError, "Min cannot be greater than max" if min > max
       @range = Range.new(min, max)
+      super(rule)
     end
 
     def match(input, offset=0)
@@ -593,15 +613,20 @@ module Citrus
       create_match(matches) if @range.include?(matches.length)
     end
 
+    # Returns the operator this rule uses as a string. Will be one of "+", "?",
+    # or <n>*<m>.
     def operator
-      m = [@range.begin, @range.end].map do |n|
-        n == 0 || n == Infinity ? '' : n.to_s
+      unless @operator
+        m = [@range.begin, @range.end].map do |n|
+          n == 0 || n == Infinity ? '' : n.to_s
+        end
+        @operator = case m
+          when ['', '1'] then '?'
+          when ['1', ''] then '+'
+          else m.join('*')
+          end
       end
-      case m
-      when ['', '1'] then '?'
-      when ['1', ''] then '+'
-      else m.join('*')
-      end
+      @operator
     end
 
     def to_s
@@ -618,21 +643,21 @@ module Citrus
   end
 
   # A Choice is a List where only one rule must match. The PEG notation is two
-  # or more expressions separated by a forward slash, e.g.:
+  # or more expressions separated by a vertical bar, e.g.:
   #
-  #     expr / expr
+  #     expr | expr
   #
   class Choice < List
     def match(input, offset=0)
       rules.each do |rule|
         m = input.match(rule, offset)
-        return extend_match!(m) if m
+        return create_match(m) if m
       end
       nil
     end
 
     def to_s
-      rules.map {|r| r.embed }.join(' / ')
+      rules.map {|r| r.embed }.join(' | ')
     end
   end
 
@@ -655,6 +680,129 @@ module Citrus
 
     def to_s
       rules.map {|r| r.embed }.join(' ')
+    end
+  end
+
+  # The base class for all matches. Matches are organized into a parse tree
+  # where any match may contain any number of other matches. This class provides
+  # several convenient tree traversal methods that help when examining parse
+  # results.
+  class Match
+    def initialize(result=nil)
+      @matches = []
+      @captures = []
+
+      case result
+      when String
+        @text = result
+      when MatchData
+        @text = result[0]
+        @captures = result.captures
+      when Array
+        @matches = result
+      else
+        raise ArgumentError, "Invalid match result: #{result.inspect}"
+      end
+    end
+
+    # An array of all sub-matches of this match.
+    attr_reader :matches
+
+    # An array of substrings returned by MatchData#captures if this match was
+    # created by an Expression.
+    attr_reader :captures
+
+    # The name by which this match can be accessed from a parent match. This
+    # will be the name of the rule that generated the match in most cases.
+    # However, if the match is the result of a Label this will be the value of
+    # the label.
+    attr_accessor :name
+
+    # Returns the raw text value of this match, which may simply be an
+    # aggregate of the text of all sub-matches if this match is not #terminal?.
+    def text
+      @text ||= matches.inject('') {|s, m| s << m.text }
+    end
+
+    alias to_s text
+
+    # Returns the length of this match's #text value as an Integer.
+    def length
+      text.length
+    end
+
+    # Passes all arguments to the #text of this match.
+    def [](*args)
+      text.__send__(:[], *args)
+    end
+
+    # Returns an array of all sub-matches with the given +name+. If +deep+ is
+    # +false+, returns only sub-matches that are immediate descendants of this
+    # match.
+    def find(name, deep=true)
+      sym = name.to_sym
+      ms = matches.select {|m| sym == m.name }
+      ms.concat(matches.map {|m| m.find(name, deep) }.flatten) if deep
+      ms
+    end
+
+    # A shortcut for retrieving the first immediate sub-match of this match. If
+    # +name+ is given, attempts to retrieve the first immediate sub-match named
+    # +name+.
+    def first(name=nil)
+      name.nil? ? matches.first : find(name, false).first
+    end
+
+    # Returns +true+ if this match has no descendants (was created from a
+    # Terminal).
+    def terminal?
+      matches.length == 0
+    end
+
+    # Checks equality by comparing this match's #text value to +obj+.
+    def ==(obj)
+      text == obj
+    end
+
+    alias eql? ==
+
+    # Uses #match to allow sub-matches of this match to be called by name as
+    # instance methods.
+    def method_missing(sym, *args)
+      m = first(sym)
+      return m if m
+      raise NameError, "No match named \"#{sym}\" in #{self}"
+    end
+
+    # Creates a Builder::XmlMarkup object from this match. Useful when
+    # inspecting a nested match. The +xml+ argument may be a Hash of
+    # Builder::XmlMarkup options.
+    def to_markup(xml={})
+      if xml.is_a?(Hash)
+        opt = { :indent => 2 }.merge(xml)
+        xml = Builder::XmlMarkup.new(opt)
+        xml.instruct!
+      end
+
+      if matches.empty?
+        xml.match("name" => name, "text" => text)
+      else
+        xml.match("name" => name, "text" => text) do
+          matches.each {|m| m.to_markup(xml) }
+        end
+      end
+
+      xml
+    end
+
+    # Returns the result of #to_markup as a String (unless an alternate target
+    # was specified).
+    def to_xml(opt={})
+      to_markup(opt).target!
+    end
+
+    def inspect
+      to_xml
     end
   end
 end

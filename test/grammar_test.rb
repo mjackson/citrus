@@ -26,7 +26,7 @@ class GrammarTest < Test::Unit::TestCase
     assert_equal([:alpha, :num, :alphanum, :one, :two, :three], grammar.rule_names)
   end
 
-  def test_has_name?
+  def test_has_name
     assert(TestGrammar.has_rule?('alpha'))
     assert(TestGrammar.has_rule?(:alpha))
   end
@@ -39,7 +39,7 @@ class GrammarTest < Test::Unit::TestCase
     grammar = Grammar.new {
       rule(:abc) { 'abc' }
     }
-    match = grammar.parse('abc')
+    match = grammar.parse!('abc')
     assert(match)
     assert_equal('abc', match.text)
     assert_equal(3, match.length)
@@ -49,7 +49,7 @@ class GrammarTest < Test::Unit::TestCase
     grammar = Grammar.new {
       rule(:alpha) { /[a-z]+/i }
     }
-    match = grammar.parse('abc')
+    match = grammar.parse!('abc')
     assert(match)
     assert_equal('abc', match.text)
     assert_equal(3, match.length)
@@ -59,7 +59,7 @@ class GrammarTest < Test::Unit::TestCase
     grammar = Grammar.new {
       rule(:num) { all(1, 2, 3) }
     }
-    match = grammar.parse('123')
+    match = grammar.parse!('123')
     assert(match)
     assert_equal('123', match.text)
     assert_equal(3, match.length)
@@ -69,16 +69,18 @@ class GrammarTest < Test::Unit::TestCase
     grammar = Grammar.new {
       rule(:num) { all(1, 2, 3) }
     }
-    match = grammar.parse('1234')
-    assert_equal(nil, match)
+    assert_raise ParseError do
+      match = grammar.parse!('1234')
+    end
   end
 
   def test_parse_sequence_short
     grammar = Grammar.new {
       rule(:num) { all(1, 2, 3) }
     }
-    match = grammar.parse('12')
-    assert_equal(nil, match)
+    assert_raise ParseError do
+      match = grammar.parse!('12')
+    end
   end
 
   def test_parse_choice
@@ -86,12 +88,12 @@ class GrammarTest < Test::Unit::TestCase
       rule(:alphanum) { any(/[a-z]/i, 0..9) }
     }
 
-    match = grammar.parse('a')
+    match = grammar.parse!('a')
     assert(match)
     assert_equal('a', match.text)
     assert_equal(1, match.length)
 
-    match = grammar.parse('1')
+    match = grammar.parse!('1')
     assert(match)
     assert_equal('1', match.text)
     assert_equal(1, match.length)
@@ -101,8 +103,9 @@ class GrammarTest < Test::Unit::TestCase
     grammar = Grammar.new {
       rule(:alphanum) { any(/[a-z]/, 0..9) }
     }
-    match = grammar.parse('A')
-    assert_equal(nil, match)
+    assert_raise ParseError do
+      match = grammar.parse!('A')
+    end
   end
 
   def test_parse_recurs
@@ -110,18 +113,18 @@ class GrammarTest < Test::Unit::TestCase
       rule(:paren) { any(['(', :paren, ')'], /[a-z]/) }
     }
 
-    match = grammar.parse('a')
+    match = grammar.parse!('a')
     assert(match)
     assert_equal('a', match.text)
     assert_equal(1, match.length)
 
-    match = grammar.parse('((a))')
+    match = grammar.parse!('((a))')
     assert(match)
     assert('((a))', match.text)
     assert(5, match.length)
 
     str = ('(' * 200) + 'a' + (')' * 200)
-    match = grammar.parse(str)
+    match = grammar.parse!(str)
     assert(match)
     assert(str, match.text)
     assert(str.length, match.length)
@@ -137,12 +140,12 @@ class GrammarTest < Test::Unit::TestCase
       rule (:value) { any('b', sup) }
     }
 
-    match = grammar2.parse('b')
+    match = grammar2.parse!('b')
     assert(match)
     assert('b', match.text)
     assert(1, match.length)
 
-    match = grammar2.parse('a')
+    match = grammar2.parse!('a')
     assert(match)
     assert('a', match.text)
     assert(1, match.length)
