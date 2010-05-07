@@ -9,29 +9,36 @@ module Citrus
 
 
     rule :file do
-      zero_or_more(any(:space, :require, :include, :grammar)) {
+      all(:space, zero_or_more(any(:require, :grammar))) {
         def requires
           find(:require)
         end
 
-        def includes
-          find(:include)
-        end
-
         def grammars
           find(:grammar)
+        end
+
+        # Evaluates all code in the file and returns an array of the Grammar
+        # modules that were created.
+        def eval!
+          requires.each {|r| require r.value }
+          grammars.map {|g| g.eval! }
         end
       }
     end
 
     rule :grammar do
       all(:grammar_keyword, :module_name, :grammar_body, :end_keyword) {
-        def name
+        def grammar_name
           module_name.value
         end
 
         def includes
           find(:include)
+        end
+
+        def modules
+          includes.map {|inc| eval(inc.value, TOPLEVEL_BINDING) }
         end
 
         def root
@@ -40,6 +47,16 @@ module Citrus
 
         def rules
           find(:rule)
+        end
+
+        def eval!
+          grammar = eval("#{grammar_name} = Citrus::Grammar.new", TOPLEVEL_BINDING)
+          modules.each {|mod| grammar.include(mod) }
+          rules.each do |rule|
+            grammar.rule(rule.rule_name) { rule.value }
+          end
+          grammar.root(root.value) if root
+          grammar
         end
       }
     end
@@ -50,12 +67,12 @@ module Citrus
 
     rule :rule do
       all(:rule_keyword, :rule_name, :rule_body, :end_keyword) {
-        def name
-          rule_name.value
+        def rule_name
+          super.value
         end
 
         def value
-          choice.value
+          rule_body.value
         end
       }
     end
@@ -158,21 +175,9 @@ module Citrus
     end
 
     rule :include do
-      all(:include_keyword, :module_list) {
-        def values
-          module_list.values
-        end
-      }
-    end
-
-    rule :module_list do
-      all(:module_name, zero_or_more([ :comma, :module_name ])) {
-        def module_names
-          find(:module_name)
-        end
-
-        def values
-          module_names.map {|m| m.value }
+      all(:include_keyword, :module_name) {
+        def value
+          module_name.value
         end
       }
     end
@@ -361,10 +366,13 @@ module Citrus
     rule(:rparen)           { [ ')', :space ] }
     rule(:lcurly)           { [ '{', :space ] }
     rule(:rcurly)           { [ '}', :space ] }
-    rule(:comma)            { [ ',', :space ] }
     rule(:bar)              { [ '|', :space ] }
     rule(:lt)               { [ '<', :space ] }
     rule(:gt)               { [ '>', :space ] }
+
+    rule :space do
+      zero_or_more(any(:white, :comment))
+    end
 
     rule :white do
       /[ \t\n\r]/
@@ -372,10 +380,6 @@ module Citrus
 
     rule :comment do
       /#.*/
-    end
-
-    rule :space do
-      zero_or_more(any(:white, :comment))
     end
   end
 end

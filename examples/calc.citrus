@@ -1,0 +1,114 @@
+# A grammar for mathematical formulas that apply the basic four operations to
+# non-negative integers.
+grammar Calc
+  # If "additive" were not already the first rule declared in this grammar, we
+  # could use the following line to make it the root rule.
+  #root additive
+
+  rule additive
+    (multitive_additive | multitive) {
+      def value
+        first.value
+      end
+    }
+  end
+
+  rule multitive_additive
+    (multitive additive_op additive) {
+      def value
+        if additive_op == '+'
+          multitive.value + additive.value
+        else
+          multitive.value - additive.value
+        end
+      end
+    }
+  end
+
+  rule multitive
+    (primary_multitive | primary) {
+      def value
+        first.value
+      end
+    }
+  end
+
+  rule primary_multitive
+    (primary multitive_op multitive) {
+      def value
+        if multitive_op == '*'
+          primary.value * multitive.value
+        else
+          primary.value / multitive.value
+        end
+      end
+    }
+  end
+
+  rule primary
+    (additive_paren | number) {
+      def value
+        first.value
+      end
+    }
+  end
+
+  rule additive_paren
+    ('(' additive ')') {
+      def value
+        additive.value
+      end
+    }
+  end
+
+  rule additive_op
+    (plus | minus) {
+      def ==(other)
+        text.strip == other
+      end
+    }
+  end
+
+  rule multitive_op
+    (star | slash) {
+      def ==(other)
+        text.strip == other
+      end
+    }
+  end
+
+  rule number
+    (float | integer) {
+      def value
+        first.value
+      end
+    }
+  end
+
+  rule float
+    (integer '.' integer space) {
+      def value
+        text.strip.to_f
+      end
+    }
+  end
+
+  rule integer
+    ([0-9]+ space) {
+      def value
+        text.strip.to_i
+      end
+    }
+  end
+
+  rule lparen  '(' space  end
+  rule rparen  ')' space  end
+  rule plus    '+' space  end
+  rule minus   '-' space  end
+  rule star    '*' space  end
+  rule slash   '/' space  end
+
+  rule space
+    /[ \t\n\r]*/
+  end
+end

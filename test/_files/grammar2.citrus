@@ -1,0 +1,25 @@
+grammar Calc
+  rule number
+    (float | integer) {
+      def value
+        first.value
+      end
+    }
+  end
+
+  rule float
+    (integer '.' integer) {
+      def value
+        text.to_f
+      end
+    }
+  end
+
+  rule integer
+    [0-9]+ {
+      def value
+        text.to_i
+      end
+    }
+  end
+end

@@ -139,6 +139,12 @@ class PEGTest < Test::Unit::TestCase
     assert_kind_of(Rule, match.value)
     assert_instance_of(Choice, match.value)
 
+    # Test precedence of Sequence over Choice.
+    match = grammar.parse!('"a" "b" | "c"')
+    assert(match)
+    assert_kind_of(Rule, match.value)
+    assert_instance_of(Choice, match.value)
+
     match = grammar.parse!('"a" ("b" | /./)* {}')
     assert(match)
     assert_kind_of(Rule, match.value)
@@ -300,34 +306,11 @@ class PEGTest < Test::Unit::TestCase
 
     match = grammar.parse!('include Module')
     assert(match)
+    assert_equal('Module', match.value)
 
     match = grammar.parse!('include ::Module')
     assert(match)
-
-    match = grammar.parse!('include Module,Module')
-    assert(match)
-
-    match = grammar.parse!('include Module, ::Module')
-    assert(match)
-  end
-
-  def test_module_list
-    grammar = peg(:module_list)
-
-    match = grammar.parse!('Module, Class')
-    assert(match)
-    assert_equal(2, match.module_names.length)
-    assert_equal([ 'Module', 'Class' ], match.values)
-
-    match = grammar.parse!('Module,Class ')
-    assert(match)
-    assert_equal(2, match.module_names.length)
-    assert_equal([ 'Module', 'Class' ], match.values)
-
-    match = grammar.parse!('Module  ,Class')
-    assert(match)
-    assert_equal(2, match.module_names.length)
-    assert_equal([ 'Module', 'Class' ], match.values)
+    assert_equal('::Module', match.value)
   end
 
   def test_root
@@ -676,6 +659,18 @@ class PEGTest < Test::Unit::TestCase
 
     assert_raise ParseError do
       match = grammar.parse!('math')
+    end
+  end
+
+  def test_comment
+    grammar = peg(:comment)
+
+    match = grammar.parse!('# A comment.')
+    assert(match)
+    assert_equal('# A comment.', match.text)
+
+    assert_raise ParseError do
+      match = grammar.parse!("# A comment.\n")
     end
   end
 

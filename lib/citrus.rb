@@ -9,12 +9,30 @@ require 'builder'
 module Citrus
   VERSION = [0, 1, 0]
 
+  # The concept of infinity, which is most definitely not a number, which
+  # distinction, in the grand scheme of things, most definitely does not matter.
+  Infinity = 1.0 / 0
+
   # Returns the current version of Citrus as a string.
   def self.version
     VERSION.join('.')
   end
 
-  Infinity = 1.0 / 0
+  # Loads the grammar from the given +file+ into the global scope using #eval!.
+  def self.load(file)
+    file << '.citrus' unless File.file?(file)
+    raise "Cannot find file #{file}" unless File.file?(file)
+    raise "Cannot read file #{file}" unless File.readable?(file)
+    code = File.read(file)
+    eval!(code)
+  end
+
+  # Evaluates the given Citrus grammar +code+ in the global scope.
+  def self.eval!(code)
+    require File.join(File.dirname(__FILE__), 'citrus', 'peg')
+    file = PEG.parse!(code)
+    file.eval!
+  end
 
   # This error is raised whenever a parse fails.
   class ParseError < Exception
@@ -22,15 +40,11 @@ module Citrus
 
     def initialize(input)
       @input = input
-      super(message)
-    end
-
-    def message # :nodoc:
       c = consumed
       s = [0, c.length - 40].max
-      msg  = "Failed to parse input at offset %d" % (max_offset + 1)
+      msg  = "Failed to parse input at offset %d" % max_offset
       msg += ", just\n    after %s" % c[s, c.length].inspect + "\n"
-      msg
+      super(msg)
     end
 
     # The Input object that was used for the parse.
@@ -198,7 +212,7 @@ module Citrus
         return grammar.rule(name) if grammar.has_rule?(name)
       end
       raise ArgumentError, "Cannot use super. No rule named \"#{name}\" " +
-       "found in inheritance hierarchy"
+        "found in inheritance hierarchy"
     end
 
     # Specifies a Module that will be used to extend all matches created with
@@ -802,7 +816,7 @@ module Citrus
     def method_missing(sym, *args)
       m = first(sym)
       return m if m
-      raise NameError, "No match named \"#{sym}\" in #{self}"
+      raise "No match named \"#{sym}\" in #{self}"
     end
 
     # Creates a Builder::XmlMarkup object from this match. Useful when
