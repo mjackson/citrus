@@ -11,12 +11,13 @@ end
 
 # DOCS ########################################################################
 
-desc "Generate API documentation (in ./api)"
+desc "Generate API documentation"
 task :api => 'lib/citrus.rb' do |t|
-  rm_rf 'api'
+  output_dir = ENV['OUTPUT_DIR'] || 'api'
+  rm_rf output_dir
   sh((<<-SH).gsub(/[\s\n]+/, ' ').strip)
   hanna
-    --op api
+    --op #{output_dir}
     --promiscuous
     --charset utf8
     --fmt html
