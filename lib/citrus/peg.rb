@@ -20,9 +20,9 @@ module Citrus
 
         # Evaluates all code in the file and returns an array of the Grammar
         # modules that were created.
-        def eval!
+        def eval
           requires.each {|r| require r.value }
-          grammars.map {|g| g.eval! }
+          grammars.map {|g| g.value }
         end
       }
     end
@@ -49,7 +49,7 @@ module Citrus
           find(:rule)
         end
 
-        def eval!
+        def value
           grammar = eval("#{grammar_name} = Citrus::Grammar.new", TOPLEVEL_BINDING)
           modules.each {|mod| grammar.include(mod) }
           rules.each do |rule|
@@ -71,8 +71,18 @@ module Citrus
           super.value
         end
 
+        def setup_super(rule)
+          if Nonterminal === rule
+            rule.rules.each {|r| setup_super(r) }
+          elsif Super === rule
+            rule.rule_name = rule_name.to_sym
+          end
+        end
+
         def value
-          rule_body.value
+          rule = rule_body.value
+          setup_super(rule)
+          rule
         end
       }
     end
@@ -147,7 +157,7 @@ module Citrus
     end
 
     rule :primary do
-      any(:proxy, :rule_body_paren, :terminal) {
+      any(:super, :proxy, :rule_body_paren, :terminal) {
         def value
           first.value
         end
@@ -198,10 +208,18 @@ module Citrus
       }
     end
 
+    rule :super do
+      all('super', :space) {
+        def value
+          Super.new
+        end
+      }
+    end
+
     rule :proxy do
       all(notp(:end_keyword), :rule_name) {
         def value
-          Rule.create(rule_name.value.to_sym)
+          Proxy.new(rule_name.value)
         end
       }
     end
@@ -359,6 +377,7 @@ module Citrus
     rule(:require_keyword)  { [ 'require', :space ] }
     rule(:include_keyword)  { [ 'include', :space ] }
     rule(:grammar_keyword)  { [ 'grammar', :space ] }
+    rule(:super_keyword)    { [ 'super', :space ] }
     rule(:root_keyword)     { [ 'root', :space ] }
     rule(:rule_keyword)     { [ 'rule', :space ] }
     rule(:end_keyword)      { [ 'end', :space ] }

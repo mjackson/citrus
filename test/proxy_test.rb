@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + '/helper'
 class ProxyTest < Test::Unit::TestCase
 
   def test_terminal?
-    rule = Proxy.new(:some_rule)
+    rule = Proxy.new
     assert_equal(false, rule.terminal?)
   end
 

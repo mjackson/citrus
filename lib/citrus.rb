@@ -17,20 +17,20 @@ module Citrus
     VERSION.join('.')
   end
 
-  # Loads the grammar from the given +file+ into the global scope using #eval!.
+  # Loads the grammar from the given +file+ into the global scope using #eval.
   def self.load(file)
     file << '.citrus' unless File.file?(file)
     raise "Cannot find file #{file}" unless File.file?(file)
     raise "Cannot read file #{file}" unless File.readable?(file)
     code = File.read(file)
-    eval!(code)
+    self.eval(code)
   end
 
   # Evaluates the given Citrus grammar +code+ in the global scope.
-  def self.eval!(code)
+  def self.eval(code)
     require File.join(File.dirname(__FILE__), 'citrus', 'peg')
     file = PEG.parse!(code)
-    file.eval!
+    file.eval
   end
 
   # This error is raised whenever a parse fails.
@@ -42,7 +42,7 @@ module Citrus
       c = consumed
       s = [0, c.length - 40].max
       msg  = "Failed to parse input at offset %d" % max_offset
-      msg += ", just\n    after %s" % c[s, c.length].inspect + "\n"
+      msg += ", just after %s" % c[s, c.length].inspect + "\n"
       super(msg)
     end
 
@@ -125,7 +125,7 @@ module Citrus
       end
     end
 
-    # Returns the name of this grammar as a String.
+    # Returns the name of this grammar as a string.
     def name
       super.to_s
     end
@@ -202,16 +202,9 @@ module Citrus
       @root || rule_names.first
     end
 
-    # Works like Ruby's +super+, but for rules. When defining a grammar, this
-    # will return the Rule object from the most recently included grammar with
-    # a rule of the same +name+. If +name+ is not supplied it defaults to the
-    # name of the rule currently being defined.
-    def sup(name=rule_names.last)
-      included_grammars.each do |grammar|
-        return grammar.rule(name) if grammar.has_rule?(name)
-      end
-      raise ArgumentError, "Cannot use super. No rule named \"#{name}\" " +
-        "found in inheritance hierarchy"
+    # Creates a new Super for the rule currently being defined in the grammar.
+    def sup
+      Super.new(rule_names.last)
     end
 
     # Specifies a Module that will be used to extend all matches created with
@@ -343,7 +336,7 @@ module Citrus
     # The grammar this rule belongs to.
     attr_accessor :grammar
 
-    # Returns a String id that is unique to this Rule object.
+    # Returns a string id that is unique to this Rule object.
     def id
       object_id.to_s
     end
@@ -406,23 +399,18 @@ module Citrus
   #     name
   #
   class Proxy < Rule
-    def initialize(name='')
+    def initialize(name='<proxy>')
       @rule_name = name.to_sym
     end
 
     # The name of the rule this rule is proxy for.
-    attr_reader :rule_name
+    attr_accessor :rule_name
 
     # Returns the underlying Rule object for this Proxy. Lazily evaluated so
     # we can create Proxy objects before we know what the actual rule looks
     # like.
     def rule
-      @rule = grammar.rule(rule_name)
-      raise RuntimeError, "No rule named \"#{rule_name}\" in grammar " +
-        grammar.name unless @rule
-      # Dynamically redefine #rule for a small speed-up on future calls.
-      instance_eval('def rule; @rule end')
-      @rule
+      @rule ||= resolve!
     end
 
     # Raises an error if the user tries to set a module for matches from this
@@ -443,6 +431,42 @@ module Citrus
     # Returns the PEG notation of this rule as a string.
     def to_s
       rule_name.to_s
+    end
+
+  private
+
+    # Searches this grammar for a rule with this proxy's name. Raises an error
+    # if one cannot be found.
+    def resolve!
+      rule = grammar.rule(rule_name)
+      raise RuntimeError, "No rule named \"#{rule_name}\" in grammar " +
+        grammar.name unless rule
+      rule
+    end
+  end
+
+  # A Super is a special kind of Proxy that works like Ruby's +super+, but for
+  # rules in a grammar. The PEG notation is the word +super+ without any other
+  # punctuation, e.g.:
+  #
+  #     super
+  #
+  class Super < Proxy
+    # Returns the PEG notation of this rule as a string.
+    def to_s
+      'super'
+    end
+
+  private
+
+    # Searches this grammar's included grammars for a rule with this proxy's
+    # name. Raises an error if one cannot be found.
+    def resolve!
+      grammar.included_grammars.each do |g|
+        return g.rule(rule_name) if g.has_rule?(rule_name)
+      end
+      raise RuntimeError, "Cannot use super. No rule named \"#{rule_name}\" " +
+        "in inheritance hierarchy of grammar " + grammar.name
     end
   end
 
@@ -818,7 +842,7 @@ module Citrus
       raise "No match named \"#{sym}\" in #{self}"
     end
 
-    # Returns the result of #to_markup as a String (unless an alternate target
+    # Returns the result of #to_markup as a string (unless an alternate target
     # was specified).
     def to_xml(indent='  ', level=0)
       margin = indent * level

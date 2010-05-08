@@ -1,0 +1,12 @@
+grammar SuperOne
+  rule num
+    '1'
+  end
+end
+
+grammar SuperTwo
+  include SuperOne
+  rule num
+    '2' | super
+  end
+end
