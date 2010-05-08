@@ -1,0 +1,110 @@
+
+
+                                  ~* Citrus *~
+
+                          Parsing Expressions for Ruby
+
+
+Citrus is a compact and powerful parsing library for Ruby that combines the
+elegance and expressiveness of the language with the simplicity and power of
+parsing expression grammars.
+
+
+  == Installation ==
+
+
+  == Theory ==
+
+
+In order to be able to use Citrus effectively, you must first understand a few
+basic concepts, namely, grammars and rules.
+
+
+  * Grammars *
+
+A grammar is a system of rules that define the structure of a language. Citrus
+uses a type of grammar known as a parsing expression grammar (or PEG). Further
+information about PEG's is readily available online.
+
+Citrus implements grammars as Ruby modules. Grammar modules have a module-level
+(or class-level) domain-specific language that assists the user in defining the
+grammar's rules.
+
+
+  * Rules *
+
+Each grammar has a finite set of rules that it uses to generate matches on some
+input string. Rules come in two flavors: terminal and non-terminal.
+
+Terminal rules match some sequence of characters in the input. Citrus currently
+supports two types of terminals: strings and regular expressions. Strings match
+
+
+  == Usage ==
+
+
+Citrus grammars may be composed in one of two ways: using pure Ruby or Citrus'
+own custom PEG format. The syntax between the two is very similar, but there is
+a small trade-off. Both methods are discussed in detail below.
+
+
+  * Using Ruby *
+
+Citrus grammars may be defined entirely in Ruby. While this usage is a bit more
+verbose than the traditional approach to writing PEG's, it's not too far off.
+Due to the flexibility of the Ruby language, Citrus' Ruby syntax for defining
+grammars is actually able to mimic the PEG notation very closely.
+
+The primary advantage of defining your grammar in Ruby is that Citrus does not
+need to do any special parsing or evaluating of your code. All that is handled
+by the Ruby interpreter, so it can operate as fast as Ruby can. This may be an
+advantage if your code runs in short-running processes.
+
+You can create a new Citrus grammar in one of two ways: 1) create a new module
+that includes Citrus::Grammar or 2) use Citrus::Grammar#new. The following two
+snippets illustrate both methods. They are equivalent.
+
+    module MyGrammar
+      include Citrus::Grammar
+    end
+
+    MyGrammar = Citrus::Grammar.new
+
+Citrus defines a set of helper methods for grammar and rule creation in the
+Citrus::GrammarDSL module. New grammar modules extend this module automatically.
+
+
+  * Using PEG *
+
+Citrus' PEG format strikes a compromise between traditional PEG notation and
+Ruby syntax. The major advantage of composing a grammar using PEG notation is
+that it is easier to read than Ruby and should be already familiar to people who
+have worked with other PEG formats in the past.
+
+The disadvantage is that Citrus must load, parse, and evaluate the grammar file
+before it can be used. However, this only takes a fraction of a second and may
+not be a significant detriment in long-running environments like servers because
+the grammar will only be evaluated once, at startup.
+
+
+  ** License **
+
+Copyright 2010 Michael Jackson
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
