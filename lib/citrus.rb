@@ -8,9 +8,9 @@ require 'forwardable'
 module Citrus
   VERSION = [0, 1, 0]
 
-  # The concept of infinity, which is most definitely not a number, which
-  # distinction, in the grand scheme of things, most definitely does not matter.
   Infinity = 1.0 / 0
+
+  autoload 'PEG', 'citrus/peg'
 
   # Returns the current version of Citrus as a string.
   def self.version
@@ -27,7 +27,6 @@ module Citrus
 
   # Evaluates the given Citrus grammar +code+ in the global scope.
   def self.eval(code)
-    require File.join(File.dirname(__FILE__), 'citrus', 'peg')
     file = PEG.parse!(code)
     file.eval
   end
