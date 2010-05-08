@@ -22,8 +22,7 @@ module Citrus
     file << '.citrus' unless File.file?(file)
     raise "Cannot find file #{file}" unless File.file?(file)
     raise "Cannot read file #{file}" unless File.readable?(file)
-    code = File.read(file)
-    self.eval(code)
+    self.eval(File.read(file))
   end
 
   # Evaluates the given Citrus grammar +code+ in the global scope.
@@ -58,22 +57,6 @@ module Citrus
     end
   end
 
-  # May be extended by another Module in order to give it the ability to call
-  # its own instance-level methods without using Module#module_function.
-  module Invoke
-    # Returns a blank instance of a Class that includes this module.
-    def instance
-      mod = self
-      @instance ||= (Class.new { include mod }).new
-    end
-
-    # Invokes the instance-level method with the given name on a blank
-    # #instance.
-    def invoke(sym, *args)
-      instance.__send__(sym, *args)
-    end
-  end
-
   # This module should be included in all grammars. Although it does not provide
   # any methods, constants, or variables to modules that include it, the mere
   # act of inclusion provides a useful lookup mechanism to determine if a module
@@ -104,6 +87,22 @@ module Citrus
     # Extends all modules that +include Grammar+ with the GrammarDSL.
     def self.included(base)
       base.extend(GrammarDSL)
+    end
+  end
+
+  # May be extended by another Module in order to give it the ability to call
+  # its own instance-level methods without using Module#module_function.
+  module Invoke
+    # Returns a blank instance of a Class that includes this module.
+    def instance
+      mod = self
+      @instance ||= (Class.new { include mod }).new
+    end
+
+    # Invokes the instance-level method with the given name on a blank
+    # #instance.
+    def invoke(sym, *args)
+      instance.__send__(sym, *args)
     end
   end
 
@@ -170,11 +169,10 @@ module Citrus
       match
     end
 
-    # Gets/sets the Rule object with the given +name+. If a block is given,
-    # will use the return value of the block as the object to pass to
-    # Rule#create. All rules are stored as instance methods of the grammar
-    # module so that grammars may be composed using Ruby's modules inclusion
-    # mechanism.
+    # Gets/sets the rule with the given +name+. If a block is given, the return
+    # value of the block is used as the object to pass to Rule#create. All rules
+    # are stored as instance methods of the grammar module so that grammars may
+    # be composed naturally using Ruby's module inclusion mechanism.
     def rule(name, &block)
       sym = name.to_sym
 
@@ -195,7 +193,7 @@ module Citrus
       raise "Cannot create rule \"#{name}\": " + e.message
     end
 
-    # Gets/sets the name of the root rule of this grammar.
+    # Gets/sets the +name+ of the root rule of this grammar.
     def root(name=nil)
       @root = name.to_sym if name
       # The first rule in a grammar is the default root.
@@ -400,11 +398,16 @@ module Citrus
   #
   class Proxy < Rule
     def initialize(name='<proxy>')
+      self.rule_name = name
+    end
+
+    # Sets the name of the rule this rule is proxy for.
+    def rule_name=(name)
       @rule_name = name.to_sym
     end
 
     # The name of the rule this rule is proxy for.
-    attr_accessor :rule_name
+    attr_reader :rule_name
 
     # Returns the underlying Rule object for this Proxy. Lazily evaluated so
     # we can create Proxy objects before we know what the actual rule looks
@@ -842,8 +845,9 @@ module Citrus
       raise "No match named \"#{sym}\" in #{self}"
     end
 
-    # Returns the result of #to_markup as a string (unless an alternate target
-    # was specified).
+    # Converts this match including all sub-matches to XML format. The given
+    # +indent+ is used at the beginning of each line, multiplied by the +level+
+    # of that match in the hierarchy.
     def to_xml(indent='  ', level=0)
       margin = indent * level
       eol = indent == '' ? '' : "\n"

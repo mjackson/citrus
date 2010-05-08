@@ -75,7 +75,7 @@ module Citrus
           if Nonterminal === rule
             rule.rules.each {|r| setup_super(r) }
           elsif Super === rule
-            rule.rule_name = rule_name.to_sym
+            rule.rule_name = rule_name
           end
         end
 
