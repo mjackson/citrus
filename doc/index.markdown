@@ -1,0 +1,15 @@
+Citrus is a compact and powerful parsing library for Ruby that combines the
+elegance and expressiveness of the language with the simplicity and power of
+parsing expression grammars.
+
+== Installation
+
+Via RubyGems:
+
+    $ sudo gem install citrus
+
+From a local copy:
+
+    $ git clone git://github.com/mjijackson/citrus.git
+    $ cd citrus
+    $ rake package && sudo rake install
