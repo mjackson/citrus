@@ -82,7 +82,8 @@ snippets illustrate both methods. They are equivalent.
     MyGrammar = Citrus::Grammar.new
 
 Citrus defines a set of helper methods for grammar and rule creation in the
-Citrus::GrammarDSL module. New grammar modules extend this module automatically.
+Citrus::GrammarMethods module. New grammar modules extend this module
+automatically.
 
 
   * Using PEG *

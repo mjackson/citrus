@@ -83,9 +83,10 @@ module Citrus
       mod
     end
 
-    # Extends all modules that +include Grammar+ with the GrammarDSL.
+    # Extends all modules that +include Grammar+ with the GrammarMethods
+    # module.
     def self.included(base)
-      base.extend(GrammarDSL)
+      base.extend(GrammarMethods)
       class << base
         public :include
       end
@@ -94,7 +95,7 @@ module Citrus
 
   # Contains methods that should be available to Grammar modules at the class
   # level.
-  module GrammarDSL
+  module GrammarMethods
     # Returns the name of this grammar as a string.
     def name
       super.to_s
@@ -117,39 +118,20 @@ module Citrus
       @rules ||= {}
     end
 
-    # Returns +true+ if this grammar or any included grammar contains a rule
-    # with the given +name+.
+    # Returns +true+ if this grammar has a rule with the given +name+.
     def has_rule?(name)
-      sym = name.to_sym
-      rules.key?(sym) || included_grammars.any? {|g| g.has_rule?(sym) }
+      rules.key?(name.to_sym)
     end
 
-    def find_rule(name)
+    # Searches the inheritance hierarchy of this grammar for a rule named +name+
+    # and returns it on success. Returns +nil+ on failure.
+    def super_rule(name)
       sym = name.to_sym
       included_grammars.each do |g|
         r = g.rule(sym)
         return r if r
       end
       nil
-    end
-
-    # Parses the given +string+ from the given +offset+. A ParseError is raised
-    # if there is no match made or if +consume_all+ is +true+ and the entire
-    # input +string+ cannot be consumed.
-    def parse(string, offset=0, consume_all=true)
-      raise "No root rule specified" unless root
-
-      root_rule = rule(root)
-      raise "No rule named \"#{root}\"" unless root_rule
-
-      input = Input.new(string)
-      match = input.match(root_rule, offset)
-
-      if !match || (consume_all && match.length != string.length)
-        raise ParseError.new(input)
-      end
-
-      match
     end
 
     # Gets/sets the rule with the given +name+. If a block is given, the return
@@ -176,7 +158,7 @@ module Citrus
         define_method(sym) { rule }
       end
 
-      rules[sym] || find_rule(sym)
+      rules[sym] || super_rule(sym)
     rescue => e
       raise "Cannot create rule \"#{name}\": " + e.message
     end
@@ -252,6 +234,25 @@ module Citrus
     # specify semantic behavior (via #mod).
     def any(*args, &block)
       mod(Choice.new(args), block)
+    end
+
+    # Parses the given +string+ from the given +offset+ using the rules in this
+    # grammar. A ParseError is raised if there is no match made or if
+    # +consume_all+ is +true+ and the entire input string cannot be consumed.
+    def parse(string, offset=0, consume_all=true)
+      raise "No root rule specified" unless root
+
+      root_rule = rule(root)
+      raise "No rule named \"#{root}\"" unless root_rule
+
+      input = Input.new(string)
+      match = input.match(root_rule, offset)
+
+      if !match || (consume_all && match.length != string.length)
+        raise ParseError.new(input)
+      end
+
+      match
     end
   end
 
@@ -453,7 +454,7 @@ module Citrus
     # Searches this grammar's included grammars for a rule with this proxy's
     # name. Raises an error if one cannot be found.
     def resolve!
-      rule = grammar.find_rule(rule_name)
+      rule = grammar.super_rule(rule_name)
       raise RuntimeError, 'Cannot use super. No rule named "%s" in hierarchy ' +
         'of grammar %s' % [rule_name, grammar.name] unless rule
       rule
