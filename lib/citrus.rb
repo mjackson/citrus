@@ -108,7 +108,8 @@ module Citrus
     end
 
     # Returns an array of all names of rules in this grammar as symbols ordered
-    # in the same way they were defined.
+    # in the same way they were defined (i.e. rules that were defined later
+    # appear later in the array).
     def rule_names
       @rule_names ||= []
     end
@@ -134,28 +135,21 @@ module Citrus
       nil
     end
 
-    # Gets/sets the rule with the given +name+. If a block is given, the return
-    # value of the block is used as the object to pass to Rule#create. All rules
-    # are stored as instance methods of the grammar module so that grammars may
-    # be composed naturally using Ruby's module inclusion mechanism.
-    def rule(name, &block)
+    # Gets/sets the rule with the given +name+. If a block is given, the rule
+    # will be set to the return value of the block passed through Rule#create.
+    def rule(name)
       sym = name.to_sym
 
-      if block
-        # Keep track of rule names that have been added to this grammar in the
-        # order they are added.
-        rule_names.delete(sym) if rules.key?(sym)
+      if block_given?
+        rule_names.delete(sym) if has_rule?(sym)
         rule_names << sym
 
-        rule = Rule.create(block.call)
+        rule = Rule.create(Proc.new.call)
         raise "Rule may not be a Proxy object" if Proxy === rule
         rule.name = name
         rule.grammar = self
 
         rules[sym] = rule
-
-        # Store the rule as an instance method to enable inheritance.
-        define_method(sym) { rule }
       end
 
       rules[sym] || super_rule(sym)
