@@ -18,22 +18,22 @@ class SuperTest < Test::Unit::TestCase
       rule (:value) { any('b', sup) }
     }
 
-    match = grammar2.parse!('b')
+    match = grammar2.parse('b')
     assert(match)
     assert('b', match.text)
     assert(1, match.length)
 
-    match = grammar2.parse!('a')
+    match = grammar2.parse('a')
     assert(match)
     assert('a', match.text)
     assert(1, match.length)
   end
 
   def test_peg
-    match = SuperTwo.parse!('2')
+    match = SuperTwo.parse('2')
     assert(match)
 
-    match = SuperTwo.parse!('1')
+    match = SuperTwo.parse('1')
     assert(match)
   end
 

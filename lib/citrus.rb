@@ -27,7 +27,7 @@ module Citrus
 
   # Evaluates the given Citrus grammar +code+ in the global scope.
   def self.eval(code)
-    file = PEG.parse!(code)
+    file = PEG.parse(code)
     file.eval
   end
 
@@ -136,7 +136,7 @@ module Citrus
     # Parses the given +string+ from the given +offset+. A ParseError is raised
     # if there is no match made or if +consume_all+ is +true+ and the entire
     # input +string+ cannot be consumed.
-    def parse!(string, offset=0, consume_all=true)
+    def parse(string, offset=0, consume_all=true)
       raise "No root rule specified" unless root
 
       root_rule = rule(root)

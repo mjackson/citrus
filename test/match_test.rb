@@ -50,14 +50,14 @@ class MatchTest < Test::Unit::TestCase
   end
 
   def test_matches
-    match = Double.parse!('123')
+    match = Double.parse('123')
     assert(match)
     assert_equal(3, match.matches.length)
     assert_equal(3, match.find(:num).length)
   end
 
   def test_match
-    match = Double.parse!('456')
+    match = Double.parse('456')
     assert(match)
     assert_equal(3, match.matches.length)
 
@@ -68,7 +68,7 @@ class MatchTest < Test::Unit::TestCase
   end
 
   def test_matches_deep
-    match = Sentence.parse!('one two three four')
+    match = Sentence.parse('one two three four')
     assert(match)
     assert_equal(15, match.find(:alpha).length)
   end
