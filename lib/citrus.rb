@@ -86,43 +86,15 @@ module Citrus
     # Extends all modules that +include Grammar+ with the GrammarDSL.
     def self.included(base)
       base.extend(GrammarDSL)
-    end
-  end
-
-  # May be extended by another Module in order to give it the ability to call
-  # its own instance-level methods without using Module#module_function.
-  module Invoke
-    # Returns a blank instance of a Class that includes this module.
-    def instance
-      mod = self
-      @instance ||= (Class.new { include mod }).new
-    end
-
-    # Invokes the instance-level method with the given name on a blank
-    # #instance.
-    def invoke(sym, *args)
-      instance.__send__(sym, *args)
+      class << base
+        public :include
+      end
     end
   end
 
   # Contains methods that should be available to Grammar modules at the class
   # level.
   module GrammarDSL
-    include Invoke
-
-    # Functions just like Module#include except that we need to collect any
-    # rule names from included grammars.
-    def include(*args)
-      super
-      args.each do |mod|
-        if mod.include?(Grammar)
-          mod.rule_names.each do |name|
-            rule_names << name unless has_rule?(name)
-          end
-        end
-      end
-    end
-
     # Returns the name of this grammar as a string.
     def name
       super.to_s
@@ -140,15 +112,25 @@ module Citrus
       @rule_names ||= []
     end
 
-    # Returns +true+ if this grammar contains a rule with the given +name+.
-    def has_rule?(name)
-      rule_names.include?(name.to_sym)
+    # Returns a hash of all Rule objects in this grammar, keyed by rule name.
+    def rules
+      @rules ||= {}
     end
 
-    # Returns a hash of the names of all rules in this grammar to their
-    # respective Rule objects.
-    def rules
-      rule_names.inject({}) {|m, sym| m[sym] = rule(sym); m }
+    # Returns +true+ if this grammar or any included grammar contains a rule
+    # with the given +name+.
+    def has_rule?(name)
+      sym = name.to_sym
+      rules.key?(sym) || included_grammars.any? {|g| g.has_rule?(sym) }
+    end
+
+    def find_rule(name)
+      sym = name.to_sym
+      included_grammars.each do |g|
+        r = g.rule(sym)
+        return r if r
+      end
+      nil
     end
 
     # Parses the given +string+ from the given +offset+. A ParseError is raised
@@ -156,10 +138,12 @@ module Citrus
     # input +string+ cannot be consumed.
     def parse!(string, offset=0, consume_all=true)
       raise "No root rule specified" unless root
-      raise "No rule named \"#{root}\"" unless has_rule?(root)
+
+      root_rule = rule(root)
+      raise "No rule named \"#{root}\"" unless root_rule
 
       input = Input.new(string)
-      match = input.match(rule(root), offset)
+      match = input.match(root_rule, offset)
 
       if !match || (consume_all && match.length != string.length)
         raise ParseError.new(input)
@@ -175,19 +159,24 @@ module Citrus
     def rule(name, &block)
       sym = name.to_sym
 
-      # Keep track of rule names that have been added to this grammar in the
-      # order they are added.
-      rule_names << sym unless has_rule?(sym)
-
       if block
+        # Keep track of rule names that have been added to this grammar in the
+        # order they are added.
+        rule_names.delete(sym) if rules.key?(sym)
+        rule_names << sym
+
         rule = Rule.create(block.call)
         raise "Rule may not be a Proxy object" if Proxy === rule
         rule.name = name
         rule.grammar = self
+
+        rules[sym] = rule
+
+        # Store the rule as an instance method to enable inheritance.
         define_method(sym) { rule }
       end
 
-      invoke(sym) if has_rule?(name)
+      rules[sym] || find_rule(sym)
     rescue => e
       raise "Cannot create rule \"#{name}\": " + e.message
     end
@@ -441,8 +430,8 @@ module Citrus
     # if one cannot be found.
     def resolve!
       rule = grammar.rule(rule_name)
-      raise RuntimeError, "No rule named \"#{rule_name}\" in grammar " +
-        grammar.name unless rule
+      raise RuntimeError, 'No rule named "%s" in grammar %s' %
+        [rule_name, grammar.name] unless rule
       rule
     end
   end
@@ -464,11 +453,10 @@ module Citrus
     # Searches this grammar's included grammars for a rule with this proxy's
     # name. Raises an error if one cannot be found.
     def resolve!
-      grammar.included_grammars.each do |g|
-        return g.rule(rule_name) if g.has_rule?(rule_name)
-      end
-      raise RuntimeError, "Cannot use super. No rule named \"#{rule_name}\" " +
-        "in inheritance hierarchy of grammar " + grammar.name
+      rule = grammar.find_rule(rule_name)
+      raise RuntimeError, 'Cannot use super. No rule named "%s" in hierarchy ' +
+        'of grammar %s' % [rule_name, grammar.name] unless rule
+      rule
     end
   end
 
