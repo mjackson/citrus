@@ -16,46 +16,46 @@ module Calc
   # could use the following line to make it the root rule.
   #root :additive
 
-  rule :additive do
-    mod(any(:multitive_additive, :multitive), FirstValue)
+  rule :term do
+    mod(any(:additive, :factor), FirstValue)
   end
 
-  rule :multitive_additive do
-    all(:multitive, :additive_op, :additive) {
+  rule :additive do
+    all(:factor, :additive_op, :term) {
       def value
         if additive_op == '+'
-          multitive.value + additive.value
+          factor.value + term.value
         else
-          multitive.value - additive.value
+          factor.value - term.value
         end
       end
     }
   end
 
-  rule :multitive do
-    mod(any(:primary_multitive, :primary), FirstValue)
+  rule :factor do
+    mod(any(:multiplicative, :primary), FirstValue)
   end
 
-  rule :primary_multitive do
-    all(:primary, :multitive_op, :multitive) {
+  rule :multiplicative do
+    all(:primary, :multiplicative_op, :factor) {
       def value
-        if multitive_op == '*'
-          primary.value * multitive.value
+        if multiplicative_op == '*'
+          primary.value * factor.value
         else
-          primary.value / multitive.value
+          primary.value / factor.value
         end
       end
     }
   end
 
   rule :primary do
-    mod(any(:additive_paren, :number), FirstValue)
+    mod(any(:term_paren, :number), FirstValue)
   end
 
-  rule :additive_paren do
-    all(:lparen, :additive, :rparen) {
+  rule :term_paren do
+    all(:lparen, :term, :rparen) {
       def value
-        additive.value
+        term.value
       end
     }
   end
@@ -68,7 +68,7 @@ module Calc
     }
   end
 
-  rule :multitive_op do
+  rule :multiplicative_op do
     any(:star, :slash) {
       def ==(other)
         text.strip == other

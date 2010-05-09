@@ -1,62 +1,62 @@
 # A grammar for mathematical formulas that apply the basic four operations to
 # non-negative integers.
 grammar Calc
-  # If "additive" were not already the first rule declared in this grammar, we
+  # If "term" were not already the first rule declared in this grammar, we
   # could use the following line to make it the root rule.
-  #root additive
+  #root term
 
-  rule additive
-    (multitive_additive | multitive) {
+  rule term
+    (additive | factor) {
       def value
         first.value
       end
     }
   end
 
-  rule multitive_additive
-    (multitive additive_op additive) {
+  rule additive
+    (factor additive_op term) {
       def value
         if additive_op == '+'
-          multitive.value + additive.value
+          factor.value + term.value
         else
-          multitive.value - additive.value
+          factor.value - term.value
         end
       end
     }
   end
 
-  rule multitive
-    (primary_multitive | primary) {
+  rule factor
+    (multiplicative | primary) {
       def value
         first.value
       end
     }
   end
 
-  rule primary_multitive
-    (primary multitive_op multitive) {
+  rule multiplicative
+    (primary multiplicative_op factor) {
       def value
-        if multitive_op == '*'
-          primary.value * multitive.value
+        if multiplicative_op == '*'
+          primary.value * factor.value
         else
-          primary.value / multitive.value
+          primary.value / factor.value
         end
       end
     }
   end
 
   rule primary
-    (additive_paren | number) {
+    (term_paren | number) {
       def value
         first.value
       end
     }
   end
 
-  rule additive_paren
-    ('(' additive ')') {
+  rule term_paren
+    ('(' term ')') {
       def value
-        additive.value
+        term.value
       end
     }
   end
@@ -69,7 +69,7 @@ grammar Calc
     }
   end
 
-  rule multitive_op
+  rule multiplicative_op
     (star | slash) {
       def ==(other)
         text.strip == other
