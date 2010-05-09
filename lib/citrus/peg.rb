@@ -88,7 +88,7 @@ module Citrus
     rule :rule_body do
       all(:sequence, :choice) {
         def choices
-          @choices ||= [ sequence ] + choice.sequences
+          @choices ||= [ sequence ] + choice.value
         end
 
         def values
@@ -103,7 +103,7 @@ module Citrus
 
     rule :choice do
       zero_or_more([ :bar, :sequence ]) {
-        def sequences
+        def value
           matches.map {|m| m.matches[1] }
         end
       }
@@ -288,12 +288,12 @@ module Citrus
 
     rule :label do
       all(/[a-zA-Z0-9_]+/, :space, ':', :space) {
-        def value
-          first.text
-        end
-
         def wrap(rule)
           Label.new(value, rule)
+        end
+
+        def value
+          first.text
         end
       }
     end
