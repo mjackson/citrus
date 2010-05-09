@@ -28,7 +28,7 @@ module Citrus
   # Evaluates the given Citrus grammar +code+ in the global scope.
   def self.eval(code)
     file = PEG.parse(code)
-    file.eval
+    file.value
   end
 
   # This error is raised whenever a parse fails.

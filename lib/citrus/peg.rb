@@ -18,9 +18,7 @@ module Citrus
           find(:grammar)
         end
 
-        # Evaluates all code in the file and returns an array of the Grammar
-        # modules that were created.
-        def eval
+        def value
           requires.each {|r| require r.value }
           grammars.map {|g| g.value }
         end
