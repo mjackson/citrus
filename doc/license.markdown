@@ -1,4 +1,5 @@
-== License
+License
+-------
 
 Copyright 2010 Michael Jackson
 
