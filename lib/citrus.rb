@@ -150,6 +150,10 @@ module Citrus
     # Gets/sets the rule with the given +name+. If +obj+ is given the rule
     # will be set to the value of +obj+ passed through Rule#create. If a block
     # is given, its return value will be used for the value of +obj+.
+    #
+    # It is important to note that this method will also check any included
+    # grammars for a rule with the given +name+ if one cannot be found in this
+    # grammar.
     def rule(name, obj=nil)
       sym = name.to_sym
 
@@ -443,8 +447,8 @@ module Citrus
 
   private
 
-    # Searches this proxy's grammar for a rule with this proxy's #rule_name.
-    # Raises an error if one cannot be found.
+    # Searches this proxy's grammar and any included grammars for a rule with
+    # this proxy's #rule_name. Raises an error if one cannot be found.
     def resolve!
       rule = grammar.rule(rule_name)
       raise RuntimeError, 'No rule named "%s" in grammar %s' %
