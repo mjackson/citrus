@@ -145,7 +145,6 @@ module Citrus
         rule_names << sym
 
         rule = Rule.create(Proc.new.call)
-        raise "Rule may not be a Proxy object" if Proxy === rule
         rule.name = name
         rule.grammar = self
 
@@ -332,7 +331,7 @@ module Citrus
     attr_reader :name
 
     # Specifies a module that will be used to extend all Match objects that
-    # result from this rule. If +mod+ is a Proc, it will be used to create an
+    # result from this rule. If +mod+ is a Proc, it is used to create an
     # anonymous module.
     def ext=(mod)
       mod = Module.new(&mod) if Proc === mod
@@ -353,8 +352,8 @@ module Citrus
       false
     end
 
-    # Returns a string version of this rule that is suitable to be used as part
-    # of the string representation of some other rule.
+    # Returns a string version of this rule that is suitable to be used in the
+    # string representation of another rule.
     def embed
       name ? name.to_s : (paren? ? '(%s)' % to_s : to_s)
     end
@@ -365,10 +364,14 @@ module Citrus
 
   private
 
+    def extend_match(match)
+      match.extend(ext) if ext
+    end
+
     def create_match(result)
       result = [result] if Match === result
       match = Match.new(result)
-      match.extend(ext) if ext
+      extend_match(match)
       match.name = name
       match
     end
@@ -400,19 +403,16 @@ module Citrus
       @rule ||= resolve!
     end
 
-    # Raises an error if the user tries to set a module for matches from this
-    # proxy. The reason for this is that proxy objects do not create matches
-    # like all other rules do. Instead, they simply pass the call to #match
-    # along to #rule and return the result. This is to make them as transparent
-    # as possible in the resulting match tree.
-    def ext=(*args)
-      raise "Proxy objects may not modify a match"
-    end
-
     # Returns the Match for this rule on +input+ at the given +offset+, +nil+ if
     # no match can be made.
     def match(input, offset=0)
-      input.match(rule, offset)
+      m = input.match(rule, offset)
+      if m
+        extend_match(m)
+        # If this Proxy has a name then it should rename all of its matches.
+        m.name = name if name
+        m
+      end
     end
 
     # Returns the PEG notation of this rule as a string.
@@ -609,7 +609,7 @@ module Citrus
     def match(input, offset=0)
       m = rule.match(input, offset)
       if m
-        m = create_match(m)
+        extend_match(m)
         m.name = label
         m
       end
