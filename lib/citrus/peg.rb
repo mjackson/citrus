@@ -51,10 +51,8 @@ module Citrus
           code = '%s = Citrus::Grammar.new' % module_name.value
           grammar = eval(code, TOPLEVEL_BINDING)
           modules.each {|mod| grammar.include(mod) }
-          rules.each do |rule|
-            grammar.rule(rule.rule_name.value) { rule.value }
-          end
           grammar.root(root.value) if root
+          rules.each {|rule| grammar.rule(rule.rule_name.value, rule.value) }
           grammar
         end
       }
