@@ -109,6 +109,6 @@ grammar Calc
   rule slash   '/' space  end
 
   rule space
-    /[ \t\n\r]*/
+    [ \t\n\r]*
   end
 end

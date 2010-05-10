@@ -96,14 +96,12 @@ module Calc
     }
   end
 
-  rule(:lparen) { ['(', :space] }
-  rule(:rparen) { [')', :space] }
-  rule(:plus)   { ['+', :space] }
-  rule(:minus)  { ['-', :space] }
-  rule(:star)   { ['*', :space] }
-  rule(:slash)  { ['/', :space] }
+  rule :lparen, ['(', :space]
+  rule :rparen, [')', :space]
+  rule :plus,   ['+', :space]
+  rule :minus,  ['-', :space]
+  rule :star,   ['*', :space]
+  rule :slash,  ['/', :space]
 
-  rule :space do
-    /[ \t\n\r]*/
-  end
+  rule :space,  /[ \t\n\r]*/
 end
