@@ -6,6 +6,7 @@ end
 
 grammar SuperTwo
   include SuperOne
+
   rule num
     '2' | super
   end

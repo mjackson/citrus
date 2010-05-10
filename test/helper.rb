@@ -7,6 +7,10 @@ require 'citrus'
 class Test::Unit::TestCase
   include Citrus
 
+  def input(str='')
+    Input.new(str)
+  end
+
   module TestGrammar
     include Citrus::Grammar
 
@@ -27,7 +31,9 @@ class Test::Unit::TestCase
     end
   end
 
-  class EqualRule < Rule
+  class EqualRule
+    include Citrus::Rule
+
     def initialize(value)
       @value = value
     end
@@ -35,10 +41,6 @@ class Test::Unit::TestCase
     def match(input, offset=0)
       create_match(@value.to_s.dup) if @value.to_s == input.string
     end
-  end
-
-  def input(str='')
-    Input.new(str)
   end
 
   module CalcTests

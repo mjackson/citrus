@@ -27,10 +27,6 @@ module Citrus
 
     rule :grammar do
       all(:grammar_keyword, :module_name, :grammar_body, :end_keyword) {
-        def grammar_name
-          module_name.value
-        end
-
         def includes
           find(:include)
         end
@@ -48,10 +44,11 @@ module Citrus
         end
 
         def value
-          grammar = eval("#{grammar_name} = Citrus::Grammar.new", TOPLEVEL_BINDING)
+          code = '%s = Citrus::Grammar.new' % module_name.value
+          grammar = eval(code, TOPLEVEL_BINDING)
           modules.each {|mod| grammar.include(mod) }
           rules.each do |rule|
-            grammar.rule(rule.rule_name) { rule.value }
+            grammar.rule(rule.rule_name.value) { rule.value }
           end
           grammar.root(root.value) if root
           grammar
@@ -65,22 +62,8 @@ module Citrus
 
     rule :rule do
       all(:rule_keyword, :rule_name, :rule_body, :end_keyword) {
-        def rule_name
-          super.value
-        end
-
-        def setup_super(rule)
-          if Nonterminal === rule
-            rule.rules.each {|r| setup_super(r) }
-          elsif Super === rule
-            rule.rule_name = rule_name
-          end
-        end
-
         def value
-          rule = rule_body.value
-          setup_super(rule)
-          rule
+          rule_body.value
         end
       }
     end
@@ -155,7 +138,7 @@ module Citrus
     end
 
     rule :primary do
-      any(:super, :proxy, :rule_body_paren, :terminal) {
+      any(:super, :alias, :rule_body_paren, :terminal) {
         def value
           first.value
         end
@@ -214,10 +197,10 @@ module Citrus
       }
     end
 
-    rule :proxy do
+    rule :alias do
       all(notp(:end_keyword), :rule_name) {
         def value
-          Proxy.new(rule_name.value)
+          Alias.new(rule_name.value)
         end
       }
     end

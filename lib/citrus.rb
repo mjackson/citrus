@@ -124,6 +124,15 @@ module Citrus
       rules.key?(name.to_sym)
     end
 
+    def setup_super(rule, name) # :nodoc:
+      if Nonterminal === rule
+        rule.rules.each {|r| setup_super(r, name) }
+      elsif Super === rule
+        rule.rule_name = name
+      end
+    end
+    private :setup_super
+
     # Searches the inheritance hierarchy of this grammar for a rule named +name+
     # and returns it on success. Returns +nil+ on failure.
     def super_rule(name)
@@ -141,11 +150,11 @@ module Citrus
       sym = name.to_sym
 
       if block_given?
-        rule_names.delete(sym) if has_rule?(sym)
-        rule_names << sym
+        rule_names << sym unless has_rule?(sym)
 
         rule = Rule.create(Proc.new.call)
         rule.name = name
+        setup_super(rule, name)
         rule.grammar = self
 
         rules[sym] = rule
@@ -165,17 +174,7 @@ module Citrus
 
     # Creates a new Super for the rule currently being defined in the grammar.
     def sup
-      Super.new(rule_names.last)
-    end
-
-    # Specifies a Module that will be used to extend all matches created with
-    # the given +rule+. A block may also be given that will be used to create
-    # an anonymous module. See Rule#ext=.
-    def ext(rule, mod=nil)
-      rule = Rule.create(rule)
-      mod = Proc.new if block_given?
-      rule.ext = mod if mod
-      rule
+      Super.new
     end
 
     # Creates a new AndPredicate using the given +rule+. A block may be provided
@@ -228,6 +227,16 @@ module Citrus
     # specify semantic behavior (via #ext).
     def any(*args, &block)
       ext(Choice.new(args), block)
+    end
+
+    # Specifies a Module that will be used to extend all matches created with
+    # the given +rule+. A block may also be given that will be used to create
+    # an anonymous module. See Rule#ext=.
+    def ext(rule, mod=nil)
+      rule = Rule.create(rule)
+      mod = Proc.new if block_given?
+      rule.ext = mod if mod
+      rule
     end
 
     # Parses the given +string+ from the given +offset+ using the rules in this
@@ -295,15 +304,14 @@ module Citrus
     end
   end
 
-  # A Rule is an object that is used during parsing to match on the Input. This
-  # class serves as an abstract base for all other rule classes and should
-  # not be directly instantiated.
-  class Rule
+  # A Rule is an object that is used by a grammar to create matches on the
+  # Input during parsing.
+  module Rule
     # Returns a new Rule object depending on the type of object given.
     def self.create(obj)
       case obj
       when Rule     then obj
-      when Symbol   then Proxy.new(obj)
+      when Symbol   then Alias.new(obj)
       when String   then FixedWidth.new(obj)
       when Regexp   then Expression.new(obj)
       when Array    then Sequence.new(obj)
@@ -377,13 +385,13 @@ module Citrus
     end
   end
 
-  # A Proxy is a Rule that is a placeholder for another rule. It is used in
-  # grammar definitions when a rule calls some other rule by name. The PEG
-  # notation is simply the name of a rule without any other punctuation, e.g.:
-  #
-  #     name
-  #
-  class Proxy < Rule
+  # A Proxy is a Rule that is a placeholder for another rule. It stores the
+  # name of some other rule in the grammar internally and resolves it to the
+  # actual Rule object at runtime. This lazy evaluation permits us to create
+  # Proxy objects for rules that we may not know the definition of yet.
+  module Proxy
+    include Rule
+
     def initialize(name='<proxy>')
       self.rule_name = name
     end
@@ -393,18 +401,16 @@ module Citrus
       @rule_name = name.to_sym
     end
 
-    # The name of the rule this rule is proxy for.
+    # The name of this proxy's rule.
     attr_reader :rule_name
 
-    # Returns the underlying Rule object for this Proxy. Lazily evaluated so
-    # we can create Proxy objects before we know what the actual rule looks
-    # like.
+    # Returns the underlying Rule for this proxy.
     def rule
       @rule ||= resolve!
     end
 
-    # Returns the Match for this rule on +input+ at the given +offset+, +nil+ if
-    # no match can be made.
+    # Returns the Match for this proxy's #rule on +input+ at the given +offset+,
+    # +nil+ if no match can be made.
     def match(input, offset=0)
       m = input.match(rule, offset)
       if m
@@ -414,6 +420,16 @@ module Citrus
         m
       end
     end
+  end
+
+  # An Alias is a Proxy for a rule in the same grammar. It is used in rule
+  # definitions when a rule calls some other rule by name. The PEG notation is
+  # simply the name of another rule without any other punctuation, e.g.:
+  #
+  #     name
+  #
+  class Alias
+    include Proxy
 
     # Returns the PEG notation of this rule as a string.
     def to_s
@@ -422,8 +438,8 @@ module Citrus
 
   private
 
-    # Searches this grammar for a rule with this proxy's name. Raises an error
-    # if one cannot be found.
+    # Searches this proxy's grammar for a rule with this proxy's #rule_name.
+    # Raises an error if one cannot be found.
     def resolve!
       rule = grammar.rule(rule_name)
       raise RuntimeError, 'No rule named "%s" in grammar %s' %
@@ -432,13 +448,16 @@ module Citrus
     end
   end
 
-  # A Super is a special kind of Proxy that works like Ruby's +super+, but for
-  # rules in a grammar. The PEG notation is the word +super+ without any other
-  # punctuation, e.g.:
+  # A Super is a Proxy for a rule of the same name that was defined previously
+  # in the grammar's inheritance chain. Thus, Super's work like Ruby's +super+,
+  # only for rules in a grammar instead of methods in a module. The PEG notation
+  # is the word +super+ without any other punctuation, e.g.:
   #
   #     super
   #
-  class Super < Proxy
+  class Super
+    include Proxy
+
     # Returns the PEG notation of this rule as a string.
     def to_s
       'super'
@@ -446,19 +465,21 @@ module Citrus
 
   private
 
-    # Searches this grammar's included grammars for a rule with this proxy's
-    # name. Raises an error if one cannot be found.
+    # Searches this proxy's included grammars for a rule with this proxy's
+    # #rule_name. Raises an error if one cannot be found.
     def resolve!
       rule = grammar.super_rule(rule_name)
-      raise RuntimeError, 'Cannot use super. No rule named "%s" in hierarchy ' +
-        'of grammar %s' % [rule_name, grammar.name] unless rule
+      raise RuntimeError, 'No rule named "%s" in hierarchy of grammar %s' %
+        [rule_name, grammar.name] unless rule
       rule
     end
   end
 
   # A Terminal is a Rule that matches directly on the input stream and may not
   # contain any other rule.
-  class Terminal < Rule
+  module Terminal
+    include Rule
+
     def initialize(rule)
       @rule = rule
     end
@@ -479,7 +500,9 @@ module Citrus
   #     'expr'
   #     "expr"
   #
-  class FixedWidth < Terminal
+  class FixedWidth
+    include Terminal
+
     def initialize(rule='')
       raise ArgumentError, "FixedWidth must be a String" unless String === rule
       super
@@ -505,7 +528,9 @@ module Citrus
   #     [a-zA-Z]
   #     .
   #
-  class Expression < Terminal
+  class Expression
+    include Terminal
+
     def initialize(rule=/^/)
       raise ArgumentError, "Expression must be a Regexp" unless Regexp === rule
       super
@@ -523,7 +548,9 @@ module Citrus
   # other rules. Nonterminals may not match directly on the input, but instead
   # invoke the rule(s) they contain to determine if a match can be made from
   # the collective result.
-  class Nonterminal < Rule
+  module Nonterminal
+    include Rule
+
     def initialize(rules=[])
       @rules = rules.map {|r| Rule.create(r) }
     end
@@ -538,7 +565,9 @@ module Citrus
   end
 
   # A Predicate is a Nonterminal that contains one other rule.
-  class Predicate < Nonterminal
+  module Predicate
+    include Nonterminal
+
     def initialize(rule='')
       super([ rule ])
     end
@@ -555,7 +584,9 @@ module Citrus
   #
   #     &expr
   #
-  class AndPredicate < Predicate
+  class AndPredicate
+    include Predicate
+
     # Returns the Match for this rule on +input+ at the given +offset+, +nil+ if
     # no match can be made.
     def match(input, offset=0)
@@ -574,7 +605,9 @@ module Citrus
   #
   #     !expr
   #
-  class NotPredicate < Predicate
+  class NotPredicate
+    include Predicate
+
     # Returns the Match for this rule on +input+ at the given +offset+, +nil+ if
     # no match can be made.
     def match(input, offset=0)
@@ -594,7 +627,9 @@ module Citrus
   #
   #     label:expr
   #
-  class Label < Predicate
+  class Label
+    include Predicate
+
     def initialize(label='', rule='')
       @label = label.to_s
       super(rule)
@@ -640,7 +675,9 @@ module Citrus
   #     expr+
   #     expr?
   #
-  class Repeat < Predicate
+  class Repeat
+    include Predicate
+
     def initialize(min=1, max=Infinity, rule='')
       raise ArgumentError, "Min cannot be greater than max" if min > max
       @range = Range.new(min, max)
@@ -684,7 +721,9 @@ module Citrus
 
   # A List is a Nonterminal that contains any number of other rules and tests
   # them for matches in sequential order.
-  class List < Nonterminal
+  module List
+    include Nonterminal
+
     def paren?
       rules.length > 1
     end
@@ -695,7 +734,9 @@ module Citrus
   #
   #     expr | expr
   #
-  class Choice < List
+  class Choice
+    include List
+
     # Returns the Match for this rule on +input+ at the given +offset+, +nil+ if
     # no match can be made.
     def match(input, offset=0)
@@ -717,7 +758,9 @@ module Citrus
   #
   #     expr expr
   #
-  class Sequence < List
+  class Sequence
+    include List
+
     # Returns the Match for this rule on +input+ at the given +offset+, +nil+ if
     # no match can be made.
     def match(input, offset=0)

@@ -1,0 +1,9 @@
+grammar AliasOne
+  rule alias
+    value
+  end
+
+  rule value
+    'a'
+  end
+end

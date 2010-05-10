@@ -48,7 +48,7 @@ class PEGTest < Test::Unit::TestCase
     match = grammar.parse('rule_name')
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_instance_of(Proxy, match.value)
+    assert_instance_of(Alias, match.value)
 
     match = grammar.parse('""')
     assert(match)
@@ -273,7 +273,7 @@ class PEGTest < Test::Unit::TestCase
     match = grammar.parse('rule_name')
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_instance_of(Proxy, match.value)
+    assert_instance_of(Alias, match.value)
 
     match = grammar.parse('"a"')
     assert(match)
@@ -335,20 +335,6 @@ class PEGTest < Test::Unit::TestCase
     match = grammar.parse('some_rule ')
     assert(match)
     assert('some_rule', match.value)
-  end
-
-  def test_proxy
-    grammar = peg(:proxy)
-
-    match = grammar.parse('some_rule')
-    assert(match)
-    assert_kind_of(Rule, match.value)
-    assert_instance_of(Proxy, match.value)
-
-    match = grammar.parse('some_rule ')
-    assert(match)
-    assert_kind_of(Rule, match.value)
-    assert_instance_of(Proxy, match.value)
   end
 
   def test_terminal
