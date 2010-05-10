@@ -25,7 +25,8 @@ module Citrus
     self.eval(File.read(file))
   end
 
-  # Evaluates the given Citrus grammar +code+ in the global scope.
+  # Evaluates the given Citrus parsing expression grammar +code+ in the global
+  # scope.
   def self.eval(code)
     file = PEG.parse(code)
     file.value
