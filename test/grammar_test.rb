@@ -2,6 +2,13 @@ require File.dirname(__FILE__) + '/helper'
 
 class GrammarTest < Test::Unit::TestCase
 
+  def test_new
+    Grammar.new do |g|
+      assert_kind_of(Module, g)
+      assert(g.include?(Grammar))
+    end
+  end
+
   def test_name
     assert_equal("Test::Unit::TestCase::TestGrammar", TestGrammar.name)
   end

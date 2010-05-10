@@ -56,19 +56,17 @@ module Citrus
     end
   end
 
-  # This module should be included in all grammars. Although it does not provide
-  # any methods, constants, or variables to modules that include it, the mere
-  # act of inclusion provides a useful lookup mechanism to determine if a module
-  # is in fact a grammar.
-  #
-  # The instance-level of included modules is left untouched so that it provides
-  # a clean slate for grammars to define their rules in.
+  # Inclusion of this module into another extends the receiver with the grammar
+  # helper methods in GrammarMethods. Although this module does not actually
+  # provide any methods, constants, or variables to modules that include it, the
+  # mere act of inclusion provides a useful lookup mechanism to determine if a
+  # module is in fact a grammar.
   module Grammar
-    # Creates a new Grammar as an anonymous module. If a block is provided, it
-    # will be called with the new Grammar as its first argument if its +arity+
-    # is 1 or +instance_eval+'d in the context of the new Grammar otherwise.
-    # See http://blog.grayproductions.net/articles/dsl_block_styles for the
-    # rationale behind this decision.
+    # Creates a new anonymous module that includes Grammar. If a +block+ is
+    # provided, it will be called with the new module as its first argument if
+    # its +arity+ is 1 or +instance_eval+'d in the context of the new module
+    # otherwise. See http://blog.grayproductions.net/articles/dsl_block_styles
+    # for the rationale behind this decision.
     #
     # Grammars created with this method may be assigned a name by being assigned
     # to some constant, e.g.:
@@ -77,24 +75,19 @@ module Citrus
     #
     def self.new(&block)
       mod = Module.new { include Grammar }
-      if block
-        block.arity == 1 ? block[self] : mod.instance_eval(&block)
-      end
+      block.arity == 1 ? block[mod] : mod.instance_eval(&block) if block
       mod
     end
 
-    # Extends all modules that +include Grammar+ with the GrammarMethods
-    # module.
-    def self.included(base)
-      base.extend(GrammarMethods)
-      class << base
-        public :include
-      end
+    # Extends all modules that +include Grammar+ with GrammarMethods and
+    # exposes Module#include.
+    def self.included(mod)
+      mod.extend(GrammarMethods)
+      class << mod; public :include end
     end
   end
 
-  # Contains methods that should be available to Grammar modules at the class
-  # level.
+  # Contains methods that are available to Grammar modules at the class level.
   module GrammarMethods
     # Returns the name of this grammar as a string.
     def name
