@@ -124,6 +124,9 @@ module Citrus
       rules.key?(name.to_sym)
     end
 
+    # Loops through the rule tree for the given +rule+ looking for any Super
+    # rules. When it finds one, it sets that rule's rule name to the given
+    # +name+.
     def setup_super(rule, name) # :nodoc:
       if Nonterminal === rule
         rule.rules.each {|r| setup_super(r, name) }
@@ -144,15 +147,18 @@ module Citrus
       nil
     end
 
-    # Gets/sets the rule with the given +name+. If a block is given, the rule
-    # will be set to the return value of the block passed through Rule#create.
-    def rule(name)
+    # Gets/sets the rule with the given +name+. If +obj+ is given the rule
+    # will be set to the value of +obj+ passed through Rule#create. If a block
+    # is given, its return value will be used for the value of +obj+.
+    def rule(name, obj=nil)
       sym = name.to_sym
 
-      if block_given?
+      obj = Proc.new.call if block_given?
+
+      if obj
         rule_names << sym unless has_rule?(sym)
 
-        rule = Rule.create(Proc.new.call)
+        rule = Rule.create(obj)
         rule.name = name
         setup_super(rule, name)
         rule.grammar = self
