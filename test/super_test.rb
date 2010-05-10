@@ -10,12 +10,12 @@ class SuperTest < Test::Unit::TestCase
 
   def test_match
     grammar1 = Grammar.new {
-      rule(:value) { 'a' }
+      rule :a, 'a'
     }
 
     grammar2 = Grammar.new {
       include grammar1
-      rule (:value) { any('b', sup) }
+      rule :a, any('b', sup)
     }
 
     match = grammar2.parse('b')
@@ -35,6 +35,27 @@ class SuperTest < Test::Unit::TestCase
 
     match = SuperTwo.parse('1')
     assert(match)
+  end
+
+  def test_nested
+    grammar1 = Grammar.new {
+      rule :a, 'a'
+      rule :b, 'b'
+    }
+
+    grammar2 = Grammar.new {
+      include grammar1
+      rule :a, any(sup, :b)
+      rule :b, sup
+    }
+
+    match = grammar2.parse('a')
+    assert(match)
+    assert_equal(:a, match.first.name)
+
+    match = grammar2.parse('b')
+    assert(match)
+    assert_equal(:b, match.first.name)
   end
 
   def test_to_s

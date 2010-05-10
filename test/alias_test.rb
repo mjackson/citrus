@@ -10,18 +10,32 @@ class AliasTest < Test::Unit::TestCase
 
   def test_match
     grammar = Grammar.new {
-      rule(:alias) { :value }
-      rule(:value) { 'a' }
+      rule :a, :b
+      rule :b, 'b'
     }
 
-    match = grammar.parse('a')
+    match = grammar.parse('b')
     assert(match)
-    assert('a', match.text)
+    assert('b', match.text)
     assert(1, match.length)
   end
 
   def test_peg
     match = AliasOne.parse('a')
+    assert(match)
+  end
+
+  def test_included
+    grammar1 = Grammar.new {
+      rule :a, 'a'
+    }
+
+    grammar2 = Grammar.new {
+      include grammar1
+      rule :b, :a
+    }
+
+    match = grammar2.parse('a')
     assert(match)
   end
 
