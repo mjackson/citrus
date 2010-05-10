@@ -1,6 +1,10 @@
 require 'citrus'
 
 module Citrus
+  # This module is a Grammar for Citrus-flavored parsing expression grammars. It
+  # is used in Citrus#eval to parse and evaluate Citrus PEG's and serves as a
+  # prime example of how to create a complex grammar complete with semantic
+  # interpretation in pure Ruby.
   module PEG
     include Grammar
 
@@ -355,31 +359,23 @@ module Citrus
       /[A-Z][a-zA-Z0-9_]*/
     end
 
-    rule(:require_keyword)  { [ 'require', :space ] }
-    rule(:include_keyword)  { [ 'include', :space ] }
-    rule(:grammar_keyword)  { [ 'grammar', :space ] }
-    rule(:super_keyword)    { [ 'super', :space ] }
-    rule(:root_keyword)     { [ 'root', :space ] }
-    rule(:rule_keyword)     { [ 'rule', :space ] }
-    rule(:end_keyword)      { [ 'end', :space ] }
-    rule(:lparen)           { [ '(', :space ] }
-    rule(:rparen)           { [ ')', :space ] }
-    rule(:lcurly)           { [ '{', :space ] }
-    rule(:rcurly)           { [ '}', :space ] }
-    rule(:bar)              { [ '|', :space ] }
-    rule(:lt)               { [ '<', :space ] }
-    rule(:gt)               { [ '>', :space ] }
+    rule :require_keyword,  [ 'require', :space ]
+    rule :include_keyword,  [ 'include', :space ]
+    rule :grammar_keyword,  [ 'grammar', :space ]
+    rule :super_keyword,    [ 'super', :space ]
+    rule :root_keyword,     [ 'root', :space ]
+    rule :rule_keyword,     [ 'rule', :space ]
+    rule :end_keyword,      [ 'end', :space ]
+    rule :lparen,           [ '(', :space ]
+    rule :rparen,           [ ')', :space ]
+    rule :lcurly,           [ '{', :space ]
+    rule :rcurly,           [ '}', :space ]
+    rule :bar,              [ '|', :space ]
+    rule :lt,               [ '<', :space ]
+    rule :gt,               [ '>', :space ]
 
-    rule :space do
-      zero_or_more(any(:white, :comment))
-    end
-
-    rule :white do
-      /[ \t\n\r]/
-    end
-
-    rule :comment do
-      /#.*/
-    end
+    rule :white,            /[ \t\n\r]/
+    rule :comment,          /#.*/
+    rule :space,            zero_or_more(any(:white, :comment))
   end
 end
