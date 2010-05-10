@@ -377,7 +377,6 @@ module Citrus
     end
 
     def create_match(result)
-      result = [result] if Match === result
       match = Match.new(result)
       extend_match(match)
       match.name = name
@@ -742,7 +741,7 @@ module Citrus
     def match(input, offset=0)
       rules.each do |rule|
         m = input.match(rule, offset)
-        return create_match(m) if m
+        return create_match([m]) if m
       end
       nil
     end
