@@ -12,12 +12,12 @@ module Calc
     end
   end
 
-  # If "additive" were not already the first rule declared in this grammar, we
+  # If "term" were not already the first rule declared in this grammar, we
   # could use the following line to make it the root rule.
-  #root :additive
+  #root :term
 
   rule :term do
-    mod(any(:additive, :factor), FirstValue)
+    ext(any(:additive, :factor), FirstValue)
   end
 
   rule :additive do
@@ -33,7 +33,7 @@ module Calc
   end
 
   rule :factor do
-    mod(any(:multiplicative, :primary), FirstValue)
+    ext(any(:multiplicative, :primary), FirstValue)
   end
 
   rule :multiplicative do
@@ -49,7 +49,7 @@ module Calc
   end
 
   rule :primary do
-    mod(any(:term_paren, :number), FirstValue)
+    ext(any(:term_paren, :number), FirstValue)
   end
 
   rule :term_paren do
@@ -77,7 +77,7 @@ module Calc
   end
 
   rule :number do
-    mod(any(:float, :integer), FirstValue)
+    ext(any(:float, :integer), FirstValue)
   end
 
   rule :float do

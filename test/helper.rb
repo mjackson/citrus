@@ -15,7 +15,7 @@ class Test::Unit::TestCase
     end
 
     rule :num do
-      mod(/[0-9]/) {
+      ext(/[0-9]/) {
         def value
           text.to_i
         end

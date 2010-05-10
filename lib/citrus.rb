@@ -171,36 +171,37 @@ module Citrus
 
     # Specifies a Module that will be used to extend all matches created with
     # the given +rule+. A block may also be given that will be used to create
-    # an anonymous module. See Rule#match_module=.
-    def mod(rule, ext=nil)
+    # an anonymous module. See Rule#ext=.
+    def ext(rule, mod=nil)
       rule = Rule.create(rule)
-      ext = Proc.new if block_given?
-      rule.match_module = ext if ext
+      mod = Proc.new if block_given?
+      rule.ext = mod if mod
       rule
     end
 
     # Creates a new AndPredicate using the given +rule+. A block may be provided
-    # to specify semantic behavior (via #mod).
+    # to specify semantic behavior (via #ext).
     def andp(rule, &block)
-      mod(AndPredicate.new(rule), block)
+      ext(AndPredicate.new(rule), block)
     end
 
     # Creates a new NotPredicate using the given +rule+. A block may be provided
-    # to specify semantic behavior (via #mod).
+    # to specify semantic behavior (via #ext).
     def notp(rule, &block)
-      mod(NotPredicate.new(rule), block)
+      ext(NotPredicate.new(rule), block)
     end
 
-    # Creates a new Label using the given +rule+ and +label+.
+    # Creates a new Label using the given +rule+ and +label+. A block may be
+    # provided to specify semantic behavior (via #ext).
     def label(rule, label, &block)
-      mod(Label.new(label, rule), block)
+      ext(Label.new(label, rule), block)
     end
 
     # Creates a new Repeat using the given +rule+. +min+ and +max+ specify the
     # minimum and maximum number of times the rule must match. A block may be
-    # provided to specify semantic behavior (via #mod).
+    # provided to specify semantic behavior (via #ext).
     def rep(rule, min=1, max=Infinity, &block)
-      mod(Repeat.new(min, max, rule), block)
+      ext(Repeat.new(min, max, rule), block)
     end
 
     # An alias for #rep.
@@ -219,15 +220,15 @@ module Citrus
     end
 
     # Creates a new Sequence using all arguments. A block may be provided to
-    # specify semantic behavior (via #mod).
+    # specify semantic behavior (via #ext).
     def all(*args, &block)
-      mod(Sequence.new(args), block)
+      ext(Sequence.new(args), block)
     end
 
     # Creates a new Choice using all arguments. A block may be provided to
-    # specify semantic behavior (via #mod).
+    # specify semantic behavior (via #ext).
     def any(*args, &block)
-      mod(Choice.new(args), block)
+      ext(Choice.new(args), block)
     end
 
     # Parses the given +string+ from the given +offset+ using the rules in this
@@ -333,13 +334,13 @@ module Citrus
     # Specifies a module that will be used to extend all Match objects that
     # result from this rule. If +mod+ is a Proc, it will be used to create an
     # anonymous module.
-    def match_module=(mod)
+    def ext=(mod)
       mod = Module.new(&mod) if Proc === mod
-      @match_module = mod
+      @ext = mod
     end
 
     # The module this rule uses to extend new matches.
-    attr_reader :match_module
+    attr_reader :ext
 
     # Returns +true+ if this rule is a Terminal.
     def terminal?
@@ -367,7 +368,7 @@ module Citrus
     def create_match(result)
       result = [result] if Match === result
       match = Match.new(result)
-      match.extend(match_module) if match_module
+      match.extend(ext) if ext
       match.name = name
       match
     end
@@ -404,7 +405,7 @@ module Citrus
     # like all other rules do. Instead, they simply pass the call to #match
     # along to #rule and return the result. This is to make them as transparent
     # as possible in the resulting match tree.
-    def match_module=(*args)
+    def ext=(*args)
       raise "Proxy objects may not modify a match"
     end
 
@@ -833,13 +834,13 @@ module Citrus
     def to_xml(indent='  ', level=0)
       margin = indent * level
       eol = indent == '' ? '' : "\n"
-      xml = level == 0 ? "<?xml version=\"1.0\"?>\n" : ''
+      xml = level == 0 ? "<?xml version=\"1.0\"?>#{eol}" : ''
 
       attrs = %w< name text >.map {|attr|
         "#{attr}=\"%s\"" % XChar.escape(__send__(attr.to_sym).to_s)
       }.join(' ')
 
-      xml << margin + "<match #{attrs}"
+      xml << "#{margin}<match #{attrs}"
 
       if matches.empty?
         xml << "/>"

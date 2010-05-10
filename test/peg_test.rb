@@ -235,17 +235,17 @@ class PEGTest < Test::Unit::TestCase
     match = grammar.parse('"" <Module>')
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_kind_of(Module, match.value.match_module)
+    assert_kind_of(Module, match.value.ext)
 
     match = grammar.parse('"" {}')
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_kind_of(Module, match.value.match_module)
+    assert_kind_of(Module, match.value.ext)
 
     match = grammar.parse('"" {} ')
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_kind_of(Module, match.value.match_module)
+    assert_kind_of(Module, match.value.ext)
   end
 
   def test_suffix

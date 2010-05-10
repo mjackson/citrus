@@ -133,11 +133,11 @@ module Citrus
     end
 
     rule :appendix do
-      all(:suffix, zero_or_one(:modifier)) {
+      all(:suffix, zero_or_one(:extension)) {
         def value
           rule = suffix.value
-          modifier = matches[1].first
-          rule = modifier.wrap(rule) if modifier
+          extension = matches[1].first
+          rule = extension.wrap(rule) if extension
           rule
         end
       }
@@ -298,10 +298,10 @@ module Citrus
       }
     end
 
-    rule :modifier do
+    rule :extension do
       any(:tag, :block) {
         def wrap(rule)
-          rule.match_module = first.value
+          rule.ext = first.value
           rule
         end
       }
