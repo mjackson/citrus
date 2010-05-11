@@ -332,21 +332,19 @@ module Citrus
       end
     end
 
-    # Generates a new id.
+    # Generates a new rule id.
     def self.uniq_id
       @id ||= 0
       @id += 1
     end
 
-    def initialize
-      @id = Rule.uniq_id
-    end
-
-    # An integer id that is unique to this Rule object.
-    attr_reader :id
-
     # The grammar this rule belongs to.
     attr_accessor :grammar
+
+    # An integer id that is unique to this rule.
+    def id
+      @id ||= Rule.uniq_id
+    end
 
     # Sets the name of this rule.
     def name=(name)
@@ -394,8 +392,8 @@ module Citrus
       match.extend(ext) if ext
     end
 
-    def create_match(result)
-      match = Match.new(result)
+    def create_match(data, offset)
+      match = Match.new(data, offset)
       extend_match(match)
       match.name = name
       match
@@ -410,7 +408,6 @@ module Citrus
     include Rule
 
     def initialize(name='<proxy>')
-      super()
       self.rule_name = name
     end
 
@@ -499,7 +496,6 @@ module Citrus
     include Rule
 
     def initialize(rule)
-      super()
       @rule = rule
     end
 
@@ -530,7 +526,7 @@ module Citrus
     # Returns the Match for this rule on +input+ at the given +offset+, +nil+ if
     # no match can be made.
     def match(input, offset=0)
-      create_match(rule.dup) if rule == input[offset, rule.length]
+      create_match(rule.dup, offset) if rule == input[offset, rule.length]
     end
   end
 
@@ -559,7 +555,7 @@ module Citrus
     # no match can be made.
     def match(input, offset=0)
       result = input[offset, input.length - offset].match(rule)
-      create_match(result) if result && result.begin(0) == 0
+      create_match(result, offset) if result && result.begin(0) == 0
     end
   end
 
@@ -571,7 +567,6 @@ module Citrus
     include Rule
 
     def initialize(rules=[])
-      super()
       @rules = rules.map {|r| Rule.create(r) }
     end
 
@@ -610,7 +605,7 @@ module Citrus
     # Returns the Match for this rule on +input+ at the given +offset+, +nil+ if
     # no match can be made.
     def match(input, offset=0)
-      create_match('') if input.match(rule, offset)
+      create_match('', offset) if input.match(rule, offset)
     end
 
     # Returns the PEG notation of this rule as a string.
@@ -631,7 +626,7 @@ module Citrus
     # Returns the Match for this rule on +input+ at the given +offset+, +nil+ if
     # no match can be made.
     def match(input, offset=0)
-      create_match('') unless input.match(rule, offset)
+      create_match('', offset) unless input.match(rule, offset)
     end
 
     # Returns the PEG notation of this rule as a string.
@@ -714,7 +709,7 @@ module Citrus
         matches << m
         offset += m.length
       end
-      create_match(matches) if @range.include?(matches.length)
+      create_match(matches, offset) if @range.include?(matches.length)
     end
 
     # Returns the operator this rule uses as a string. Will be one of
@@ -762,7 +757,7 @@ module Citrus
     def match(input, offset=0)
       rules.each do |rule|
         m = input.match(rule, offset)
-        return create_match([m]) if m
+        return create_match([m], offset) if m
       end
       nil
     end
@@ -791,7 +786,7 @@ module Citrus
         matches << m
         offset += m.length
       end
-      create_match(matches) if matches.length == rules.length
+      create_match(matches, offset) if matches.length == rules.length
     end
 
     # Returns the PEG notation of this rule as a string.
@@ -800,40 +795,43 @@ module Citrus
     end
   end
 
-  # The base class for all matches. Matches are organized into a parse tree
-  # where any match may contain any number of other matches. This class provides
-  # several convenient tree traversal methods that help when examining parse
-  # results.
+  # The base class for all matches. Matches are organized into a tree where any
+  # match may contain any number of other matches. This class provides several
+  # convenient tree traversal methods that help when examining parse results.
   class Match
-    def initialize(result=nil)
-      @matches = []
-      @captures = []
-
-      case result
+    def initialize(data, offset=0)
+      case data
       when String
-        @text = result
+        @text = data
       when MatchData
-        @text = result[0]
-        @captures = result.captures
+        @text = data[0]
+        @captures = data.captures
       when Array
-        @matches = result
-      else
-        raise ArgumentError, "Invalid match result: #{result.inspect}"
+        @matches = data
       end
+
+      @offset = offset
     end
-
-    # An array of all sub-matches of this match.
-    attr_reader :matches
-
-    # An array of substrings returned by MatchData#captures if this match was
-    # created by an Expression.
-    attr_reader :captures
 
     # The name by which this match can be accessed from a parent match. This
     # will be the name of the rule that generated the match in most cases.
     # However, if the match is the result of a Label this will be the value of
     # the label.
     attr_accessor :name
+
+    # The offset in the input at which this match occurred.
+    attr_reader :offset
+
+    # An array of all sub-matches of this match.
+    def matches
+      @matches ||= []
+    end
+
+    # An array of substrings returned by MatchData#captures if this match was
+    # created by an Expression.
+    def captures
+      @captures ||= []
+    end
 
     # Returns the raw text value of this match, which may simply be an
     # aggregate of the text of all sub-matches if this match is not #terminal?.
@@ -899,7 +897,7 @@ module Citrus
       eol = indent == '' ? '' : "\n"
       xml = level == 0 ? "<?xml version=\"1.0\"?>#{eol}" : ''
 
-      attrs = %w< name text >.map {|attr|
+      attrs = %w< name text offset >.map {|attr|
         "#{attr}=\"%s\"" % XChar.escape(__send__(attr.to_sym).to_s)
       }.join(' ')
 

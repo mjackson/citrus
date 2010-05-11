@@ -39,7 +39,7 @@ class Test::Unit::TestCase
     end
 
     def match(input, offset=0)
-      create_match(@value.to_s.dup) if @value.to_s == input.string
+      create_match(@value.to_s.dup, offset) if @value.to_s == input.string
     end
   end
 
