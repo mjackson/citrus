@@ -263,11 +263,11 @@ module Citrus
     end
   end
 
-  # The core of the packrat parsing algorithm, this class wraps a string that
-  # is to be parsed and keeps a cache of matches for all rules at any given
-  # offset. See http://pdos.csail.mit.edu/~baford/packrat/icfp02/ for more
-  # information on packrat parsing.
+  # This class represents the core of the parsing algorithm. It wraps the input
+  # string and serves matches to all nonterminals.
   class Input
+    # Takes the input +string+ that is to be parsed. If +enable_memo+ is +true+
+    # a cache is created that holds references to already generated matches.
     def initialize(string, enable_memo=false)
       @string = string
       @max_offset = 0
@@ -280,14 +280,15 @@ module Citrus
     # The input string.
     attr_reader :string
 
-    # A two-level hash of rule id's and offsets to their respective matches.
-    attr_reader :cache
-
-    # The number of times the cache was hit.
-    attr_reader :cache_hits
-
     # The maximum offset that has been achieved.
     attr_reader :max_offset
+
+    # A two-level hash of rule id's and offsets to their respective matches.
+    # Only present if memoing is enabled.
+    attr_reader :cache
+
+    # The number of times the cache was hit. Only present if memoing is enabled.
+    attr_reader :cache_hits
 
     # Sends all arguments to this input's +string+.
     def [](*args)
@@ -299,9 +300,11 @@ module Citrus
       @string.length
     end
 
-    # Returns the match for a given +rule+ at a given +offset+. If no such match
-    # exists in the cache, the rule is executed and the result is cached before
-    # returning.
+    # Returns the match for a given +rule+ at a given +offset+. If memoing is
+    # enabled and a match does not already exist for the given rule/offset pair
+    # then the rule is executed and the result is cached before returning. See
+    # http://pdos.csail.mit.edu/~baford/packrat/icfp02/ for more information on
+    # memoing match results (also known as packrat parsing).
     def match(rule, offset=0)
       @max_offset = offset if offset > @max_offset
 
