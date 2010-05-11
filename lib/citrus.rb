@@ -176,9 +176,10 @@ module Citrus
       @root || rule_names.first
     end
 
-    # Creates a new Super for the rule currently being defined in the grammar.
-    def sup
-      Super.new
+    # Creates a new Super for the rule currently being defined in the grammar. A
+    # block may be provided to specify semantic behavior (via #ext).
+    def sup(&block)
+      ext(Super.new, block)
     end
 
     # Creates a new AndPredicate using the given +rule+. A block may be provided
