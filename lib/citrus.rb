@@ -26,7 +26,7 @@ module Citrus
   end
 
   # Evaluates the given Citrus parsing expression grammar +code+ in the global
-  # scope.
+  # scope. Returns an array of any grammar modules that were created.
   def self.eval(code)
     file = PEG.parse(code)
     file.value
