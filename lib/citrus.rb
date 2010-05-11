@@ -712,11 +712,12 @@ module Citrus
     # no match can be made.
     def match(input, offset=0)
       matches = []
+      ofs = offset
       while matches.length < @range.end
-        m = input.match(rule, offset)
+        m = input.match(rule, ofs)
         break unless m
         matches << m
-        offset += m.length
+        ofs += m.length
       end
       create_match(matches, offset) if @range.include?(matches.length)
     end
@@ -789,11 +790,12 @@ module Citrus
     # no match can be made.
     def match(input, offset=0)
       matches = []
+      ofs = offset
       rules.each do |rule|
-        m = input.match(rule, offset)
+        m = input.match(rule, ofs)
         break unless m
         matches << m
-        offset += m.length
+        ofs += m.length
       end
       create_match(matches, offset) if matches.length == rules.length
     end
