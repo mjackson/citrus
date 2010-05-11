@@ -246,13 +246,13 @@ module Citrus
     # Parses the given +string+ from the given +offset+ using the rules in this
     # grammar. A ParseError is raised if there is no match made or if
     # +consume_all+ is +true+ and the entire input string cannot be consumed.
-    def parse(string, offset=0, consume_all=true)
+    def parse(string, offset=0, enable_memo=false, consume_all=true)
       raise "No root rule specified" unless root
 
       root_rule = rule(root)
       raise "No rule named \"#{root}\"" unless root_rule
 
-      input = Input.new(string)
+      input = Input.new(string, enable_memo)
       match = input.match(root_rule, offset)
 
       if !match || (consume_all && match.length != string.length)
@@ -268,11 +268,13 @@ module Citrus
   # offset. See http://pdos.csail.mit.edu/~baford/packrat/icfp02/ for more
   # information on packrat parsing.
   class Input
-    def initialize(string)
+    def initialize(string, enable_memo=false)
       @string = string
-      @cache = {}
-      @cache_hits = 0
       @max_offset = 0
+      if enable_memo
+        @cache = {}
+        @cache_hits = 0
+      end
     end
 
     # The input string.
@@ -301,15 +303,19 @@ module Citrus
     # exists in the cache, the rule is executed and the result is cached before
     # returning.
     def match(rule, offset=0)
-      c = @cache[rule.id] ||= {}
-
       @max_offset = offset if offset > @max_offset
 
-      if c.key?(offset)
-        @cache_hits += 1
-        c[offset]
+      if @cache
+        c = @cache[rule.id] ||= {}
+
+        if c.key?(offset)
+          @cache_hits += 1
+          c[offset]
+        else
+          c[offset] = rule.match(self, offset)
+        end
       else
-        c[offset] = rule.match(self, offset)
+        rule.match(self, offset)
       end
     end
   end
