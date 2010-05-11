@@ -1,5 +1,3 @@
-require 'forwardable'
-
 # Citrus is a compact and powerful parsing library for Ruby that combines the
 # elegance and expressiveness of the language with the simplicity and power of
 # parsing expression grammars.
@@ -34,8 +32,6 @@ module Citrus
 
   # This error is raised whenever a parse fails.
   class ParseError < Exception
-    extend Forwardable
-
     def initialize(input)
       @input = input
       c = consumed
@@ -48,7 +44,10 @@ module Citrus
     # The Input object that was used for the parse.
     attr_reader :input
 
-    def_delegators :@input, :string, :length, :max_offset
+    # Returns the maximum offset that was reached before the error occurred.
+    def max_offset
+      input.max_offset
+    end
 
     # Returns the portion of the input string that was successfully consumed
     # before the parse failed.
@@ -269,16 +268,12 @@ module Citrus
   # offset. See http://pdos.csail.mit.edu/~baford/packrat/icfp02/ for more
   # information on packrat parsing.
   class Input
-    extend Forwardable
-
     def initialize(string)
       @string = string
       @cache = {}
       @cache_hits = 0
       @max_offset = 0
     end
-
-    def_delegators :@string, :[], :length
 
     # The input string.
     attr_reader :string
@@ -291,6 +286,16 @@ module Citrus
 
     # The maximum offset that has been achieved.
     attr_reader :max_offset
+
+    # Sends all arguments to this input's +string+.
+    def [](*args)
+      @string.__send__(:[], *args)
+    end
+
+    # Returns the length of this input.
+    def length
+      @string.length
+    end
 
     # Returns the match for a given +rule+ at a given +offset+. If no such match
     # exists in the cache, the rule is executed and the result is cached before
@@ -327,13 +332,21 @@ module Citrus
       end
     end
 
+    # Generates a new id.
+    def self.uniq_id
+      @id ||= 0
+      @id += 1
+    end
+
+    def initialize
+      @id = Rule.uniq_id
+    end
+
+    # An integer id that is unique to this Rule object.
+    attr_reader :id
+
     # The grammar this rule belongs to.
     attr_accessor :grammar
-
-    # Returns a string id that is unique to this Rule object.
-    def id
-      object_id.to_s
-    end
 
     # Sets the name of this rule.
     def name=(name)
@@ -397,6 +410,7 @@ module Citrus
     include Rule
 
     def initialize(name='<proxy>')
+      super()
       self.rule_name = name
     end
 
@@ -485,6 +499,7 @@ module Citrus
     include Rule
 
     def initialize(rule)
+      super()
       @rule = rule
     end
 
@@ -556,6 +571,7 @@ module Citrus
     include Rule
 
     def initialize(rules=[])
+      super()
       @rules = rules.map {|r| Rule.create(r) }
     end
 
