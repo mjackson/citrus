@@ -300,11 +300,11 @@ module Citrus
       @string.length
     end
 
-    # Returns the match for a given +rule+ at a given +offset+. If memoing is
-    # enabled and a match does not already exist for the given rule/offset pair
-    # then the rule is executed and the result is cached before returning. See
-    # http://pdos.csail.mit.edu/~baford/packrat/icfp02/ for more information on
-    # memoing match results (also known as packrat parsing).
+    # Returns the match for a given +rule+ at +offset+. If memoing is enabled
+    # and a match does not already exist for the given rule/offset pair then
+    # the rule is executed and the result is cached before returning. See
+    # http://pdos.csail.mit.edu/~baford/packrat/icfp02/ for more information
+    # on memoing match results (also known as packrat parsing).
     def match(rule, offset=0)
       @max_offset = offset if offset > @max_offset
 
@@ -712,12 +712,12 @@ module Citrus
     # no match can be made.
     def match(input, offset=0)
       matches = []
-      ofs = offset
+      os = offset
       while matches.length < @range.end
-        m = input.match(rule, ofs)
+        m = input.match(rule, os)
         break unless m
         matches << m
-        ofs += m.length
+        os += m.length
       end
       create_match(matches, offset) if @range.include?(matches.length)
     end
@@ -790,12 +790,12 @@ module Citrus
     # no match can be made.
     def match(input, offset=0)
       matches = []
-      ofs = offset
+      os = offset
       rules.each do |rule|
-        m = input.match(rule, ofs)
+        m = input.match(rule, os)
         break unless m
         matches << m
-        ofs += m.length
+        os += m.length
       end
       create_match(matches, offset) if matches.length == rules.length
     end
