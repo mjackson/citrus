@@ -57,11 +57,7 @@ grammar Calc
   rule additive_op
     (plus | minus) {
       def apply(factor, term)
-        if text.strip == '+'
-          factor + term
-        else
-          factor - term
-        end
+        text.strip == '+' ? factor + term : factor - term
       end
     }
   end
@@ -69,11 +65,7 @@ grammar Calc
   rule multiplicative_op
     (star | slash) {
       def apply(primary, factor)
-        if text.strip == '*'
-          primary * factor
-        else
-          primary / factor
-        end
+        text.strip == '*' ? primary * factor : primary / factor
       end
     }
   end

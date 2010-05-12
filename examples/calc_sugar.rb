@@ -55,11 +55,7 @@ module Calc
   rule additive_op do
     any(plus, minus) {
       def apply(factor, term)
-        if text.strip == '+'
-          factor + term
-        else
-          factor - term
-        end
+        text.strip == '+' ? factor + term : factor - term
       end
     }
   end
@@ -67,11 +63,7 @@ module Calc
   rule multiplicative_op do
     any(star, slash) {
       def apply(primary, factor)
-        if text.strip == '*'
-          primary * factor
-        else
-          primary / factor
-        end
+        text.strip == '*' ? primary * factor : primary / factor
       end
     }
   end
