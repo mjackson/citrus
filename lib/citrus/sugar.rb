@@ -11,7 +11,7 @@ module Citrus
     #
     # can now be written as
     #
-    #     rule :value do
+    #     rule value do
     #       any(alpha, num)
     #     end
     #
