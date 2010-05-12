@@ -21,9 +21,9 @@ module Calc
   end
 
   rule :additive do
-    all(:factor, :additive_op, :term) {
+    all(:factor, label(:additive_op, :operator), :term) {
       def value
-        additive_op.apply(factor.value, term.value)
+        operator.apply(factor.value, term.value)
       end
     }
   end
@@ -33,9 +33,9 @@ module Calc
   end
 
   rule :multiplicative do
-    all(:primary, :multiplicative_op, :factor) {
+    all(:primary, label(:multiplicative_op, :operator), :factor) {
       def value
-        multiplicative_op.apply(primary.value, factor.value)
+        operator.apply(primary.value, factor.value)
       end
     }
   end
