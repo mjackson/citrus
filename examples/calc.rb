@@ -23,11 +23,7 @@ module Calc
   rule :additive do
     all(:factor, :additive_op, :term) {
       def value
-        if additive_op == '+'
-          factor.value + term.value
-        else
-          factor.value - term.value
-        end
+        additive_op.apply(factor.value, term.value)
       end
     }
   end
@@ -39,11 +35,7 @@ module Calc
   rule :multiplicative do
     all(:primary, :multiplicative_op, :factor) {
       def value
-        if multiplicative_op == '*'
-          primary.value * factor.value
-        else
-          primary.value / factor.value
-        end
+        multiplicative_op.apply(primary.value, factor.value)
       end
     }
   end
@@ -62,16 +54,24 @@ module Calc
 
   rule :additive_op do
     any(:plus, :minus) {
-      def ==(other)
-        text.strip == other
+      def apply(factor, term)
+        if text.strip == '+'
+          factor + term
+        else
+          factor - term
+        end
       end
     }
   end
 
   rule :multiplicative_op do
     any(:star, :slash) {
-      def ==(other)
-        text.strip == other
+      def apply(primary, factor)
+        if text.strip == '*'
+          primary * factor
+        else
+          primary / factor
+        end
       end
     }
   end
