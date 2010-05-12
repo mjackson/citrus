@@ -654,12 +654,12 @@ module Citrus
   class Label
     include Predicate
 
-    def initialize(label='', rule='')
-      @label = label.to_s
+    def initialize(label='<label>', rule='')
+      @label = label.to_sym
       super(rule)
     end
 
-    # The string this rule uses to re-name all its matches.
+    # The symbol this rule uses to re-name all its matches.
     attr_reader :label
 
     # Returns the Match for this rule on +input+ at the given +offset+, +nil+ if
@@ -897,7 +897,7 @@ module Citrus
     def method_missing(sym, *args)
       m = first(sym)
       return m if m
-      raise "No match named \"#{sym}\" in #{self}"
+      raise 'No match named "%s" in %s (%s)' % [sym, self, name]
     end
   end
 end
