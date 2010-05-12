@@ -676,7 +676,7 @@ module Citrus
 
     # Returns the PEG notation of this rule as a string.
     def to_s
-      label + ':' + rule.embed
+      label.to_s + ':' + rule.embed
     end
   end
 

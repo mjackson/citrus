@@ -12,7 +12,7 @@ class LabelTest < Test::Unit::TestCase
 
     match = rule.match(input('a'))
     assert(match)
-    assert_equal('label', match.name)
+    assert_equal(:label, match.name)
   end
 
   def test_to_s
