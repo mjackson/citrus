@@ -342,7 +342,7 @@ module Citrus
     end
 
     # Generates a new rule id.
-    def self.uniq_id
+    def self.new_id
       @id ||= 0
       @id += 1
     end
@@ -352,7 +352,7 @@ module Citrus
 
     # An integer id that is unique to this rule.
     def id
-      @id ||= Rule.uniq_id
+      @id ||= Rule.new_id
     end
 
     # Sets the name of this rule.
