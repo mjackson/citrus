@@ -2,7 +2,7 @@
 # elegance and expressiveness of the language with the simplicity and power of
 # parsing expression grammars.
 #
-# http://mjijackson.com/citrus
+# http://github.com/mjijackson/citrus
 module Citrus
   VERSION = [1, 0, 0]
 
@@ -341,10 +341,11 @@ module Citrus
       end
     end
 
+    @uniq_id = 0
+
     # Generates a new rule id.
     def self.new_id
-      @id ||= 0
-      @id += 1
+      @uniq_id += 1
     end
 
     # The grammar this rule belongs to.
