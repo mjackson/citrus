@@ -20,6 +20,25 @@ class AliasTest < Test::Unit::TestCase
     assert(1, match.length)
   end
 
+  def test_match_renamed
+    grammar = Grammar.new {
+      rule :a, ext(:b) {
+        def value
+          'a' + text
+        end
+      }
+      rule :b, 'b'
+    }
+
+    match = grammar.parse('b')
+    assert(match)
+    assert('ab', match.value)
+
+    assert_raise RuntimeError do
+      match.b
+    end
+  end
+
   def test_peg
     match = AliasOne.parse('a')
     assert(match)
