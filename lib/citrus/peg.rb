@@ -1,16 +1,14 @@
 require 'citrus'
 
 module Citrus
-  # This module is a Grammar for Citrus-flavored parsing expression grammars. It
-  # is used in Citrus#eval to parse and evaluate Citrus PEG's and serves as a
-  # prime example of how to create a complex grammar complete with semantic
+  # A grammar for Citrus-flavored parsing expression grammars. This module is
+  # used in Citrus#eval to parse and evaluate Citrus PEG's and serves as a prime
+  # example of how to create a complex grammar complete with semantic
   # interpretation in pure Ruby.
   module PEG
     include Grammar
 
-
     ## Hierarchical syntax
-
 
     rule :file do
       all(:space, zero_or_more(any(:require, :grammar))) {
@@ -73,7 +71,7 @@ module Citrus
     rule :rule_body do
       all(:sequence, :choice) {
         def choices
-          @choices ||= [ sequence ] + choice.value
+          @choices ||= [ sequence ] + choice.sequences
         end
 
         def values
@@ -88,7 +86,7 @@ module Citrus
 
     rule :choice do
       zero_or_more([ :bar, :sequence ]) {
-        def value
+        def sequences
           matches.map {|m| m.matches[1] }
         end
       }
@@ -155,9 +153,7 @@ module Citrus
       }
     end
 
-
     ## Lexical syntax
-
 
     rule :require do
       all(:require_keyword, :quoted_string) {
@@ -234,7 +230,7 @@ module Citrus
     rule :anything_symbol do
       all('.', :space) {
         def value
-          /./m # The dot matches newlines.
+          /./m # The dot matches newlines
         end
       }
     end
