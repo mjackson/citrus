@@ -3,8 +3,8 @@ Gem::Specification.new do |s|
   s.version = '1.0.0'
   s.date = '2010-05-11'
 
-  s.summary = 'Parsing Expressions for Ruby'
-  s.description = 'Parsing Expressions for Ruby'
+  s.summary = 'Parsing expressions for Ruby'
+  s.description = 'Parsing expressions for Ruby'
 
   s.author = 'Michael Jackson'
   s.email = 'mjijackson@gmail.com'
@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
   s.test_files = s.files.select {|path| path =~ /^test\/.*_test.rb/ }
 
   s.add_development_dependency('rake')
+  s.add_development_dependency('builder')
 
   s.has_rdoc = true
   s.rdoc_options = %w< --line-numbers --inline-source --title Citrus --main Citrus >
