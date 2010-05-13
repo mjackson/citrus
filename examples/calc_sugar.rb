@@ -3,18 +3,13 @@ require 'citrus/sugar'
 # A grammar for mathematical formulas that apply the basic four operations to
 # non-negative numbers (integers and floats), respecting operator precedence and
 # ignoring whitespace.
-module Calc
-  include Citrus::Grammar
+Calc = Citrus::Grammar.new {
 
   module FirstValue
     def value
       first.value
     end
   end
-
-  # If "term" were not already the first rule declared in this grammar, we
-  # could use the following line to make it the root rule.
-  #root term
 
   rule term do
     ext(any(additive, factor), FirstValue)
@@ -96,4 +91,4 @@ module Calc
   rule slash,  ['/', space]
 
   rule space,  /[ \t\n\r]*/
-end
+}

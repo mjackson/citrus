@@ -12,10 +12,6 @@ module Calc
     end
   end
 
-  # If "term" were not already the first rule declared in this grammar, we
-  # could use the following line to make it the root rule.
-  #root :term
-
   rule :term do
     ext(any(:additive, :factor), FirstValue)
   end
