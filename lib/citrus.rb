@@ -888,7 +888,7 @@ module Citrus
 
     # Checks equality by comparing this match's #text value to +obj+.
     def ==(obj)
-      text == obj
+      obj == text
     end
 
     alias eql? ==

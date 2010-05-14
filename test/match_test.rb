@@ -49,6 +49,18 @@ class MatchTest < Test::Unit::TestCase
     assert_equal(11, match.length)
   end
 
+  def test_equality
+    match1 = Match.new('a')
+    match2 = Match.new('a')
+    assert(match1 == 'a')
+    assert(match1 == match2)
+    assert(match2 == match1)
+
+    match3 = Match.new('b')
+    assert_equal(false, match1 == match3)
+    assert_equal(false, match3 == match1)
+  end
+
   def test_matches
     match = Double.parse('123')
     assert(match)
