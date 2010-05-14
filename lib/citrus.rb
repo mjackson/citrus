@@ -63,19 +63,15 @@ module Citrus
   # module is in fact a grammar.
   module Grammar
     # Creates a new anonymous module that includes Grammar. If a +block+ is
-    # provided, it will be called with the new module as its first argument if
-    # its +arity+ is 1 or +instance_eval+'d in the context of the new module
-    # otherwise. See http://blog.grayproductions.net/articles/dsl_block_styles
-    # for the rationale behind this decision.
-    #
-    # Grammars created with this method may be assigned a name by being assigned
-    # to some constant, e.g.:
+    # provided, it is +module_eval+'d in the context of the new module. Grammars
+    # created with this method may be assigned a name by being assigned to some
+    # constant, e.g.:
     #
     #     Calc = Grammar.new {}
     #
     def self.new(&block)
       mod = Module.new { include Grammar }
-      block.arity == 1 ? block[mod] : mod.instance_eval(&block) if block
+      mod.module_eval(&block) if block
       mod
     end
 

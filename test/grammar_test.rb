@@ -3,9 +3,9 @@ require File.dirname(__FILE__) + '/helper'
 class GrammarTest < Test::Unit::TestCase
 
   def test_new
-    Grammar.new do |g|
-      assert_kind_of(Module, g)
-      assert(g.include?(Grammar))
+    Grammar.new do
+      assert_kind_of(Module, self)
+      assert(include?(Grammar))
     end
   end
 
