@@ -356,7 +356,6 @@ module Citrus
     rule :require_keyword,  [ 'require', :space ]
     rule :include_keyword,  [ 'include', :space ]
     rule :grammar_keyword,  [ 'grammar', :space ]
-    rule :super_keyword,    [ 'super', :space ]
     rule :root_keyword,     [ 'root', :space ]
     rule :rule_keyword,     [ 'rule', :space ]
     rule :end_keyword,      [ 'end', :space ]
