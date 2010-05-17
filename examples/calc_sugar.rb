@@ -4,7 +4,6 @@ require 'citrus/sugar'
 # non-negative numbers (integers and floats), respecting operator precedence and
 # ignoring whitespace.
 Calc = Citrus::Grammar.new {
-
   module FirstValue
     def value
       first.value
