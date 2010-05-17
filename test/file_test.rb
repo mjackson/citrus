@@ -1,41 +1,39 @@
 require File.dirname(__FILE__) + '/helper'
-require 'citrus/peg'
+require 'citrus/file'
 
-class PEGTest < Test::Unit::TestCase
+class CitrusFileTest < Test::Unit::TestCase
 
   # A shortcut for creating a grammar that includes Citrus::PEG but uses a
   # different root.
   def peg(root_rule)
     Grammar.new {
-      include Citrus::PEG
+      include Citrus::File
       root root_rule
     }
   end
 
-
   ## File tests
 
+  F = ::File
 
   def run_file_test(file, root)
     grammar = peg(root)
-    code = File.read(file)
+    code = F.read(file)
     match = grammar.parse(code)
     assert(match)
   end
 
   %w< rule grammar >.each do |type|
-    Dir[File.dirname(__FILE__) + "/_files/#{type}*.citrus"].each do |path|
+    Dir[F.dirname(__FILE__) + "/_files/#{type}*.citrus"].each do |path|
       module_eval(<<-RUBY.gsub(/^        /, ''), __FILE__, __LINE__ + 1)
-        def test_#{File.basename(path, '.citrus')}
+        def test_#{F.basename(path, '.citrus')}
           run_file_test("#{path}", :#{type})
         end
       RUBY
     end
   end
 
-
   ## Hierarchical syntax
-
 
   def test_rule_body
     grammar = peg(:rule_body)

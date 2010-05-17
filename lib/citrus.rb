@@ -8,25 +8,27 @@ module Citrus
 
   Infinity = 1.0 / 0
 
-  autoload 'PEG', 'citrus/peg'
+  autoload 'File', 'citrus/file'
 
   # Returns the current version of Citrus as a string.
   def self.version
     VERSION.join('.')
   end
 
+  F = ::File
+
   # Loads the grammar from the given +file+ into the global scope using #eval.
   def self.load(file)
-    file << '.citrus' unless File.file?(file)
-    raise "Cannot find file #{file}" unless File.file?(file)
-    raise "Cannot read file #{file}" unless File.readable?(file)
-    self.eval(File.read(file))
+    file << '.citrus' unless F.file?(file)
+    raise "Cannot find file #{file}" unless F.file?(file)
+    raise "Cannot read file #{file}" unless F.readable?(file)
+    self.eval(F.read(file))
   end
 
   # Evaluates the given Citrus parsing expression grammar +code+ in the global
   # scope. Returns an array of any grammar modules that were created.
   def self.eval(code)
-    file = PEG.parse(code)
+    file = File.parse(code)
     file.value
   end
 

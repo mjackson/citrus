@@ -1,11 +1,10 @@
 require 'citrus'
 
 module Citrus
-  # A grammar for Citrus-flavored parsing expression grammars. This module is
-  # used in Citrus#eval to parse and evaluate Citrus PEG's and serves as a prime
-  # example of how to create a complex grammar complete with semantic
-  # interpretation in pure Ruby.
-  module PEG
+  # A grammar for Citrus grammar files. This module is used in Citrus#eval to
+  # parse and evaluate Citrus grammars and serves as a prime example of how to
+  # create a complex grammar complete with semantic interpretation in pure Ruby.
+  module File
     include Grammar
 
     ## Hierarchical syntax
