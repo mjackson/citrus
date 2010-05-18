@@ -27,9 +27,9 @@ syn match ctKeyword "\<super\>" contained
 " Terminals
 syn region ctString matchgroup=ctStringDelimiter start="\"" end="\"" skip="\\\\\|\\\"" contains=@ctStringSpecial
 syn region ctString matchgroup=ctStringDelimiter start="'" end="'" skip="\\\\\|\\'"
-syn region ctRegexp matchgroup=ctRegexpDelimiter start="/" end="/[iomxneus]*" skip="\\\\\|\\/" contains=@ctRegexpSpecial
-syn region ctCharClass matchgroup=ctRegexpDelimiter start="\[" end="\]" skip="\\\\\|\\\[" contains=@ctRegexpSpecial
-syn match ctAnything "\."
+syn region ctRegexp matchgroup=ctRegexpDelimiter start="/" end="/[iomxneus]*" skip="\\\\\|\\/" contains=@ctRegexpSpecial contained display
+syn region ctCharClass matchgroup=ctRegexpDelimiter start="\[" end="\]" skip="\\\\\|\\\[" contains=@ctRegexpSpecial contained display
+syn match ctAnything "\." contained display
 
 syn cluster ctStringSpecial contains=rubyStringEscape
 syn cluster ctRegexpSpecial contains=rubyStringEscape,rubyRegexpSpecial,rubyRegexpEscape,rubyRegexpBrackets,rubyRegexpCharClass,rubyRegexpDot,rubyRegexpQuantifier,rubyRegexpAnchor,rubyRegexpParens,rubyRegexpComment
