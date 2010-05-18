@@ -9,11 +9,9 @@ elseif exists("b:current_syntax")
   finish
 endif
 
-" Grammars are case sensitive.
-syn case match
-
-" Include the Ruby grammar for use later.
 syn include @rubyTop syntax/ruby.vim
+
+syn case match
 
 syn match ctDoubleColon "::" contained
 syn match ctConstant "\u\w*" contained
@@ -27,15 +25,14 @@ syn match ctComment "#.*" contains=@Spell
 syn match ctKeyword "\<super\>" contained
 
 " Terminals
-syn region ctString matchgroup=ctStringDelimiter start="\"" end="\"" skip="\\\\\|\\\"" contains=ctStringEscape
+syn region ctString matchgroup=ctStringDelimiter start="\"" end="\"" skip="\\\\\|\\\"" contains=@ctStringSpecial
 syn region ctString matchgroup=ctStringDelimiter start="'" end="'" skip="\\\\\|\\'"
-syn region ctRegexp matchgroup=ctRegexpDelimiter start="/" end="/[iomxneus]*" skip="\\\\\|\\/" contained display
+syn region ctRegexp matchgroup=ctRegexpDelimiter start="/" end="/[iomxneus]*" skip="\\\\\|\\/" contains=@ctRegexpSpecial
+syn region ctCharClass matchgroup=ctRegexpDelimiter start="\[" end="\]" skip="\\\\\|\\\[" contains=@ctRegexpSpecial
+syn match ctAnything "\."
 
-syn match ctCharacterClass  "\[\(\\.\|[^\]\\]\)*\]" contained display
-syn match ctAnything        "\." contained display
-
-syn match ctStringEscape  "\\\\\|\\[abefnrstv]\|\\\o\{1,3}\|\\x\x\{1,2}" contained display
-syn match ctStringEscape  "\%(\\M-\\C-\|\\C-\\M-\|\\M-\\c\|\\c\\M-\|\\c\|\\C-\|\\M-\)\%(\\\o\{1,3}\|\\x\x\{1,2}\|\\\=\S\)" contained display
+syn cluster ctStringSpecial contains=rubyStringEscape
+syn cluster ctRegexpSpecial contains=rubyStringEscape,rubyRegexpSpecial,rubyRegexpEscape,rubyRegexpBrackets,rubyRegexpCharClass,rubyRegexpDot,rubyRegexpQuantifier,rubyRegexpAnchor,rubyRegexpParens,rubyRegexpComment
 
 " Quantifiers
 syn match ctQuantifier "+" contained display
@@ -44,6 +41,7 @@ syn match ctQuantifier "\d*\*\d*" contained display
 
 " Operators
 syn match ctOperator "|" contained
+syn match ctOperator "\l\w*:"me=e-1 contained
 
 " Extensions
 syn region ctRubyBlock start="{"ms=e+1 end="}"me=s-1 contains=@rubyTop contained
@@ -58,7 +56,7 @@ syn match ctRule    "\<rule\>"    nextgroup=ctVariable skipwhite skipnl containe
 
 " Blocks
 syn region ctGrammarBlock start="\<grammar\>" matchgroup=ctGrammar end="\<end\>" contains=ctComment,ctGrammar,ctInclude,ctRoot,ctRuleBlock fold
-syn region ctRuleBlock start="\<rule\>" matchgroup=ctRule end="\<end\>" contains=ALLBUT,ctRequire,ctGrammar,ctInclude,ctRoot fold
+syn region ctRuleBlock start="\<rule\>" matchgroup=ctRule end="\<end\>" contains=ALLBUT,ctRequire,ctGrammar,ctInclude,ctRoot,ctConstant,ctVariable fold
 
 " Groups
 hi def link ctComment       Comment
@@ -74,18 +72,21 @@ hi def link ctConstant      Type
 hi def link ctVariable      Function
 hi def link ctKeyword       Keyword
 
-hi def link ctString          ctTerminal
-hi def link ctCharacterClass  ctTerminal
-hi def link ctAnything        ctTerminal
-hi def link ctRegexp          ctTerminal
-hi def link ctTerminal        String
+hi def link ctString        ctTerminal
+hi def link ctRegexp        ctTerminal
+hi def link ctCharClass     ctTerminal
+hi def link ctAnything      ctTerminal
+hi def link ctTerminal      String
 
 hi def link ctRegexpDelimiter ctStringDelimiter
 hi def link ctStringDelimiter Delimiter
 
-hi def link ctStringEscape  Special
+hi def link ctRegexpSpecial  ctStringSpecial
+hi def link ctStringSpecial  Special
 
 hi def link ctQuantifier    ctOperator
 hi def link ctOperator      Operator
 
 let b:current_syntax = "citrus"
+
+" vim: nowrap:
