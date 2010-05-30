@@ -339,11 +339,11 @@ module Citrus
       end
     end
 
-    @uniq_id = 0
+    @unique_id = 0
 
     # Generates a new rule id.
     def self.new_id
-      @uniq_id += 1
+      @unique_id += 1
     end
 
     # The grammar this rule belongs to.
@@ -397,7 +397,7 @@ module Citrus
   private
 
     def extend_match(match)
-      match.extend(ext) if ext
+      match.ext = ext if ext
     end
 
     def create_match(data, offset)
@@ -829,6 +829,9 @@ module Citrus
     # the label.
     attr_accessor :name
 
+    # A module that will be used to extend this match.
+    attr_accessor :ext
+
     # The offset in the input at which this match occurred.
     attr_reader :offset
 
@@ -894,9 +897,21 @@ module Citrus
     # Uses #match to allow sub-matches of this match to be called by name as
     # instance methods.
     def method_missing(sym, *args)
-      m = first(sym)
-      return m if m
-      raise 'No match named "%s" in %s (%s)' % [sym, self, name]
+      extend(ext) if ext
+      redefine_method_missing!
+      __send__(sym, *args)
+    end
+
+  private
+
+    def redefine_method_missing!
+      instance_eval(<<-RUBY, __FILE__, __LINE__ + 1)
+        def method_missing(sym, *args)
+          m = first(sym)
+          return m if m
+          raise 'No match named "%s" in %s (%s)' % [sym, self, name]
+        end
+      RUBY
     end
   end
 end

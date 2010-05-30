@@ -3,7 +3,9 @@ require File.dirname(__FILE__) + '/helper'
 class RuleTest < Test::Unit::TestCase
 
   module MatchModule
-    def a_test; end
+    def a_test
+      :test
+    end
   end
 
   NumericProc = Proc.new {
@@ -23,8 +25,7 @@ class RuleTest < Test::Unit::TestCase
     rule.ext = MatchModule
     match = rule.match(input('a'))
     assert(match)
-    assert_kind_of(MatchModule, match)
-    assert_respond_to(match, :a_test)
+    assert_equal(:test, match.a_test)
   end
 
   def test_numeric_proc
@@ -41,7 +42,6 @@ class RuleTest < Test::Unit::TestCase
     rule.ext = NumericModule
     match = rule.match(input('1'))
     assert(match)
-    assert_kind_of(NumericModule, match)
     assert_equal(1, match.to_i)
     assert_instance_of(Float, match.to_f)
   end
