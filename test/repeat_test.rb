@@ -51,22 +51,27 @@ class RepeatTest < Test::Unit::TestCase
   end
 
   def test_operator
-    rule = Repeat.new(1, 2, '')
+    rule = Repeat.new(1, 2)
     assert_equal('1*2', rule.operator)
   end
 
+  def test_operator_empty
+    rule = Repeat.new(0, 0)
+    assert_equal('', rule.operator)
+  end
+
   def test_operator_asterisk
-    rule = Repeat.new(0, Infinity, '')
+    rule = Repeat.new(0, Infinity)
     assert_equal('*', rule.operator)
   end
 
   def test_operator_question_mark
-    rule = Repeat.new(0, 1, '')
+    rule = Repeat.new(0, 1)
     assert_equal('?', rule.operator)
   end
 
   def test_operator_plus
-    rule = Repeat.new(1, Infinity, '')
+    rule = Repeat.new(1, Infinity)
     assert_equal('+', rule.operator)
   end
 

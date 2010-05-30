@@ -721,20 +721,26 @@ module Citrus
       create_match(matches, offset) if @range.include?(matches.length)
     end
 
+    # The minimum number of times this rule must match.
+    def min
+      @range.begin
+    end
+
+    # The maximum number of times this rule may match.
+    def max
+      @range.end
+    end
+
     # Returns the operator this rule uses as a string. Will be one of
     # <tt>+</tt>, <tt>?</tt>, or <tt>N*M</tt>.
     def operator
-      unless @operator
-        m = [@range.begin, @range.end].map do |n|
-          n == 0 || n == Infinity ? '' : n.to_s
+      @operator ||= case [min, max]
+        when [0, 0] then ''
+        when [0, 1] then '?'
+        when [1, Infinity] then '+'
+        else
+          [min, max].map {|n| n == 0 || n == Infinity ? '' : n.to_s }.join('*')
         end
-        @operator = case m
-          when ['', '1'] then '?'
-          when ['1', ''] then '+'
-          else m.join('*')
-          end
-      end
-      @operator
     end
 
     # Returns the PEG notation of this rule as a string.
