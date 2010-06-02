@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name = 'citrus'
-  s.version = '1.1.0'
-  s.date = '2010-05-18'
+  s.version = '1.2.0'
+  s.date = '2010-06-02'
 
   s.summary = 'Parsing Expressions for Ruby'
   s.description = 'Parsing Expressions for Ruby'
@@ -11,9 +11,12 @@ Gem::Specification.new do |s|
 
   s.require_paths = %w< lib >
 
-  s.files = Dir['lib/**/*.rb'] +
+  s.files = Dir['benchmark/*.rb'] +
+    Dir['benchmark/*.citrus'] +
+    Dir['benchmark/*.gnuplot'] +
     Dir['examples/**/*'] +
     Dir['extras/**/*'] +
+    Dir['lib/**/*.rb'] +
     Dir['test/*.rb'] +
     %w< citrus.gemspec Rakefile README >
 
