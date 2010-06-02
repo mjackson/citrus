@@ -8,7 +8,7 @@ module Citrus
 
   Infinity = 1.0 / 0
 
-  autoload 'File', 'citrus/file'
+  autoload :File, 'citrus/file'
 
   # Returns the current version of Citrus as a string.
   def self.version
@@ -28,8 +28,7 @@ module Citrus
   # Evaluates the given Citrus parsing expression grammar +code+ in the global
   # scope. Returns an array of any grammar modules that were created.
   def self.eval(code)
-    file = File.parse(code)
-    file.value
+    File.parse(code).value
   end
 
   # This error is raised whenever a parse fails.
@@ -147,7 +146,6 @@ module Citrus
     # grammar.
     def rule(name, obj=nil)
       sym = name.to_sym
-
       obj = Proc.new.call if block_given?
 
       if obj
@@ -166,7 +164,8 @@ module Citrus
       raise "Cannot create rule \"#{name}\": " + e.message
     end
 
-    # Gets/sets the +name+ of the root rule of this grammar.
+    # Gets/sets the +name+ of the root rule of this grammar. If no root rule is
+    # explicitly specified, the name of this grammar's first rule is returned.
     def root(name=nil)
       @root = name.to_sym if name
       # The first rule in a grammar is the default root.
@@ -241,23 +240,46 @@ module Citrus
       rule
     end
 
-    # Parses the given +string+ from the given +offset+ using the rules in this
-    # grammar. A ParseError is raised if there is no match made or if
-    # +consume_all+ is +true+ and the entire input string cannot be consumed.
-    def parse(string, offset=0, enable_memo=false, consume_all=true)
-      raise "No root rule specified" unless root
+    # Parses the given input +string+ using the given +options+. If no match can
+    # be made, a ParseError is raised. See #default_parse_options for a detailed
+    # description of available parse options.
+    def parse(string, options={})
+      opts = default_parse_options.merge(options)
 
-      root_rule = rule(root)
+      raise "No root rule specified" unless opts[:root]
+
+      root_rule = rule(opts[:root])
       raise "No rule named \"#{root}\"" unless root_rule
 
-      input = Input.new(string, enable_memo)
-      match = input.match(root_rule, offset)
+      input = Input.new(string, opts[:enable_memo])
+      match = input.match(root_rule, opts[:offset])
 
-      if !match || (consume_all && match.length != string.length)
+      if !match || (opts[:consume_all] && match.length != string.length)
         raise ParseError.new(input)
       end
 
       match
+    end
+
+    # The default set of options that is used in #parse. The options hash may
+    # have any of the following keys:
+    #
+    # offset::        The offset at which the parse should start. Defaults to 0.
+    # root::          The name of the root rule to use for the parse. Defaults
+    #                 to the name supplied by calling #root.
+    # consume_all::   If this is +true+ and the entire input string cannot be
+    #                 consumed, a ParseError will be raised. Defaults to +true+.
+    # enable_memo::   If this is +true+ the matches generated during a parse are
+    #                 memoized. This technique (also known as Packrat parsing)
+    #                 guarantees parsers will operate in linear time but costs
+    #                 significantly more in terms of time and memory required.
+    #                 Defaults to +false+.
+    def default_parse_options
+      { :offset => 0,
+        :root => root,
+        :consume_all => true,
+        :enable_memo => false
+      }
     end
   end
 
