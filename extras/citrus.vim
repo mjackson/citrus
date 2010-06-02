@@ -15,8 +15,8 @@ syn case match
 
 syn match ctDoubleColon "::" contained
 syn match ctConstant "\u\w*" contained
-syn match ctVariable "\l\w*" contained
 syn match ctModule "\(\(::\)\?\u\w*\)\+" contains=ctDoubleColon,ctConstant contained
+syn match ctVariable "\a[a-zA-Z_-]*" contained
 
 " Comments
 syn match ctComment "#.*" contains=@Spell
@@ -56,7 +56,7 @@ syn match ctRule    "\<rule\>"    nextgroup=ctVariable skipwhite skipnl containe
 
 " Blocks
 syn region ctGrammarBlock start="\<grammar\>" matchgroup=ctGrammar end="\<end\>" contains=ctComment,ctGrammar,ctInclude,ctRoot,ctRuleBlock fold
-syn region ctRuleBlock start="\<rule\>" matchgroup=ctRule end="\<end\>" contains=ALLBUT,ctRequire,ctGrammar,ctInclude,ctRoot,ctConstant,ctVariable fold
+syn region ctRuleBlock start="\<rule\>" matchgroup=ctRule end="\<end\>" contains=ALLBUT,ctRequire,ctGrammar,ctInclude,ctRoot,ctConstant fold
 
 " Groups
 hi def link ctComment       Comment
@@ -84,7 +84,7 @@ hi def link ctStringDelimiter Delimiter
 hi def link ctRegexpSpecial  ctStringSpecial
 hi def link ctStringSpecial  Special
 
-hi def link ctQuantifier    ctOperator
+hi def link ctQuantifier    Number
 hi def link ctOperator      Operator
 
 let b:current_syntax = "citrus"
