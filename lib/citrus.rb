@@ -468,15 +468,15 @@ module Citrus
   end
 
   # An Alias is a Proxy for a rule in the same grammar. It is used in rule
-  # definitions when a rule calls some other rule by name. The PEG notation is
-  # simply the name of another rule without any other punctuation, e.g.:
+  # definitions when a rule calls some other rule by name. The Citrus notation
+  # is simply the name of another rule without any other punctuation, e.g.:
   #
   #     name
   #
   class Alias
     include Proxy
 
-    # Returns the PEG notation of this rule as a string.
+    # Returns the Citrus notation of this rule as a string.
     def to_s
       rule_name.to_s
     end
@@ -495,15 +495,15 @@ module Citrus
 
   # A Super is a Proxy for a rule of the same name that was defined previously
   # in the grammar's inheritance chain. Thus, Super's work like Ruby's +super+,
-  # only for rules in a grammar instead of methods in a module. The PEG notation
-  # is the word +super+ without any other punctuation, e.g.:
+  # only for rules in a grammar instead of methods in a module. The Citrus
+  # notation is the word +super+ without any other punctuation, e.g.:
   #
   #     super
   #
   class Super
     include Proxy
 
-    # Returns the PEG notation of this rule as a string.
+    # Returns the Citrus notation of this rule as a string.
     def to_s
       'super'
     end
@@ -532,13 +532,13 @@ module Citrus
     # The actual String or Regexp object this rule uses to match.
     attr_reader :rule
 
-    # Returns the PEG notation of this rule as a string.
+    # Returns the Citrus notation of this rule as a string.
     def to_s
       rule.inspect
     end
   end
 
-  # A FixedWidth is a Terminal that matches based on its length. The PEG
+  # A FixedWidth is a Terminal that matches based on its length. The Citrus
   # notation is any sequence of characters enclosed in either single or double
   # quotes, e.g.:
   #
@@ -562,13 +562,13 @@ module Citrus
 
   # An Expression is a Terminal that has the same semantics as a regular
   # expression in Ruby. The expression must match at the beginning of the input
-  # (index 0). The PEG notation is identical to Ruby's regular expression
+  # (index 0). The Citrus notation is identical to Ruby's regular expression
   # notation, e.g.:
   #
   #     /expr/
   #
-  # Character classes and the dot symbol may also be used in PEG notation for
-  # compatibility with other PEG implementations, e.g.:
+  # Character classes and the dot symbol may also be used in Citrus notation for
+  # compatibility with other parsing expression implementations, e.g.:
   #
   #     [a-zA-Z]
   #     .
@@ -624,7 +624,7 @@ module Citrus
   end
 
   # An AndPredicate is a Predicate that contains a rule that must match. Upon
-  # success an empty match is returned and no input is consumed. The PEG
+  # success an empty match is returned and no input is consumed. The Citrus
   # notation is any expression preceeded by an ampersand, e.g.:
   #
   #     &expr
@@ -638,14 +638,14 @@ module Citrus
       create_match('', offset) if input.match(rule, offset)
     end
 
-    # Returns the PEG notation of this rule as a string.
+    # Returns the Citrus notation of this rule as a string.
     def to_s
       '&' + rule.embed
     end
   end
 
   # A NotPredicate is a Predicate that contains a rule that must not match. Upon
-  # success an empty match is returned and no input is consumed. The PEG
+  # success an empty match is returned and no input is consumed. The Citrus
   # notation is any expression preceeded by an exclamation mark, e.g.:
   #
   #     !expr
@@ -659,14 +659,14 @@ module Citrus
       create_match('', offset) unless input.match(rule, offset)
     end
 
-    # Returns the PEG notation of this rule as a string.
+    # Returns the Citrus notation of this rule as a string.
     def to_s
       '!' + rule.embed
     end
   end
 
   # A Label is a Predicate that applies a new name to any matches made by its
-  # rule. The PEG notation is any sequence of word characters (i.e.
+  # rule. The Citrus notation is any sequence of word characters (i.e.
   # <tt>[a-zA-Z0-9_]</tt>) followed by a colon, followed by any other
   # expression, e.g.:
   #
@@ -695,14 +695,14 @@ module Citrus
       end
     end
 
-    # Returns the PEG notation of this rule as a string.
+    # Returns the Citrus notation of this rule as a string.
     def to_s
       label.to_s + ':' + rule.embed
     end
   end
 
   # A Repeat is a Predicate that specifies a minimum and maximum number of times
-  # its rule must match. The PEG notation is an integer, +N+, followed by an
+  # its rule must match. The Citrus notation is an integer, +N+, followed by an
   # asterisk, followed by another integer, +M+, all of which follow any other
   # expression, e.g.:
   #
@@ -765,7 +765,7 @@ module Citrus
         end
     end
 
-    # Returns the PEG notation of this rule as a string.
+    # Returns the Citrus notation of this rule as a string.
     def to_s
       rule.embed + operator
     end
@@ -781,8 +781,8 @@ module Citrus
     end
   end
 
-  # A Choice is a List where only one rule must match. The PEG notation is two
-  # or more expressions separated by a vertical bar, e.g.:
+  # A Choice is a List where only one rule must match. The Citrus notation is
+  # two or more expressions separated by a vertical bar, e.g.:
   #
   #     expr | expr
   #
@@ -799,14 +799,14 @@ module Citrus
       nil
     end
 
-    # Returns the PEG notation of this rule as a string.
+    # Returns the Citrus notation of this rule as a string.
     def to_s
       rules.map {|r| r.embed }.join(' | ')
     end
   end
 
-  # A Sequence is a List where all rules must match. The PEG notation is two or
-  # more expressions separated by a space, e.g.:
+  # A Sequence is a List where all rules must match. The Citrus notation is two
+  # or more expressions separated by a space, e.g.:
   #
   #     expr expr
   #
@@ -827,7 +827,7 @@ module Citrus
       create_match(matches, offset) if matches.length == rules.length
     end
 
-    # Returns the PEG notation of this rule as a string.
+    # Returns the Citrus notation of this rule as a string.
     def to_s
       rules.map {|r| r.embed }.join(' ')
     end
@@ -925,6 +925,8 @@ module Citrus
     # Uses #match to allow sub-matches of this match to be called by name as
     # instance methods.
     def method_missing(sym, *args)
+      # Extend this object only when needed and immediately redefine
+      # #method_missing so that the new version is used on all future calls.
       extend(ext) if ext
       redefine_method_missing!
       __send__(sym, *args)
@@ -932,7 +934,7 @@ module Citrus
 
   private
 
-    def redefine_method_missing!
+    def redefine_method_missing! # :nodoc:
       instance_eval(<<-RUBY, __FILE__, __LINE__ + 1)
         def method_missing(sym, *args)
           m = first(sym)
