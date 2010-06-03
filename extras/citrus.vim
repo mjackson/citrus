@@ -16,7 +16,7 @@ syn case match
 syn match ctDoubleColon "::" contained
 syn match ctConstant "\u\w*" contained
 syn match ctModule "\(\(::\)\?\u\w*\)\+" contains=ctDoubleColon,ctConstant contained
-syn match ctVariable "\a[a-zA-Z_-]*" contained
+syn match ctVariable "[a-zA-Z_-]\+" contained
 
 " Comments
 syn match ctComment "#.*" contains=@Spell
@@ -41,7 +41,7 @@ syn match ctQuantifier "\d*\*\d*" contained display
 
 " Operators
 syn match ctOperator "|" contained
-syn match ctOperator "\l\w*:"me=e-1 contained
+syn match ctOperator "\w\+:"me=e-1 contained
 
 " Extensions
 syn region ctRubyBlock start="{"ms=e+1 end="}"me=s-1 contains=@rubyTop contained

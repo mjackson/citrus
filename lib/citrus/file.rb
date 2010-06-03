@@ -179,7 +179,7 @@ module Citrus
     end
 
     rule :rule_name do
-      all(/[a-z][a-zA-Z_-]*/, :space) {
+      all(/[a-zA-Z_-]+/, :space) {
         def value
           first.text
         end
