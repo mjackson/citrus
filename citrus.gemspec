@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'citrus'
-  s.version = '1.2.0'
+  s.version = '1.2.1'
   s.date = '2010-06-02'
 
   s.summary = 'Parsing Expressions for Ruby'
