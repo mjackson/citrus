@@ -625,7 +625,7 @@ module Citrus
 
   # An AndPredicate is a Predicate that contains a rule that must match. Upon
   # success an empty match is returned and no input is consumed. The Citrus
-  # notation is any expression preceeded by an ampersand, e.g.:
+  # notation is any expression preceded by an ampersand, e.g.:
   #
   #     &expr
   #
@@ -646,7 +646,7 @@ module Citrus
 
   # A NotPredicate is a Predicate that contains a rule that must not match. Upon
   # success an empty match is returned and no input is consumed. The Citrus
-  # notation is any expression preceeded by an exclamation mark, e.g.:
+  # notation is any expression preceded by an exclamation mark, e.g.:
   #
   #     !expr
   #
@@ -708,7 +708,7 @@ module Citrus
   #
   #     expr N*M
   #
-  # In this notation +N+ specifies the minimum number of times the preceeding
+  # In this notation +N+ specifies the minimum number of times the preceding
   # expression must match and +M+ specifies the maximum. If +N+ is ommitted,
   # it is assumed to be 0. Likewise, if +M+ is omitted, it is assumed to be
   # infinity (no maximum). Thus, an expression followed by only an asterisk may
