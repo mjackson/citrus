@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Citrus ~ Parsing Expressions for Ruby</title>
+    <link rel="stylesheet" type="text/css" media="all" href="css/style.css">
+    <meta name="description" content="Parsing Expressions for Ruby">
+    <meta name="keywords" content="Ruby, PEG, parsing expression grammar">
+    <meta name="viewport" content="width=800">
+</head>
+
+<body>
+    <div id="wrapper">
+        <div id="content">
+            <ul id="nav">
+                <li><h1>citrus</h1></li>
+                <li class="separator">~<span class="splat">✻</span>~</li>
+                <li><a href="usage.html">usage</a></li>
+                <li><a href="http://github.com/mjijackson/citrus">code</a></li>
+                <li><a href="http://github.com/mjijackson/citrus/issues">issues</a></li>
+                <li><a href="api/index.html">api</a></li>
+            </ul>
+            <div id="body">
+            <h2>Background</h2>
+<p>
+In order to be able to use Citrus effectively, you must first understand
+the difference between syntax and semantics. Syntax is a set of rules that
+govern the way letters and punctuation may be used in a language. For
+example, English syntax dictates that proper nouns should start with a
+capital letter and that sentences should end with a period.
+</p>
+<p>
+Semantics are the rules by which meaning may be derived in a language. For
+example, as you read a book you are able to make some sense of the
+particular way in which words on a page are combined to form thoughts and
+express ideas because you understand what the words themselves mean and you
+can understand what they mean collectively.
+</p>
+<p>
+Computers use a similar process when interpreting code. First, the code
+must be parsed into recognizable symbols or tokens. These tokens may then
+be passed to an interpreter which is responsible for forming actual
+instructions from them.
+</p>
+<p>
+Citrus is a pure Ruby library that allows you to perform both lexical
+analysis and semantic interpretation on an input string quickly and easily.
+Using Citrus you can write powerful parsers that are simple to understand
+and easy to create.
+</p>
+<p>
+In Citrus, there are three main types of objects: rules, grammars, and
+matches.
+</p>
+<h3>Rules</h3>
+<p>
+Rules are objects that specify some matching behavior on a string. There
+are two types of rules: terminals and non-terminals. Terminals can be
+either Ruby strings or regular expressions that specify some input to
+match. For example, a terminal object created from the string
+&#8220;end&#8221; would match any sequence of the characters
+&#8220;e&#8221;, &#8220;n&#8221;, and &#8220;d&#8221;, in that order. A
+terminal object created from a regular expression uses Ruby&#8217;s regular
+expression engine to attempt to create a match on the input.
+</p>
+<p>
+Non-terminals are rules that may contain other rules but do not themselves
+match directly on the input. For example, a Repeat is a non-terminal that
+may contain one other rule that will try and match a certain number of
+times. Several other types of non-terminals exist that will be discussed
+later.
+</p>
+<p>
+Rule objects may also have semantic information associated with them in the
+form of Ruby modules. These modules contain methods that will be used to
+extend any matches created by the rule with which they are associated.
+</p>
+<h3>Grammars</h3>
+<p>
+A grammar is a container for rules. Usually the rules in a grammar
+collectively form a complete specification for some language, or a
+well-defined subset thereof. A Citrus grammar is really just a souped-up
+Ruby module. These modules may be included in other grammar modules in the
+same way that Ruby modules are normally used to create more complex
+grammars. Any grammar rule with the same name as a rule in an included
+grammar may access that rule with a mechanism similar to Ruby&#8217;s
+<tt>super</tt> keyword.
+</p>
+<h3>Matches</h3>
+<p>
+Matches are created by Rule objects when they match on the input. Matches
+contain the string of text that made up the match as well as its offset in
+the original input string. During a parse, matches are arranged in a tree
+structure where any match may contain any number of other matches. This
+structure is determined by the way in which the rule that generated each
+match is used in the grammar.
+</p>
+<p>
+For example, a match that is created from a non-terminal rule that contains
+several other terminals will likewise contain several matches, one for each
+terminal.
+</p>
+<p>
+Match objects may be extended with semantic information in the form of
+methods. These methods can interpret the text of a match using the wealth
+of information available to them including the text of the match, its
+position in the input, and any submatches.
+</p>
+
+            <p class="copyright"><a href="license.html">Copyright</a> &copy; 2010 <a href="http://mjijackson.com/">Michael Jackson</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

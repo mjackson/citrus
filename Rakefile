@@ -21,9 +21,9 @@ def overwrite_api
   sh 'mv api_new api'
 end
 
-# Fetch contents of Markdown doc files.
+# Fetch contents of RDoc files.
 def fetch_docs
-  Dir['doc/*.markdown'].inject({}) do |m, file|
+  Dir['doc/*.rdoc'].inject({}) do |m, file|
     m[file] = File.read(file)
     m
   end
@@ -32,12 +32,13 @@ end
 # Generate the HTML docs.
 def generate_docs(docs)
   require 'erb'
-  require 'rdiscount'
+  require 'rdoc/markup/to_html'
   layout = ERB.new(File.read('layout.html.erb'), 0, '%<>')
+  html = RDoc::Markup::ToHtml.new
   docs.each do |file, source|
-    content = Markdown.new(source, :smart).to_html
+    content = html.convert(source)
     output = layout.result(binding)
-    File.open(File.basename(file, '.markdown') + '.html', 'w') do |f|
+    File.open(File.basename(file, '.rdoc') + '.html', 'w') do |f|
       f.write(output)
     end
   end
