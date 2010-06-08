@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>: Citrus::Input [Citrus API Documentation]</title>
+    <meta content='text/html; charset=utf8' http-equiv='Content-Type'>
+    <link href='../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>Class</span>
+          Citrus::Input
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../files/lib/citrus_rb.html">lib/citrus.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong>Object</strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <p>
+            This class represents the core of the parsing algorithm. It wraps the input
+            string and serves matches to all nonterminals.
+            </p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>public class</h3>
+            <ol>
+              <li><a href="#M000049">new</a></li>
+            </ol>
+            <h3>public instance</h3>
+            <ol>
+              <li><a href="#M000050">[]</a></li>
+              <li><a href="#M000051">length</a></li>
+              <li><a href="#M000052">match</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>cache</td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      A two-level hash of rule id&#8217;s and offsets to their respective
+                      matches. Only present if memoing is enabled.
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>cache_hits</td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      The number of times the cache was hit. Only present if memoing is enabled.
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>max_offset</td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      The maximum offset that has been achieved.
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>string</td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      The input string.
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public class methods</h2>
+              <div class='method public-class' id='method-M000049'>
+                <a name='M000049'></a>
+                <div class='synopsis'>
+                  <span class='name'>new</span>
+                  <span class='arguments'>(string, enable_memo=false)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Takes the input <tt>string</tt> that is to be parsed. If
+                  <tt>enable_memo</tt> is <tt>true</tt> a cache is created that holds
+                  references to already generated matches.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000049-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000049-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 291</span>&#x000A;291:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">string</span>, <span class="ruby-identifier">enable_memo</span>=<span class="ruby-keyword kw">false</span>)&#x000A;292:       <span class="ruby-ivar">@string</span> = <span class="ruby-identifier">string</span>&#x000A;293:       <span class="ruby-ivar">@max_offset</span> = <span class="ruby-value">0</span>&#x000A;294:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">enable_memo</span>&#x000A;295:         <span class="ruby-ivar">@cache</span> = {}&#x000A;296:         <span class="ruby-ivar">@cache_hits</span> = <span class="ruby-value">0</span>&#x000A;297:       <span class="ruby-keyword kw">end</span>&#x000A;298:     <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <h2>Public instance methods</h2>
+              <div class='method public-instance' id='method-M000050'>
+                <a name='M000050'></a>
+                <div class='synopsis'>
+                  <span class='name'>[]</span>
+                  <span class='arguments'>(*args)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Sends all arguments to this input&#8217;s <tt>string</tt>.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000050-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000050-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 314</span>&#x000A;314:     <span class="ruby-keyword kw">def</span> <span class="ruby-operator">[]</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;315:       <span class="ruby-ivar">@string</span>.<span class="ruby-identifier">__send__</span>(<span class="ruby-identifier">:[]</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;316:     <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-M000051'>
+                <a name='M000051'></a>
+                <div class='synopsis'>
+                  <span class='name'>length</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Returns the length of this input.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000051-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000051-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 319</span>&#x000A;319:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">length</span>&#x000A;320:       <span class="ruby-ivar">@string</span>.<span class="ruby-identifier">length</span>&#x000A;321:     <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-M000052'>
+                <a name='M000052'></a>
+                <div class='synopsis'>
+                  <span class='name'>match</span>
+                  <span class='arguments'>(rule, offset=0)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Returns the match for a given <tt>rule</tt> at <tt>offset</tt>. If memoing
+                  is enabled and a match does not already exist for the given rule/offset
+                  pair then the rule is executed and the result is cached before returning.
+                  See <a
+                  href="http://pdos.csail.mit.edu/~baford/packrat/icfp02/">pdos.csail.mit.edu/~baford/packrat/icfp02/</a>
+                  for more information on memoing match results (also known as packrat
+                  parsing).
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000052-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000052-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 328</span>&#x000A;328:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">match</span>(<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">offset</span>=<span class="ruby-value">0</span>)&#x000A;329:       <span class="ruby-ivar">@max_offset</span> = <span class="ruby-identifier">offset</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">offset</span> <span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@max_offset</span>&#x000A;330: &#x000A;331:       <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@cache</span>&#x000A;332:         <span class="ruby-identifier">c</span> = <span class="ruby-ivar">@cache</span>[<span class="ruby-identifier">rule</span>.<span class="ruby-identifier">id</span>] <span class="ruby-operator">||=</span> {}&#x000A;333: &#x000A;334:         <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">offset</span>)&#x000A;335:           <span class="ruby-ivar">@cache_hits</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>&#x000A;336:           <span class="ruby-identifier">c</span>[<span class="ruby-identifier">offset</span>]&#x000A;337:         <span class="ruby-keyword kw">else</span>&#x000A;338:           <span class="ruby-identifier">c</span>[<span class="ruby-identifier">offset</span>] = <span class="ruby-identifier">rule</span>.<span class="ruby-identifier">match</span>(<span class="ruby-keyword kw">self</span>, <span class="ruby-identifier">offset</span>)&#x000A;339:         <span class="ruby-keyword kw">end</span>&#x000A;340:       <span class="ruby-keyword kw">else</span>&#x000A;341:         <span class="ruby-identifier">rule</span>.<span class="ruby-identifier">match</span>(<span class="ruby-keyword kw">self</span>, <span class="ruby-identifier">offset</span>)&#x000A;342:       <span class="ruby-keyword kw">end</span>&#x000A;343:     <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

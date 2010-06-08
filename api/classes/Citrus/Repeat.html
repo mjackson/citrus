@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>: Citrus::Repeat [Citrus API Documentation]</title>
+    <meta content='text/html; charset=utf8' http-equiv='Content-Type'>
+    <link href='../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>Class</span>
+          Citrus::Repeat
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../files/lib/citrus_rb.html">lib/citrus.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong>Object</strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <p>
+            A <a href="Repeat.html">Repeat</a> is a <a
+            href="Predicate.html">Predicate</a> that specifies a minimum and maximum
+            number of times its rule must match. The <a
+            href="../Citrus.html">Citrus</a> notation is an integer, <tt>N</tt>,
+            followed by an asterisk, followed by another integer, <tt>M</tt>, all of
+            which follow any other expression, e.g.:
+            </p>
+            <pre>expr N*M</pre>
+            <p>
+            In this notation <tt>N</tt> specifies the minimum number of times the
+            preceding expression must match and <tt>M</tt> specifies the maximum. If
+            <tt>N</tt> is ommitted, it is assumed to be 0. Likewise, if <tt>M</tt> is
+            omitted, it is assumed to be infinity (no maximum). Thus, an expression
+            followed by only an asterisk may match any number of times, including zero.
+            </p>
+            <p>
+            The shorthand notation <tt>+</tt> and <tt>?</tt> may be used for the common
+            cases of <tt>1*</tt> and <tt>*1</tt> respectively, e.g.:
+            </p>
+            <pre>expr+&#x000A;expr?</pre>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>public class</h3>
+            <ol>
+              <li><a href="#M000066">new</a></li>
+            </ol>
+            <h3>public instance</h3>
+            <ol>
+              <li><a href="#M000067">match</a></li>
+              <li><a href="#M000069">max</a></li>
+              <li><a href="#M000068">min</a></li>
+              <li><a href="#M000070">operator</a></li>
+              <li><a href="#M000071">to_s</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+            <div id='includes'>
+              <h2>Included modules</h2>
+              <ol>
+                <li><a href="Predicate.html">Predicate</a></li>
+              </ol>
+            </div>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public class methods</h2>
+              <div class='method public-class' id='method-M000066'>
+                <a name='M000066'></a>
+                <div class='synopsis'>
+                  <span class='name'>new</span>
+                  <span class='arguments'>(min=1, max=Infinity, rule='')</span>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000066-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000066-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 726</span>&#x000A;726:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">min</span>=<span class="ruby-value">1</span>, <span class="ruby-identifier">max</span>=<span class="ruby-constant">Infinity</span>, <span class="ruby-identifier">rule</span>=<span class="ruby-value str">''</span>)&#x000A;727:       <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-value str">&quot;Min cannot be greater than max&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">min</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">max</span>&#x000A;728:       <span class="ruby-ivar">@range</span> = <span class="ruby-constant">Range</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">min</span>, <span class="ruby-identifier">max</span>)&#x000A;729:       <span class="ruby-keyword kw">super</span>(<span class="ruby-identifier">rule</span>)&#x000A;730:     <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <h2>Public instance methods</h2>
+              <div class='method public-instance' id='method-M000067'>
+                <a name='M000067'></a>
+                <div class='synopsis'>
+                  <span class='name'>match</span>
+                  <span class='arguments'>(input, offset=0)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Returns the <a href="Match.html">Match</a> for this rule on <tt>input</tt>
+                  at the given <tt>offset</tt>, <tt>nil</tt> if no match can be made.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000067-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000067-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 734</span>&#x000A;734:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">match</span>(<span class="ruby-identifier">input</span>, <span class="ruby-identifier">offset</span>=<span class="ruby-value">0</span>)&#x000A;735:       <span class="ruby-identifier">matches</span> = []&#x000A;736:       <span class="ruby-identifier">os</span> = <span class="ruby-identifier">offset</span>&#x000A;737:       <span class="ruby-keyword kw">while</span> <span class="ruby-identifier">matches</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&lt;</span> <span class="ruby-ivar">@range</span>.<span class="ruby-identifier">end</span>&#x000A;738:         <span class="ruby-identifier">m</span> = <span class="ruby-identifier">input</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">os</span>)&#x000A;739:         <span class="ruby-keyword kw">break</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">m</span>&#x000A;740:         <span class="ruby-identifier">matches</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">m</span>&#x000A;741:         <span class="ruby-identifier">os</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">length</span>&#x000A;742:       <span class="ruby-keyword kw">end</span>&#x000A;743:       <span class="ruby-identifier">create_match</span>(<span class="ruby-identifier">matches</span>, <span class="ruby-identifier">offset</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@range</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">matches</span>.<span class="ruby-identifier">length</span>)&#x000A;744:     <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-M000069'>
+                <a name='M000069'></a>
+                <div class='synopsis'>
+                  <span class='name'>max</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  The maximum number of times this rule may match.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000069-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000069-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 752</span>&#x000A;752:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">max</span>&#x000A;753:       <span class="ruby-ivar">@range</span>.<span class="ruby-identifier">end</span>&#x000A;754:     <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-M000068'>
+                <a name='M000068'></a>
+                <div class='synopsis'>
+                  <span class='name'>min</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  The minimum number of times this rule must match.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000068-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000068-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 747</span>&#x000A;747:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">min</span>&#x000A;748:       <span class="ruby-ivar">@range</span>.<span class="ruby-identifier">begin</span>&#x000A;749:     <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-M000070'>
+                <a name='M000070'></a>
+                <div class='synopsis'>
+                  <span class='name'>operator</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Returns the operator this rule uses as a string. Will be one of <tt>+</tt>,
+                  <tt>?</tt>, or <tt>N*M</tt>.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000070-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000070-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 758</span>&#x000A;758:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">operator</span>&#x000A;759:       <span class="ruby-ivar">@operator</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword kw">case</span> [<span class="ruby-identifier">min</span>, <span class="ruby-identifier">max</span>]&#x000A;760:         <span class="ruby-keyword kw">when</span> [<span class="ruby-value">0</span>, <span class="ruby-value">0</span>] <span class="ruby-keyword kw">then</span> <span class="ruby-value str">''</span>&#x000A;761:         <span class="ruby-keyword kw">when</span> [<span class="ruby-value">0</span>, <span class="ruby-value">1</span>] <span class="ruby-keyword kw">then</span> <span class="ruby-value str">'?'</span>&#x000A;762:         <span class="ruby-keyword kw">when</span> [<span class="ruby-value">1</span>, <span class="ruby-constant">Infinity</span>] <span class="ruby-keyword kw">then</span> <span class="ruby-value str">'+'</span>&#x000A;763:         <span class="ruby-keyword kw">else</span>&#x000A;764:           [<span class="ruby-identifier">min</span>, <span class="ruby-identifier">max</span>].<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">n</span><span class="ruby-operator">|</span> <span class="ruby-identifier">n</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">n</span> <span class="ruby-operator">==</span> <span class="ruby-constant">Infinity</span> <span class="ruby-value">? </span><span class="ruby-value str">''</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">n</span>.<span class="ruby-identifier">to_s</span> }.<span class="ruby-identifier">join</span>(<span class="ruby-value str">'*'</span>)&#x000A;765:         <span class="ruby-keyword kw">end</span>&#x000A;766:     <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-M000071'>
+                <a name='M000071'></a>
+                <div class='synopsis'>
+                  <span class='name'>to_s</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Returns the <a href="../Citrus.html">Citrus</a> notation of this rule as a
+                  string.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000071-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000071-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 769</span>&#x000A;769:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">to_s</span>&#x000A;770:       <span class="ruby-identifier">rule</span>.<span class="ruby-identifier">embed</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">operator</span>&#x000A;771:     <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

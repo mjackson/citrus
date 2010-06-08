@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>: Citrus::Label [Citrus API Documentation]</title>
+    <meta content='text/html; charset=utf8' http-equiv='Content-Type'>
+    <link href='../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>Class</span>
+          Citrus::Label
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../files/lib/citrus_rb.html">lib/citrus.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong>Object</strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <p>
+            A <a href="Label.html">Label</a> is a <a
+            href="Predicate.html">Predicate</a> that applies a new name to any matches
+            made by its rule. The <a href="../Citrus.html">Citrus</a> notation is any
+            sequence of word characters (i.e. <tt>[a-zA-Z0-9_]</tt>) followed by a
+            colon, followed by any other expression, e.g.:
+            </p>
+            <pre>label:expr</pre>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>public class</h3>
+            <ol>
+              <li><a href="#M000063">new</a></li>
+            </ol>
+            <h3>public instance</h3>
+            <ol>
+              <li><a href="#M000064">match</a></li>
+              <li><a href="#M000065">to_s</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+            <div id='includes'>
+              <h2>Included modules</h2>
+              <ol>
+                <li><a href="Predicate.html">Predicate</a></li>
+              </ol>
+            </div>
+          </div>
+          <div id='section'>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>label</td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      The symbol this rule uses to re-name all its matches.
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public class methods</h2>
+              <div class='method public-class' id='method-M000063'>
+                <a name='M000063'></a>
+                <div class='synopsis'>
+                  <span class='name'>new</span>
+                  <span class='arguments'>(label='&lt;label&gt;', rule='')</span>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000063-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000063-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 678</span>&#x000A;678:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">label</span>=<span class="ruby-value str">'&lt;label&gt;'</span>, <span class="ruby-identifier">rule</span>=<span class="ruby-value str">''</span>)&#x000A;679:       <span class="ruby-ivar">@label</span> = <span class="ruby-identifier">label</span>.<span class="ruby-identifier">to_sym</span>&#x000A;680:       <span class="ruby-keyword kw">super</span>(<span class="ruby-identifier">rule</span>)&#x000A;681:     <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <h2>Public instance methods</h2>
+              <div class='method public-instance' id='method-M000064'>
+                <a name='M000064'></a>
+                <div class='synopsis'>
+                  <span class='name'>match</span>
+                  <span class='arguments'>(input, offset=0)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Returns the <a href="Match.html">Match</a> for this rule on <tt>input</tt>
+                  at the given <tt>offset</tt>, <tt>nil</tt> if no match can be made. When a
+                  <a href="Label.html">Label</a> makes a match, it re-names the match to the
+                  value of its label.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000064-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000064-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 689</span>&#x000A;689:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">match</span>(<span class="ruby-identifier">input</span>, <span class="ruby-identifier">offset</span>=<span class="ruby-value">0</span>)&#x000A;690:       <span class="ruby-identifier">m</span> = <span class="ruby-identifier">rule</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">input</span>, <span class="ruby-identifier">offset</span>)&#x000A;691:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">m</span>&#x000A;692:         <span class="ruby-identifier">extend_match</span>(<span class="ruby-identifier">m</span>)&#x000A;693:         <span class="ruby-identifier">m</span>.<span class="ruby-identifier">name</span> = <span class="ruby-identifier">label</span>&#x000A;694:         <span class="ruby-identifier">m</span>&#x000A;695:       <span class="ruby-keyword kw">end</span>&#x000A;696:     <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-M000065'>
+                <a name='M000065'></a>
+                <div class='synopsis'>
+                  <span class='name'>to_s</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Returns the <a href="../Citrus.html">Citrus</a> notation of this rule as a
+                  string.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000065-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000065-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 699</span>&#x000A;699:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">to_s</span>&#x000A;700:       <span class="ruby-identifier">label</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">+</span> <span class="ruby-value str">':'</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">rule</span>.<span class="ruby-identifier">embed</span>&#x000A;701:     <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>
