@@ -7,7 +7,153 @@
 
 Citrus is a compact and powerful parsing library for Ruby that combines the
 elegance and expressiveness of the language with the simplicity and power of
-parsing expression grammars.
+parsing expressions.
+
+
+  ** Installation **
+
+
+Via RubyGems:
+
+  $ sudo gem install citrus
+
+From a local copy:
+
+  $ git clone git://github.com/mjijackson/citrus.git
+  $ cd citrus
+  $ rake package && sudo rake install
+
+
+  ** Background **
+
+
+In order to be able to use Citrus effectively, you must first understand the
+difference between syntax and semantics. Syntax is a set of rules that govern
+the way letters and punctuation may be used in a language. For example, English
+syntax dictates that proper nouns should start with a capital letter and that
+sentences should end with a period.
+
+Semantics are the rules by which meaning may be derived in a language. For
+example, as you read a book you are able to make some sense of the particular
+way in which words on a page are combined to form thoughts and express ideas
+because you understand what the words themselves mean and you can understand
+what they mean collectively.
+
+Computers use a similar process when interpreting code. First, the code must be
+parsed into recognizable symbols or tokens. These tokens may then be passed to
+an interpreter which is responsible for forming actual instructions from them.
+
+Citrus is a pure Ruby library that allows you to perform both lexical analysis
+and semantic interpretation on an input string quickly and easily. Using Citrus
+you can write powerful parsers that are simple to understand and easy to create.
+
+In Citrus, there are three main types of objects: rules, grammars, and matches.
+
+=== Rules
+
+Rules are objects that specify some matching behavior on a string. There are
+two types of rules: terminals and non-terminals. Terminals can be either Ruby
+strings or regular expressions that specify some input to match. For example,
+a terminal object created from the string "end" would match any sequence of the
+characters "e", "n", and "d", in that order. A terminal object created from a
+regular expression uses Ruby's regular expression engine to attempt to create
+a match on the input.
+
+Non-terminals are rules that may contain other rules but do not themselves match
+directly on the input. For example, a Repeat is a non-terminal that may contain
+one other rule that will try and match a certain number of times. Several other
+types of non-terminals exist that will be discussed later.
+
+Rule objects may also have semantic information associated with them in the form
+of Ruby modules. These modules contain methods that will be used to extend any
+matches created by the rule with which they are associated.
+
+=== Grammars
+
+A grammar is a container for rules. Usually the rules in a grammar collectively
+form a complete specification for some language, or a well-defined subset
+thereof. A Citrus grammar is really just a souped-up Ruby module. These modules
+may be included in other grammar modules in the same way that Ruby modules are
+normally used to create more complex grammars. Any grammar rule with the same
+name as a rule in an included grammar may access that rule with a mechanism
+similar to Ruby's +super+ keyword.
+
+=== Matches
+
+Matches are created by Rule objects when they match on the input. Matches
+contain the string of text that made up the match as well as its offset in the
+original input string. During a parse, matches are arranged in a tree structure
+where any match may contain any number of other matches. This structure is
+determined by the way in which the rule that generated each match is used in the
+grammar.
+
+For example, a match that is created from a non-terminal rule that contains
+several other terminals will likewise contain several matches, one for each
+terminal.
+
+Match objects may be extended with semantic information in the form of methods.
+These methods can interpret the text of a match using the wealth of information
+available to them including the text of the match, its position in the input,
+and any submatches.
+
+
+  ** Usage **
+
+
+The most straightforward way to compose a Citrus grammar is to use Citrus' own
+custom grammar syntax. The syntax borrows heavily from Ruby, so it should
+already be familiar to most Ruby programmers. Below is an example of a simple
+calculator that respects operator precedence.
+
+  grammar Calculator
+    rule additive
+      multiplicative '+' additive | multiplicative
+    end
+
+    rule multiplicative
+      primary '*' multiplicative | primary
+    end
+
+    rule primary
+      '(' additive ')' | number
+    end
+
+    rule number
+      [0-9]+
+    end
+  end
+
+Several things to note about the above example are:
+
+  * Grammar and rule declarations end with the "end" keyword
+
+  * Rules may refer to other rules in their own definitions by simply using the
+    other rule's name
+
+  * A Sequence of rules is created by separating expressions with a space.
+    Likewise, ordered choice may be represented with a vertical bar
+
+  * Any expression may be followed by a quantifier which specifies the number
+    of times that expression should match
+
+=== Interpretation
+
+This simple grammar is able to parse mathematical expressions such as "1+2" and
+"4+5*(1+2)", but it does not yet have enough semantic information to be able to
+actually interpret these expressions.
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Citrus grammars look very much like Treetop grammars but take a completely
 different approach. Instead of generating parsers from your grammars, Citrus
@@ -46,20 +192,6 @@ fairly easy to understand for anyone who is familiar with parsing expressions.
 http://pdos.csail.mit.edu/~baford/packrat/
 http://en.wikipedia.org/wiki/Parsing_expression_grammar
 http://treetop.rubyforge.org/index.html
-
-
-  ** Installation **
-
-
-Via RubyGems:
-
-    $ sudo gem install citrus
-
-From a local copy:
-
-    $ git clone git://github.com/mjijackson/citrus.git
-    $ cd citrus
-    $ rake package && sudo rake install
 
 
   ** License **
