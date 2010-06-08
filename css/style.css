@@ -10,24 +10,44 @@ ins{text-decoration:none;}
 del{text-decoration:line-through;}
 table{border-collapse:collapse;border-spacing:0;}
 
-html,body{position:relative;height:100%;}
-body{background:url(bg.gif) repeat;font-family:Baskerville,'Times New Roman',serif;font-size:12pt;line-height:1.2;}
+body{
+  background:url(bg.gif) repeat;
+  font-family:Helvetica,Arial,sans-serif;
+  font-size:11pt;
+  line-height:1.5;
+  padding:18px 0;
+}
+#nav,h1,h2,h3{font-family:Baskerville,'Times New Roman',serif;}
 h1,h2,h3,p,ul,ol,pre{margin-bottom:18px;}
 h1,h2,h3{font-weight:normal}
 h1{font-size:42pt;}
 h2{font-size:22pt;}
 h3{font-size:18pt;}
-code{font-family:Menlo,monospace;font-size:8pt;}
+pre,code{font-family:Menlo,monospace;font-size:8pt;}
 
-#wrapper{position:relative;width:1000px;margin:0 auto;height:100%;}
-#content{position:relative;height:100%;margin-left:200px;background:url(content-bg.gif) repeat-y;}
+#wrapper{position:relative;width:700px;margin:0 auto;}
 
-#nav{position:fixed;width:200px;text-align:center;color:white;font-size:32pt;text-shadow:#cc6600 2px 2px 0;top:64px;}
-#nav li.separator{font-size:22pt;letter-spacing:2pt;}
+#nav{
+  position:fixed;
+  width:200px;
+  text-align:center;
+  color:white;
+  text-shadow:#cc6600 2px 2px 0;
+  top:56px;
+}
+#nav li{font-size:22pt;line-height:1.2;}
+#nav li.title{font-size:42pt;}
+#nav li.separator{font-size:22pt;letter-spacing:2pt;padding:12px 0;}
 #nav li.separator .splat{font-size:18pt;}
 #nav a{color:white;text-decoration:none;}
 #nav a:hover{border-bottom:1px dotted white;}
 
-#body{margin:0 200px;padding:64px 18px;}
+#body{
+  margin-left:200px;
+  padding:48px 18px;
+  background:white;
+  -webkit-box-shadow:0px 0px 10px #cc6600;
+  -moz-box-shadow:0px 0px 10px #cc6600;
+}
 
 .copyright{padding-top:36px;text-align:right;font-size:8pt;}
