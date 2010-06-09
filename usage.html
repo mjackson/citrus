@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Citrus ~ Parsing Expressions for Ruby</title>
+    <link rel="stylesheet" type="text/css" media="all" href="css/style.css">
+    <meta name="description" content="Parsing Expressions for Ruby">
+    <meta name="keywords" content="Ruby, PEG, parsing expression grammar">
+    <meta name="viewport" content="width=800">
+</head>
+
+<body>
+    <div id="wrapper">
+        <ul id="nav">
+            <li class="title"><a href="index.html">citrus</a></li>
+            <li class="separator">~<span class="splat">✻</span>~</li>
+            <li><a href="http://github.com/mjijackson/citrus">code</a></li>
+            <li><a href="background.html">background</a></li>
+            <li><a href="usage.html">usage</a></li>
+            <li><a href="http://github.com/mjijackson/citrus/issues">issues</a></li>
+            <li><a href="api/index.html">api</a></li>
+        </ul>
+        <div id="body">
+            <h1>Usage</h1>
+<p>
+The most straightforward way to compose a Citrus grammar is to use
+Citrus&#8217; own custom grammar syntax. The syntax borrows heavily from
+Ruby, so it should already be familiar to most Ruby programmers.
+</p>
+<h2>Terminals</h2>
+<p>
+Terminals may be represented by a string or a regular expression. Both
+follow the same rules as Ruby string and regular expression literals.
+</p>
+<pre>
+  'abc'
+  &quot;abc\n&quot;
+  /\xFF/
+</pre>
+<p>
+Character classes and the dot (match anything) symbol are supported as well
+for compatibility with other parsing expression implementations.
+</p>
+<pre>
+  [a-z0-9]      # match any lowercase letter or digit
+  [\x00-\xFF]   # match any octet
+  .             # match anything, even new lines
+</pre>
+<h2>Repetition</h2>
+<p>
+Quantifiers may be used with any expression to specify a number of times it
+must match. The universal form of a quantifier is N*M where N is the
+minimum and M is the maximum number of times the expression may match. The
++ and ? operators are supported as well for the common cases of 1* and *1
+respectively.
+</p>
+<pre>
+  'abc'1*2      # match &quot;abc&quot; a minimum of one, maximum
+                # of two times
+  'abc'1*       # match &quot;abc&quot; at least once
+  'abc'+        # same
+  'abc'*1       # match &quot;abc&quot; a maximum of twice
+  'abc'?        # same
+</pre>
+<h2>Lookahead</h2>
+<p>
+Both positive and negative lookahead are supported in Citrus. Use the &amp;
+and ! operators to indicate that an expression either should or should not
+match. In neither case is any input consumed.
+</p>
+<pre>
+  &amp;'a' 'b'      # Match a &quot;b&quot; preceded by an &quot;a&quot;
+  !'a' 'b'      # Match a &quot;b&quot; that is not preceded by an &quot;a&quot;
+  !'a' .        # Match any character except for &quot;a&quot;
+</pre>
+<h2>Sequences</h2>
+<p>
+Sequences of expressions may be separated by a space to indicate that the
+rules should match in that order.
+</p>
+<pre>
+  'a' 'b' 'c'   # match &quot;a&quot;, then &quot;b&quot;, then &quot;c&quot;
+  'a' [0-9]     # match &quot;a&quot;, then a numeric digit
+</pre>
+<h2>Choices</h2>
+<p>
+Ordered choice is indicated by a vertical bar that separates two
+expressions. Note that any operator binds more tightly than the bar.
+</p>
+<pre>
+  'a' | 'b'       # match &quot;a&quot; or &quot;b&quot;
+  'a' 'b' | 'c'   # match &quot;a&quot; then &quot;b&quot; (in sequence), or &quot;c&quot;
+</pre>
+<h2>Super</h2>
+<p>
+When including a grammar inside another, all rules in the child that have
+the same name as a rule in the parent also have access to the super
+keyword.
+</p>
+<h2>An Example</h2>
+<p>
+Below is an example of a simple calculator that respects operator
+precedence.
+</p>
+<pre>
+  grammar Calculator
+    rule additive
+      multiplicative '+' additive | multiplicative
+    end
+
+    rule multiplicative
+      primary '*' multiplicative | primary
+    end
+
+    rule primary
+      '(' additive ')' | number
+    end
+
+    rule number
+      [0-9]+
+    end
+  end
+</pre>
+<p>
+Several things to note about the above example are:
+</p>
+<pre>
+  * Grammar and rule declarations end with the &quot;end&quot; keyword
+  * Rules may refer to other rules in their own definitions by simply using the
+    other rule's name
+  * A Sequence of rules is created by separating expressions with a space.
+    Likewise, ordered choice may be represented with a vertical bar
+  * Any expression may be followed by a quantifier which specifies the number
+    of times that expression should match
+</pre>
+<h2>Interpretation</h2>
+<p>
+This simple grammar is able to parse mathematical expressions such as
+&#8220;1+2&#8221; and &#8220;4+5*(1+2)&#8221;, but it does not yet have
+enough semantic information to be able to actually interpret these
+expressions.
+</p>
+
+            <p class="copyright"><a href="license.html">Copyright</a> &copy; 2010 <a href="http://mjijackson.com/">Michael Jackson</a></p>
+        </div>
+    </div>
+</body>
+
+</html>

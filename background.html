@@ -23,7 +23,7 @@
             <li><a href="api/index.html">api</a></li>
         </ul>
         <div id="body">
-            <h2>Background</h2>
+            <h1>Background</h1>
 <p>
 In order to be able to use Citrus effectively, you must first understand
 the difference between syntax and semantics. Syntax is a set of rules that
@@ -54,7 +54,7 @@ and easy to create.
 In Citrus, there are three main types of objects: rules, grammars, and
 matches.
 </p>
-<h3>Rules</h3>
+<h2>Rules</h2>
 <p>
 Rules are objects that specify some matching behavior on a string. There
 are two types of rules: terminals and non-terminals. Terminals can be
@@ -77,7 +77,7 @@ Rule objects may also have semantic information associated with them in the
 form of Ruby modules. These modules contain methods that will be used to
 extend any matches created by the rule with which they are associated.
 </p>
-<h3>Grammars</h3>
+<h2>Grammars</h2>
 <p>
 A grammar is a container for rules. Usually the rules in a grammar
 collectively form a complete specification for some language, or a
@@ -88,7 +88,7 @@ grammars. Any grammar rule with the same name as a rule in an included
 grammar may access that rule with a mechanism similar to Ruby&#8217;s
 <tt>super</tt> keyword.
 </p>
-<h3>Matches</h3>
+<h2>Matches</h2>
 <p>
 Matches are created by Rule objects when they match on the input. Matches
 contain the string of text that made up the match as well as its offset in

@@ -20,9 +20,9 @@ body{
 #nav,h1,h2,h3{font-family:Baskerville,'Times New Roman',serif;}
 h1,h2,h3,p,ul,ol,pre{margin-bottom:18px;}
 h1,h2,h3{font-weight:normal}
-h1{font-size:42pt;}
-h2{font-size:22pt;}
-h3{font-size:18pt;}
+h1{font-size:22pt;}
+h2{font-size:18pt;}
+h3{font-size:12pt;}
 pre,code{font-family:Menlo,monospace;font-size:8pt;}
 
 #wrapper{position:relative;width:700px;margin:0 auto;}
