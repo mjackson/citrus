@@ -57,14 +57,14 @@ matches.
 </p>
 <h2>Rules</h2>
 <p>
-Rules are objects that specify some matching behavior on a string. There
-are two types of rules: terminals and non-terminals. Terminals can be
-either Ruby strings or regular expressions that specify some input to
-match. For example, a terminal object created from the string
-&#8220;end&#8221; would match any sequence of the characters
-&#8220;e&#8221;, &#8220;n&#8221;, and &#8220;d&#8221;, in that order. A
-terminal object created from a regular expression uses Ruby&#8217;s regular
-expression engine to attempt to create a match on the input.
+A <a href="api/classes/Citrus/Rule.html">Rule</a> is an object that
+specifies some matching behavior on a string. There are two types of rules:
+terminals and non-terminals. Terminals can be either Ruby strings or
+regular expressions that specify some input to match. For example, a
+terminal created from the string &#8220;end&#8221; would match any sequence
+of the characters &#8220;e&#8221;, &#8220;n&#8221;, and &#8220;d&#8221;, in
+that order. A terminal created from a regular expression uses Ruby&#8217;s
+regular expression engine to attempt to create a match.
 </p>
 <p>
 Non-terminals are rules that may contain other rules but do not themselves
@@ -81,9 +81,9 @@ associated.
 </p>
 <h2>Grammars</h2>
 <p>
-A grammar is a container for rules. Usually the rules in a grammar
-collectively form a complete specification for some language, or a
-well-defined subset thereof.
+A <a href="api/classes/Citrus/Grammar.html">Grammar</a> is a container for
+rules. Usually the rules in a grammar collectively form a complete
+specification for some language, or a well-defined subset thereof.
 </p>
 <p>
 A Citrus grammar is really just a souped-up Ruby module. These modules may
@@ -95,12 +95,12 @@ rule with a mechanism similar to Ruby&#8217;s super keyword.
 </p>
 <h2>Matches</h2>
 <p>
-Matches are created by Rule objects when they match on the input. Matches
-contain the string of text that made up the match as well as its offset in
-the original input string. During a parse, matches are arranged in a tree
-structure where any match may contain any number of other matches. This
-structure is determined by the way in which the rule that generated each
-match is used in the grammar.
+Matches are created by rule objects when they match on the input. A <a
+href="api/classes/Citrus/Match.html">Match</a> contains the string of text
+that made up the match as well as its offset in the original input string.
+During a parse, matches are arranged in a tree structure where any match
+may contain any number of other matches. This structure is determined by
+the way in which the rule that generated each match is used in the grammar.
 </p>
 <p>
 For example, a match that is created from a non-terminal rule that contains

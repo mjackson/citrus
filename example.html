@@ -27,7 +27,7 @@
             <h1>Example</h1>
 <p>
 Below is an example of a simple grammar that is able to parse strings of
-integers separated by any amount of white space and a + symbol.
+integers separated by any amount of white space and a <tt>+</tt> symbol.
 </p>
 <pre>
   grammar Addition
@@ -53,7 +53,7 @@ Several things to note about the above example:
 </p>
 <ul>
 <li><p>
-Grammar and rule declarations end with the &#8220;end&#8221; keyword
+Grammar and rule declarations end with the <tt>end</tt> keyword
 </p>
 </li>
 <li><p>
@@ -85,10 +85,10 @@ The grammar above is able to parse simple mathematical expressions such as
 semantic information to be able to actually interpret these expressions.
 </p>
 <p>
-At this point, when the grammar parses a string it generates a tree of
-Match objects. Each match is created by a rule. A match will know what text
-it contains, its offset in the original input, and what submatches it
-contains.
+At this point, when the grammar parses a string it generates a tree of <a
+href="api/classes/Citrus/Match.html">Match</a> objects. Each match is
+created by a rule. A match will know what text it contains, its offset in
+the original input, and what submatches it contains.
 </p>
 <p>
 Submatches are created whenever a rule contains another rule. For example,
@@ -189,9 +189,10 @@ following sequence of commands in a terminal.
 Congratulations! You just ran your first piece of Citrus code.
 </p>
 <p>
-Take a look at examples/calc.citrus for a more extensive example of a
-calculator that is able to parse and evaluate more complex mathematical
-expressions.
+Take a look at <a
+href="http://github.com/mjijackson/citrus/blob/master/examples/calc.citrus">examples/calc.citrus</a>
+for an example of a calculator that is able to parse and evaluate more
+complex mathematical expressions.
 </p>
 
             <p class="copyright"><a href="license.html">Copyright</a> &copy; 2010 <a href="http://mjijackson.com/">Michael Jackson</a></p>
