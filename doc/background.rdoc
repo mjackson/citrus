@@ -17,8 +17,8 @@ parsed into recognizable symbols or tokens. These tokens may then be passed to
 an interpreter which is responsible for forming actual instructions from them.
 
 Citrus is a pure Ruby library that allows you to perform both lexical analysis
-and semantic interpretation on an input string quickly and easily. Using Citrus
-you can write powerful parsers that are simple to understand and easy to create.
+and semantic interpretation quickly and easily. Using Citrus you can write
+powerful parsers that are simple to understand and easy to create and maintain.
 
 In Citrus, there are three main types of objects: rules, grammars, and matches.
 
@@ -35,21 +35,24 @@ a match on the input.
 Non-terminals are rules that may contain other rules but do not themselves match
 directly on the input. For example, a Repeat is a non-terminal that may contain
 one other rule that will try and match a certain number of times. Several other
-types of non-terminals exist that will be discussed later.
+types of non-terminals are available that will be discussed later.
 
 Rule objects may also have semantic information associated with them in the form
 of Ruby modules. These modules contain methods that will be used to extend any
-matches created by the rule with which they are associated.
+match objects created by the rule with which they are associated.
 
 == Grammars
 
 A grammar is a container for rules. Usually the rules in a grammar collectively
 form a complete specification for some language, or a well-defined subset
-thereof. A Citrus grammar is really just a souped-up Ruby module. These modules
-may be included in other grammar modules in the same way that Ruby modules are
-normally used to create more complex grammars. Any grammar rule with the same
-name as a rule in an included grammar may access that rule with a mechanism
-similar to Ruby's +super+ keyword.
+thereof.
+
+A Citrus grammar is really just a souped-up Ruby module. These modules may be
+included in other grammar modules in the same way that Ruby modules are normally
+used. This property allows you to divide a complex grammar into reusable pieces
+that may be combined dynamically at runtime. Any grammar rule with the same name
+as a rule in an included grammar may access that rule with a mechanism similar
+to Ruby's super keyword.
 
 == Matches
 
