@@ -2,7 +2,7 @@
 # elegance and expressiveness of the language with the simplicity and power of
 # parsing expressions.
 #
-# http://github.com/mjijackson/citrus
+# http://mjijackson.com/citrus
 module Citrus
   VERSION = [1, 2, 1]
 

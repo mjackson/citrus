@@ -24,13 +24,12 @@ In Citrus, there are three main types of objects: rules, grammars, and matches.
 
 == Rules
 
-Rules are objects that specify some matching behavior on a string. There are
+A Rule[link:api/classes/Citrus/Rule.html] is an object that specifies some matching behavior on a string. There are
 two types of rules: terminals and non-terminals. Terminals can be either Ruby
-strings or regular expressions that specify some input to match. For example,
-a terminal object created from the string "end" would match any sequence of the
-characters "e", "n", and "d", in that order. A terminal object created from a
-regular expression uses Ruby's regular expression engine to attempt to create
-a match on the input.
+strings or regular expressions that specify some input to match. For example, a
+terminal created from the string "end" would match any sequence of the
+characters "e", "n", and "d", in that order. A terminal created from a regular
+expression uses Ruby's regular expression engine to attempt to create a match.
 
 Non-terminals are rules that may contain other rules but do not themselves match
 directly on the input. For example, a Repeat is a non-terminal that may contain
@@ -43,7 +42,7 @@ match objects created by the rule with which they are associated.
 
 == Grammars
 
-A grammar is a container for rules. Usually the rules in a grammar collectively
+A Grammar[link:api/classes/Citrus/Grammar.html] is a container for rules. Usually the rules in a grammar collectively
 form a complete specification for some language, or a well-defined subset
 thereof.
 
@@ -56,8 +55,8 @@ to Ruby's super keyword.
 
 == Matches
 
-Matches are created by Rule objects when they match on the input. Matches
-contain the string of text that made up the match as well as its offset in the
+Matches are created by rule objects when they match on the input. A Match[link:api/classes/Citrus/Match.html]
+contains the string of text that made up the match as well as its offset in the
 original input string. During a parse, matches are arranged in a tree structure
 where any match may contain any number of other matches. This structure is
 determined by the way in which the rule that generated each match is used in the

@@ -51,13 +51,12 @@ In Citrus, there are three main types of objects: rules, grammars, and matches.
 
 == Rules
 
-Rules are objects that specify some matching behavior on a string. There are
+A rule is an object that specifies some matching behavior on a string. There are
 two types of rules: terminals and non-terminals. Terminals can be either Ruby
-strings or regular expressions that specify some input to match. For example,
-a terminal object created from the string "end" would match any sequence of the
-characters "e", "n", and "d", in that order. A terminal object created from a
-regular expression uses Ruby's regular expression engine to attempt to create
-a match on the input.
+strings or regular expressions that specify some input to match. For example, a
+terminal created from the string "end" would match any sequence of the
+characters "e", "n", and "d", in that order. A terminal created from a regular
+expression uses Ruby's regular expression engine to attempt to create a match.
 
 Non-terminals are rules that may contain other rules but do not themselves match
 directly on the input. For example, a Repeat is a non-terminal that may contain
@@ -83,8 +82,8 @@ to Ruby's super keyword.
 
 == Matches
 
-Matches are created by Rule objects when they match on the input. Matches
-contain the string of text that made up the match as well as its offset in the
+Matches are created by rule objects when they match on the input. A match
+contains the string of text that made up the match as well as its offset in the
 original input string. During a parse, matches are arranged in a tree structure
 where any match may contain any number of other matches. This structure is
 determined by the way in which the rule that generated each match is used in the
@@ -146,9 +145,9 @@ Both positive and negative lookahead are supported in Citrus. Use the & and !
 operators to indicate that an expression either should or should not match. In
 neither case is any input consumed.
 
-  &'a' 'b'      # Match a "b" preceded by an "a"
-  !'a' 'b'      # Match a "b" that is not preceded by an "a"
-  !'a' .        # Match any character except for "a"
+  &'a' 'b'      # match a "b" preceded by an "a"
+  !'a' 'b'      # match a "b" that is not preceded by an "a"
+  !'a' .        # match any character except for "a"
 
 == Sequences
 
@@ -310,8 +309,8 @@ following sequence of commands in a terminal.
 
 Congratulations! You just ran your first piece of Citrus code.
 
-Take a look at examples/calc.citrus for a more extensive example of a calculator
-that is able to parse and evaluate more complex mathematical expressions.
+Take a look at examples/calc.citrus for an example of a calculator that is able
+to parse and evaluate more complex mathematical expressions.
 
 
   ** Links **

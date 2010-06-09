@@ -20,6 +20,9 @@ compatibility with other parsing expression implementations.
   [\x00-\xFF]   # match any octet
   .             # match anything, even new lines
 
+See FixedWidth[link:api/classes/Citrus/FixedWidth.html] and
+Expression[link:api/classes/Citrus/Expression.html] for more information.
+
 == Repetition
 
 Quantifiers may be used after any expression to specify a number of times it
@@ -37,15 +40,20 @@ respectively.
   'abc'+        # match "abc" at least once
   'abc'?        # match "abc" a maximum of once
 
+See Repeat[link:api/classes/Citrus/Repeat.html] for more information.
+
 == Lookahead
 
 Both positive and negative lookahead are supported in Citrus. Use the & and !
 operators to indicate that an expression either should or should not match. In
 neither case is any input consumed.
 
-  &'a' 'b'      # Match a "b" preceded by an "a"
-  !'a' 'b'      # Match a "b" that is not preceded by an "a"
-  !'a' .        # Match any character except for "a"
+  &'a' 'b'      # match a "b" preceded by an "a"
+  !'a' 'b'      # match a "b" that is not preceded by an "a"
+  !'a' .        # match any character except for "a"
+
+See AndPredicate[link:api/classes/Citrus/AndPredicate.html] and
+NotPredicate[link:api/classes/Citrus/NotPredicate.html] for more information.
 
 == Sequences
 
@@ -55,6 +63,8 @@ should match in that order.
   'a' 'b' 'c'   # match "a", then "b", then "c"
   'a' [0-9]     # match "a", then a numeric digit
 
+See Sequence[link:api/classes/Citrus/Sequence.html] for more information.
+
 == Choices
 
 Ordered choice is indicated by a vertical bar that separates two expressions.
@@ -63,11 +73,15 @@ Note that any operator binds more tightly than the bar.
   'a' | 'b'       # match "a" or "b"
   'a' 'b' | 'c'   # match "a" then "b" (in sequence), or "c"
 
+See Choice[link:api/classes/Citrus/Choice.html] for more information.
+
 == Super
 
 When including a grammar inside another, all rules in the child that have the
 same name as a rule in the parent also have access to the super keyword to
 invoke the parent rule.
+
+See Super[link:api/classes/Citrus/Super.html] for more information.
 
 == Labels
 
@@ -78,3 +92,5 @@ immediately preceding any expression.
   chars:/[a-z]+/  # the characters matched by the regular
                   # expression may be referred to as "chars"
                   # in a block method
+
+See Label[link:api/classes/Citrus/Label.html] for more information.

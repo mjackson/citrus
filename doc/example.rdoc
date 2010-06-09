@@ -1,7 +1,7 @@
 = Example
 
 Below is an example of a simple grammar that is able to parse strings of
-integers separated by any amount of white space and a + symbol.
+integers separated by any amount of white space and a <tt>+</tt> symbol.
 
   grammar Addition
     rule additive
@@ -23,7 +23,7 @@ integers separated by any amount of white space and a + symbol.
 
 Several things to note about the above example:
 
-* Grammar and rule declarations end with the "end" keyword
+* Grammar and rule declarations end with the <tt>end</tt> keyword
 * A Sequence of rules is created by separating expressions with a space
 * Likewise, ordered choice is represented with a vertical bar
 * Parentheses may be used to override the natural binding order
@@ -37,7 +37,7 @@ The grammar above is able to parse simple mathematical expressions such as "1+2"
 and "1 + 2+3", but it does not have enough semantic information to be able to
 actually interpret these expressions.
 
-At this point, when the grammar parses a string it generates a tree of Match
+At this point, when the grammar parses a string it generates a tree of Match[link:api/classes/Citrus/Match.html]
 objects. Each match is created by a rule. A match will know what text it
 contains, its offset in the original input, and what submatches it contains.
 
@@ -124,5 +124,5 @@ following sequence of commands in a terminal.
 
 Congratulations! You just ran your first piece of Citrus code.
 
-Take a look at examples/calc.citrus for a more extensive example of a calculator
-that is able to parse and evaluate more complex mathematical expressions.
+Take a look at examples/calc.citrus[http://github.com/mjijackson/citrus/blob/master/examples/calc.citrus] for an example of a calculator that is able
+to parse and evaluate more complex mathematical expressions.
