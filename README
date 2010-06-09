@@ -100,7 +100,7 @@ available to them including the text of the match, its position in the input,
 and any submatches.
 
 
-  ** Usage **
+  ** Syntax **
 
 
 The most straightforward way to compose a Citrus grammar is to use Citrus' own

@@ -1,4 +1,4 @@
-= Usage
+= Syntax
 
 The most straightforward way to compose a Citrus grammar is to use Citrus' own
 custom grammar syntax. This syntax borrows heavily from Ruby, so it should
