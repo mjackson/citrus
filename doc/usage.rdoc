@@ -1,0 +1,106 @@
+= Usage
+
+The most straightforward way to compose a Citrus grammar is to use Citrus' own
+custom grammar syntax. The syntax borrows heavily from Ruby, so it should
+already be familiar to most Ruby programmers.
+
+== Terminals
+
+Terminals may be represented by a string or a regular expression. Both follow
+the same rules as Ruby string and regular expression literals.
+
+  'abc'
+  "abc\n"
+  /\xFF/
+
+Character classes and the dot (match anything) symbol are supported as well for
+compatibility with other parsing expression implementations.
+
+  [a-z0-9]      # match any lowercase letter or digit
+  [\x00-\xFF]   # match any octet
+  .             # match anything, even new lines
+
+== Repetition
+
+Quantifiers may be used with any expression to specify a number of times it must
+match. The universal form of a quantifier is N*M where N is the minimum and M is
+the maximum number of times the expression may match. The + and ? operators are
+supported as well for the common cases of 1* and *1 respectively.
+
+  'abc'1*2      # match "abc" a minimum of one, maximum
+                # of two times
+  'abc'1*       # match "abc" at least once
+  'abc'+        # same
+  'abc'*1       # match "abc" a maximum of twice
+  'abc'?        # same
+
+== Lookahead
+
+Both positive and negative lookahead are supported in Citrus. Use the & and !
+operators to indicate that an expression either should or should not match. In
+neither case is any input consumed.
+
+  &'a' 'b'      # Match a "b" preceded by an "a"
+  !'a' 'b'      # Match a "b" that is not preceded by an "a"
+  !'a' .        # Match any character except for "a"
+
+== Sequences
+
+Sequences of expressions may be separated by a space to indicate that the rules
+should match in that order.
+
+  'a' 'b' 'c'   # match "a", then "b", then "c"
+  'a' [0-9]     # match "a", then a numeric digit
+
+== Choices
+
+Ordered choice is indicated by a vertical bar that separates two expressions.
+Note that any operator binds more tightly than the bar.
+
+  'a' | 'b'       # match "a" or "b"
+  'a' 'b' | 'c'   # match "a" then "b" (in sequence), or "c"
+
+== Super
+
+When including a grammar inside another, all rules in the child that have the
+same name as a rule in the parent also have access to the super keyword.
+
+== An Example
+
+Below is an example of a simple calculator that respects operator precedence.
+
+  grammar Calculator
+    rule additive
+      multiplicative '+' additive | multiplicative
+    end
+
+    rule multiplicative
+      primary '*' multiplicative | primary
+    end
+
+    rule primary
+      '(' additive ')' | number
+    end
+
+    rule number
+      [0-9]+
+    end
+  end
+
+Several things to note about the above example are:
+
+  * Grammar and rule declarations end with the "end" keyword
+  * Rules may refer to other rules in their own definitions by simply using the
+    other rule's name
+  * A Sequence of rules is created by separating expressions with a space.
+    Likewise, ordered choice may be represented with a vertical bar
+  * Any expression may be followed by a quantifier which specifies the number
+    of times that expression should match
+
+== Interpretation
+
+This simple grammar is able to parse mathematical expressions such as "1+2" and
+"4+5*(1+2)", but it does not yet have enough semantic information to be able to
+actually interpret these expressions.
+
+
