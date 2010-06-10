@@ -7,7 +7,7 @@ module Citrus
     # inspecting a nested match. The +xml+ argument may be a Hash of
     # Builder::XmlMarkup options.
     def to_markup(xml={})
-      if xml.is_a?(Hash)
+      if Hash === xml
         opt = { :indent => 2 }.merge(xml)
         xml = Builder::XmlMarkup.new(opt)
         xml.instruct!
