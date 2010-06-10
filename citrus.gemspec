@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name = 'citrus'
-  s.version = '1.2.1'
-  s.date = '2010-06-02'
+  s.version = '1.2.2'
+  s.date = '2010-06-09'
 
   s.summary = 'Parsing Expressions for Ruby'
   s.description = 'Parsing Expressions for Ruby'
@@ -14,6 +14,7 @@ Gem::Specification.new do |s|
   s.files = Dir['benchmark/*.rb'] +
     Dir['benchmark/*.citrus'] +
     Dir['benchmark/*.gnuplot'] +
+    Dir['doc/**/*'] +
     Dir['examples/**/*'] +
     Dir['extras/**/*'] +
     Dir['lib/**/*.rb'] +

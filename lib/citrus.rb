@@ -4,7 +4,7 @@
 #
 # http://mjijackson.com/citrus
 module Citrus
-  VERSION = [1, 2, 1]
+  VERSION = [1, 2, 2]
 
   Infinity = 1.0 / 0
 
