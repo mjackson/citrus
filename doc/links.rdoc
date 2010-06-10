@@ -3,7 +3,7 @@
 The primary resource for all things to do with parsing expressions can be found
 at MIT.
 
-http://pdos.csail.mit.edu/~baford/packrat/
+http://pdos.csail.mit.edu/~baford/packrat
 
 A useful summary of parsing expression grammars can be found on Wikipedia as
 well.
@@ -15,4 +15,4 @@ expression grammars, Treetop. While Citrus' syntax is similar to that of
 Treetop, it's not identical. The link is included here for those who may wish to
 explore an alternative implementation.
 
-http://treetop.rubyforge.org/index.html
+http://treetop.rubyforge.org
