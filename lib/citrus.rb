@@ -418,15 +418,15 @@ module Citrus
 
   private
 
-    def extend_match(match)
-      match.extend(ext) if ext
+    def extend_match(match, name)
+      match.extensions << ext if ext
+      match.names << name if name
+      match
     end
 
     def create_match(data, offset)
       match = Match.new(data, offset)
-      extend_match(match)
-      match.names << name if name
-      match
+      extend_match(match, name)
     end
   end
 
@@ -458,12 +458,7 @@ module Citrus
     # +nil+ if no match can be made.
     def match(input, offset=0)
       m = input.match(rule, offset)
-      if m
-        extend_match(m)
-        # This proxy's name should be added to the names of the match.
-        m.names << name if name
-        m
-      end
+      extend_match(m, name) if m
     end
   end
 
@@ -584,8 +579,8 @@ module Citrus
     # Returns the Match for this rule on +input+ at the given +offset+, +nil+ if
     # no match can be made.
     def match(input, offset=0)
-      result = input[offset, input.length - offset].match(rule)
-      create_match(result, offset) if result && result.begin(0) == 0
+      m = input[offset, input.length - offset].match(rule)
+      create_match(m, offset) if m && m.begin(0) == 0
     end
   end
 
@@ -693,12 +688,7 @@ module Citrus
     # the value of its label.
     def match(input, offset=0)
       m = rule.match(input, offset)
-      if m
-        extend_match(m)
-        # This label's name should be added to the names of the match.
-        m.names << label_name
-        m
-      end
+      extend_match(m, label_name) if m
     end
 
     # Returns the Citrus notation of this rule as a string.
@@ -800,12 +790,7 @@ module Citrus
     def match(input, offset=0)
       rules.each do |rule|
         m = input.match(rule, offset)
-        if m
-          extend_match(m)
-          # This choice's name should be added to the names of the match.
-          m.names << name if name
-          return m
-        end
+        return extend_match(m, name) if m
       end
       nil
     end
@@ -882,6 +867,11 @@ module Citrus
       names.include?(name)
     end
 
+    # An array of all extension modules of this match.
+    def extensions
+      @extensions ||= []
+    end
+
     # An array of all sub-matches of this match.
     def matches
       @matches ||= []
@@ -944,9 +934,23 @@ module Citrus
     # Uses #match to allow sub-matches of this match to be called by name as
     # instance methods.
     def method_missing(sym, *args)
-      m = first(sym)
-      return m if m
-      raise 'No match named "%s" in %s (%s)' % [sym, self, name]
+      # Extend this object only when needed and immediately redefine
+      # #method_missing so that the new version is used on all future calls.
+      extensions.each {|e| extend(e) } if @extensions
+      redefine_method_missing!
+      __send__(sym, *args)
+    end
+
+  private
+
+    def redefine_method_missing! # :nodoc:
+      instance_eval(<<-RUBY, __FILE__, __LINE__ + 1)
+        def method_missing(sym, *args)
+          m = first(sym)
+          return m if m
+          raise 'No match named "%s" in %s (%s)' % [sym, self, name]
+        end
+      RUBY
     end
   end
 end
