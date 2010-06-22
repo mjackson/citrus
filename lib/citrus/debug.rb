@@ -13,10 +13,12 @@ module Citrus
         xml.instruct!
       end
 
+      attrs = { "names" => names.join(','), "text" => text, "offset" => offset }
+
       if matches.empty?
-        xml.match("name" => name, "text" => text, "offset" => offset)
+        xml.match(attrs)
       else
-        xml.match("name" => name, "text" => text, "offset" => offset) do
+        xml.match(attrs) do
           matches.each {|m| m.to_markup(xml) }
         end
       end

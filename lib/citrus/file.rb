@@ -74,7 +74,7 @@ module Citrus
         end
 
         def values
-          choices.map {|s| s.value }
+          choices.map {|c| c.value }
         end
 
         def value
@@ -137,11 +137,7 @@ module Citrus
     end
 
     rule :primary do
-      any(:super, :alias, :rule_body_paren, :terminal) {
-        def value
-          first.value
-        end
-      }
+      any(:super, :alias, :rule_body_paren, :terminal)
     end
 
     rule :rule_body_paren do
@@ -205,7 +201,7 @@ module Citrus
     rule :terminal do
       any(:quoted_string, :character_class, :anything_symbol, :regular_expression) {
         def value
-          Rule.create(first.value)
+          Rule.create(super)
         end
       }
     end
@@ -243,11 +239,7 @@ module Citrus
     end
 
     rule :qualifier do
-      any(:and, :not, :label) {
-        def wrap(rule)
-          first.wrap(rule)
-        end
-      }
+      any(:and, :not, :label)
     end
 
     rule :and do
@@ -281,7 +273,7 @@ module Citrus
     rule :extension do
       any(:tag, :block) {
         def wrap(rule)
-          rule.ext = first.value
+          rule.ext = value
           rule
         end
       }
@@ -305,9 +297,6 @@ module Citrus
 
     rule :quantifier do
       any(:question, :plus, :repeat) {
-        def min; first.min end
-        def max; first.max end
-
         def wrap(rule)
           Repeat.new(min, max, rule)
         end

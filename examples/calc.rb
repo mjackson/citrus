@@ -6,14 +6,8 @@ require 'citrus'
 module Calc
   include Citrus::Grammar
 
-  module FirstValue
-    def value
-      first.value
-    end
-  end
-
   rule :term do
-    ext(any(:additive, :factor), FirstValue)
+    any(:additive, :factor)
   end
 
   rule :additive do
@@ -25,7 +19,7 @@ module Calc
   end
 
   rule :factor do
-    ext(any(:multiplicative, :primary), FirstValue)
+    any(:multiplicative, :primary)
   end
 
   rule :multiplicative do
@@ -37,7 +31,7 @@ module Calc
   end
 
   rule :primary do
-    ext(any(:term_paren, :number), FirstValue)
+    any(:term_paren, :number)
   end
 
   rule :term_paren do
@@ -65,7 +59,7 @@ module Calc
   end
 
   rule :number do
-    ext(any(:float, :integer), FirstValue)
+    any(:float, :integer)
   end
 
   rule :float do

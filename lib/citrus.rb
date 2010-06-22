@@ -419,13 +419,13 @@ module Citrus
   private
 
     def extend_match(match)
-      match.ext = ext if ext
+      match.extend(ext) if ext
     end
 
     def create_match(data, offset)
       match = Match.new(data, offset)
       extend_match(match)
-      match.name = name
+      match.names << name if name
       match
     end
   end
@@ -437,13 +437,13 @@ module Citrus
   module Proxy
     include Rule
 
-    def initialize(name='<proxy>')
-      self.rule_name = name
+    def initialize(rule_name='<proxy>')
+      self.rule_name = rule_name
     end
 
     # Sets the name of the rule this rule is proxy for.
-    def rule_name=(name)
-      @rule_name = name.to_sym
+    def rule_name=(rule_name)
+      @rule_name = rule_name.to_sym
     end
 
     # The name of this proxy's rule.
@@ -460,8 +460,8 @@ module Citrus
       m = input.match(rule, offset)
       if m
         extend_match(m)
-        # If this Proxy has a name then it should rename all of its matches.
-        m.name = name if name
+        # This proxy's name should be added to the names of the match.
+        m.names << name if name
         m
       end
     end
@@ -675,13 +675,18 @@ module Citrus
   class Label
     include Predicate
 
-    def initialize(label='<label>', rule='')
-      @label = label.to_sym
+    def initialize(label_name='<label>', rule='')
       super(rule)
+      self.label_name = label_name
     end
 
-    # The symbol this rule uses to re-name all its matches.
-    attr_reader :label
+    # Sets the name of this label.
+    def label_name=(label_name)
+      @label_name = label_name.to_sym
+    end
+
+    # The name this rule adds to all its matches.
+    attr_reader :label_name
 
     # Returns the Match for this rule on +input+ at the given +offset+, +nil+ if
     # no match can be made. When a Label makes a match, it re-names the match to
@@ -690,14 +695,15 @@ module Citrus
       m = rule.match(input, offset)
       if m
         extend_match(m)
-        m.name = label
+        # This label's name should be added to the names of the match.
+        m.names << label_name
         m
       end
     end
 
     # Returns the Citrus notation of this rule as a string.
     def to_s
-      label.to_s + ':' + rule.embed
+      label_name.to_s + ':' + rule.embed
     end
   end
 
@@ -794,7 +800,12 @@ module Citrus
     def match(input, offset=0)
       rules.each do |rule|
         m = input.match(rule, offset)
-        return create_match([m], offset) if m
+        if m
+          extend_match(m)
+          # This choice's name should be added to the names of the match.
+          m.names << name if name
+          return m
+        end
       end
       nil
     end
@@ -851,17 +862,25 @@ module Citrus
       @offset = offset
     end
 
-    # The name by which this match can be accessed from a parent match. This
-    # will be the name of the rule that generated the match in most cases.
-    # However, if the match is the result of a Label this will be the value of
-    # the label.
-    attr_accessor :name
-
-    # A module that will be used to extend this match.
-    attr_accessor :ext
-
     # The offset in the input at which this match occurred.
     attr_reader :offset
+
+    # An array of all names of this match. A name is added to a match object
+    # for each rule that returns that object when matching. These names can then
+    # be used to determine which rules were satisfied by a given match.
+    def names
+      @names ||= []
+    end
+
+    # The name of the lowest level rule that originally created this match.
+    def name
+      names.first
+    end
+
+    # Returns +true+ if this match has the given +name+.
+    def has_name?(name)
+      names.include?(name)
+    end
 
     # An array of all sub-matches of this match.
     def matches
@@ -897,7 +916,7 @@ module Citrus
     # match.
     def find(name, deep=true)
       sym = name.to_sym
-      ms = matches.select {|m| sym == m.name }
+      ms = matches.select {|m| m.has_name?(sym) }
       ms.concat(matches.map {|m| m.find(name, deep) }.flatten) if deep
       ms
     end
@@ -925,23 +944,9 @@ module Citrus
     # Uses #match to allow sub-matches of this match to be called by name as
     # instance methods.
     def method_missing(sym, *args)
-      # Extend this object only when needed and immediately redefine
-      # #method_missing so that the new version is used on all future calls.
-      extend(ext) if ext
-      redefine_method_missing!
-      __send__(sym, *args)
-    end
-
-  private
-
-    def redefine_method_missing! # :nodoc:
-      instance_eval(<<-RUBY, __FILE__, __LINE__ + 1)
-        def method_missing(sym, *args)
-          m = first(sym)
-          return m if m
-          raise 'No match named "%s" in %s (%s)' % [sym, self, name]
-        end
-      RUBY
+      m = first(sym)
+      return m if m
+      raise 'No match named "%s" in %s (%s)' % [sym, self, name]
     end
   end
 end

@@ -51,11 +51,11 @@ class SuperTest < Test::Unit::TestCase
 
     match = grammar2.parse('a')
     assert(match)
-    assert_equal(:a, match.first.name)
+    assert_equal(:a, match.name)
 
     match = grammar2.parse('b')
     assert(match)
-    assert_equal(:b, match.first.name)
+    assert_equal(:b, match.name)
   end
 
   def test_to_s

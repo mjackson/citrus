@@ -3,11 +3,7 @@
 # ignoring whitespace.
 grammar Calc
   rule term
-    (additive | factor) {
-      def value
-        first.value
-      end
-    }
+    additive | factor
   end
 
   rule additive
@@ -19,11 +15,7 @@ grammar Calc
   end
 
   rule factor
-    (multiplicative | primary) {
-      def value
-        first.value
-      end
-    }
+    multiplicative | primary
   end
 
   rule multiplicative
@@ -35,11 +27,7 @@ grammar Calc
   end
 
   rule primary
-    (term_paren | number) {
-      def value
-        first.value
-      end
-    }
+    term_paren | number
   end
 
   rule term_paren
@@ -67,11 +55,7 @@ grammar Calc
   end
 
   rule number
-    (float | integer) {
-      def value
-        first.value
-      end
-    }
+    float | integer
   end
 
   rule float

@@ -7,5 +7,5 @@ end
 Citrus.load(File.dirname(__FILE__) + '/../examples/calc')
 
 class CalcFileTest < Test::Unit::TestCase
-  include CalcTests
+  include CalcTestMethods
 end

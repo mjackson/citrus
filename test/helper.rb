@@ -43,7 +43,7 @@ class Test::Unit::TestCase
     end
   end
 
-  module CalcTests
+  module CalcTestMethods
     def test_int
       match = Calc.parse('3')
       assert(match)

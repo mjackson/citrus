@@ -4,14 +4,8 @@ require 'citrus/sugar'
 # non-negative numbers (integers and floats), respecting operator precedence and
 # ignoring whitespace.
 Calc = Citrus::Grammar.new {
-  module FirstValue
-    def value
-      first.value
-    end
-  end
-
   rule term do
-    ext(any(additive, factor), FirstValue)
+    any(additive, factor)
   end
 
   rule additive do
@@ -23,7 +17,7 @@ Calc = Citrus::Grammar.new {
   end
 
   rule factor do
-    ext(any(multiplicative, primary), FirstValue)
+    any(multiplicative, primary)
   end
 
   rule multiplicative do
@@ -35,7 +29,7 @@ Calc = Citrus::Grammar.new {
   end
 
   rule primary do
-    ext(any(term_paren, number), FirstValue)
+    any(term_paren, number)
   end
 
   rule term_paren do
@@ -63,7 +57,7 @@ Calc = Citrus::Grammar.new {
   end
 
   rule number do
-    ext(any(float, integer), FirstValue)
+    any(float, integer)
   end
 
   rule float do
