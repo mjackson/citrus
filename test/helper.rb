@@ -44,100 +44,66 @@ class Test::Unit::TestCase
   end
 
   module CalcTestMethods
-    def test_int
-      match = Calc.parse('3')
+    # A helper method that tests the successful parsing and evaluation of the
+    # given mathematical expression.
+    def do_test(expr)
+      match = Calc.parse(expr)
       assert(match)
-      assert_equal('3', match.text)
-      assert_equal(1, match.length)
-      assert_equal(3, match.value)
+      assert_equal(expr, match.text)
+      assert_equal(expr.length, match.length)
+      assert_equal(eval(expr), match.value)
+    end
+
+    def test_int
+      do_test('3')
     end
 
     def test_float
-      match = Calc.parse('1.5')
-      assert(match)
-      assert_equal('1.5', match.text)
-      assert_equal(3, match.length)
-      assert_equal(1.5, match.value)
+      do_test('1.5')
     end
 
     def test_addition
-      match = Calc.parse('1+2')
-      assert(match)
-      assert_equal('1+2', match.text)
-      assert_equal(3, match.length)
-      assert_equal(3, match.value)
+      do_test('1+2')
     end
 
     def test_addition_multi
-      match = Calc.parse('1+2+3')
-      assert(match)
-      assert_equal('1+2+3', match.text)
-      assert_equal(5, match.length)
-      assert_equal(6, match.value)
+      do_test('1+2+3')
     end
 
     def test_addition_float
-      match = Calc.parse('1.5+3')
-      assert(match)
-      assert_equal('1.5+3', match.text)
-      assert_equal(5, match.length)
-      assert_equal(4.5, match.value)
+      do_test('1.5+3')
     end
 
     def test_subtraction
-      match = Calc.parse('3-2')
-      assert(match)
-      assert_equal(1, match.value)
+      do_test('3-2')
     end
 
     def test_subtraction_float
-      match = Calc.parse('4.5-3')
-      assert(match)
-      assert_equal('4.5-3', match.text)
-      assert_equal(5, match.length)
-      assert_equal(1.5, match.value)
+      do_test('4.5-3')
     end
 
     def test_multiplication
-      match = Calc.parse('2*5')
-      assert(match)
-      assert_equal(10, match.value)
+      do_test('2*5')
     end
 
     def test_multiplication_float
-      match = Calc.parse('1.5*3')
-      assert(match)
-      assert_equal('1.5*3', match.text)
-      assert_equal(5, match.length)
-      assert_equal(4.5, match.value)
+      do_test('1.5*3')
     end
 
     def test_division
-      match = Calc.parse('20/5')
-      assert(match)
-      assert_equal(4, match.value)
+      do_test('20/5')
     end
 
     def test_division_float
-      match = Calc.parse('4.5/3')
-      assert(match)
-      assert_equal('4.5/3', match.text)
-      assert_equal(5, match.length)
-      assert_equal(1.5, match.value)
+      do_test('4.5/3')
     end
 
     def test_complex
-      match = Calc.parse('7*4+3.5*(4.5/3)')
-      assert(match)
-      assert_equal('7*4+3.5*(4.5/3)', match.text)
-      assert_equal(33.25, match.value)
+      do_test('7*4+3.5*(4.5/3)')
     end
 
     def test_complex_spaced
-      match = Calc.parse('7 * 4 + 3.5 * (4.5 / 3)')
-      assert(match)
-      assert_equal(33.25, match.value)
+      do_test('7 * 4 + 3.5 * (4.5 / 3)')
     end
   end
-
 end
