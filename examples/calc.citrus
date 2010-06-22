@@ -7,9 +7,9 @@ grammar Calc
   end
 
   rule additive
-    (factor operator:additive_op term) {
+    (factor operator:(plus | minus) term) {
       def value
-        operator.apply(factor.value, term.value)
+        operator.apply(factor, term)
       end
     }
   end
@@ -19,9 +19,9 @@ grammar Calc
   end
 
   rule multiplicative
-    (primary operator:multiplicative_op factor) {
+    (primary operator:(star | slash) factor) {
       def value
-        operator.apply(primary.value, factor.value)
+        operator.apply(primary, factor)
       end
     }
   end
@@ -34,22 +34,6 @@ grammar Calc
     (lparen term rparen) {
       def value
         term.value
-      end
-    }
-  end
-
-  rule additive_op
-    (plus | minus) {
-      def apply(factor, term)
-        text.strip == '+' ? factor + term : factor - term
-      end
-    }
-  end
-
-  rule multiplicative_op
-    (star | slash) {
-      def apply(primary, factor)
-        text.strip == '*' ? primary * factor : primary / factor
       end
     }
   end
@@ -74,14 +58,39 @@ grammar Calc
     }
   end
 
-  rule lparen  '(' space  end
-  rule rparen  ')' space  end
-  rule plus    '+' space  end
-  rule minus   '-' space  end
-  rule star    '*' space  end
-  rule slash   '/' space  end
-
-  rule space
-    [ \t\n\r]*
+  rule plus
+    ('+' space) {
+      def apply(factor, term)
+        factor.value + term.value
+      end
+    }
   end
+
+  rule minus
+    ('-' space) {
+      def apply(factor, term)
+        factor.value - term.value
+      end
+    }
+  end
+
+  rule star
+    ('*' space) {
+      def apply(primary, factor)
+        primary.value * factor.value
+      end
+    }
+  end
+
+  rule slash
+    ('/' space) {
+      def apply(primary, factor)
+        primary.value / factor.value
+      end
+    }
+  end
+
+  rule lparen '(' space  end
+  rule rparen ')' space  end
+  rule space  [ \t\n\r]* end
 end

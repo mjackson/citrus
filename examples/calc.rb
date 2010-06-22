@@ -9,9 +9,9 @@ Calc = Citrus::Grammar.new do
   end
 
   rule additive do
-    all(factor, label(additive_op, operator), term) {
+    all(factor, label(any(plus, minus), operator), term) {
       def value
-        operator.apply(factor.value, term.value)
+        operator.apply(factor, term)
       end
     }
   end
@@ -21,9 +21,9 @@ Calc = Citrus::Grammar.new do
   end
 
   rule multiplicative do
-    all(primary, label(multiplicative_op, operator), factor) {
+    all(primary, label(any(star, slash), operator), factor) {
       def value
-        operator.apply(primary.value, factor.value)
+        operator.apply(primary, factor)
       end
     }
   end
@@ -36,22 +36,6 @@ Calc = Citrus::Grammar.new do
     all(lparen, term, rparen) {
       def value
         term.value
-      end
-    }
-  end
-
-  rule additive_op do
-    any(plus, minus) {
-      def apply(factor, term)
-        text.strip == '+' ? factor + term : factor - term
-      end
-    }
-  end
-
-  rule multiplicative_op do
-    any(star, slash) {
-      def apply(primary, factor)
-        text.strip == '*' ? primary * factor : primary / factor
       end
     }
   end
@@ -76,12 +60,39 @@ Calc = Citrus::Grammar.new do
     }
   end
 
+  rule plus do
+    all('+', space) {
+      def apply(factor, term)
+        factor.value + term.value
+      end
+    }
+  end
+
+  rule minus do
+    all('-', space) {
+      def apply(factor, term)
+        factor.value - term.value
+      end
+    }
+  end
+
+  rule star do
+    all('*', space) {
+      def apply(primary, factor)
+        primary.value * factor.value
+      end
+    }
+  end
+
+  rule slash do
+    all('/', space) {
+      def apply(primary, factor)
+        primary.value / factor.value
+      end
+    }
+  end
+
   rule lparen, ['(', space]
   rule rparen, [')', space]
-  rule plus,   ['+', space]
-  rule minus,  ['-', space]
-  rule star,   ['*', space]
-  rule slash,  ['/', space]
-
   rule space,  /[ \t\n\r]*/
 end
