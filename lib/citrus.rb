@@ -236,8 +236,28 @@ module Citrus
     def ext(rule, mod=nil)
       rule = Rule.create(rule)
       mod = Proc.new if block_given?
-      rule.ext = mod if mod
+      rule.extension = mod if mod
       rule
+    end
+
+    # Permits creation of aliases within rule definitions in Ruby grammars using
+    # the bare name of a rule instead of a Symbol, e.g.:
+    #
+    #     rule :value do
+    #       any(:alpha, :num)
+    #     end
+    #
+    # can also be written as
+    #
+    #     rule value do
+    #       any(alpha, num)
+    #     end
+    #
+    # The only caveat is that since this hack uses +method_missing+ you must
+    # still use symbols for rule names that are the same as any of the methods
+    # already defined in GrammarMethods (root, rule, rules, etc.)
+    def method_missing(sym, *args)
+      sym
     end
 
     # Parses the given input +string+ using the given +options+. If no match can
@@ -387,13 +407,13 @@ module Citrus
     # Specifies a module that will be used to extend all Match objects that
     # result from this rule. If +mod+ is a Proc, it is used to create an
     # anonymous module.
-    def ext=(mod)
+    def extension=(mod)
       mod = Module.new(&mod) if Proc === mod
-      @ext = mod
+      @extension = mod
     end
 
     # The module this rule uses to extend new matches.
-    attr_reader :ext
+    attr_reader :extension
 
     # Returns +true+ if this rule is a Terminal.
     def terminal?
@@ -419,7 +439,7 @@ module Citrus
   private
 
     def extend_match(match, name)
-      match.extensions << ext if ext
+      match.extensions << extension if extension
       match.names << name if name
       match
     end

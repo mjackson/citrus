@@ -233,17 +233,17 @@ class CitrusFileTest < Test::Unit::TestCase
     match = grammar.parse('"" <Module>')
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_kind_of(Module, match.value.ext)
+    assert_kind_of(Module, match.value.extension)
 
     match = grammar.parse('"" {}')
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_kind_of(Module, match.value.ext)
+    assert_kind_of(Module, match.value.extension)
 
     match = grammar.parse('"" {} ')
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_kind_of(Module, match.value.ext)
+    assert_kind_of(Module, match.value.extension)
   end
 
   def test_suffix

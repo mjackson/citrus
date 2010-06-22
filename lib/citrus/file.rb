@@ -1,11 +1,10 @@
 require 'citrus'
 
 module Citrus
-  # A grammar for Citrus grammar files. This module is used in Citrus#eval to
+  # A grammar for Citrus grammar files. This grammar is used in Citrus#eval to
   # parse and evaluate Citrus grammars and serves as a prime example of how to
   # create a complex grammar complete with semantic interpretation in pure Ruby.
-  module File
-    include Grammar
+  File = Grammar.new do
 
     ## Hierarchical syntax
 
@@ -119,7 +118,7 @@ module Citrus
         def value
           rule = suffix.value
           extension = matches[1].first
-          rule = extension.wrap(rule) if extension
+          extension.apply(rule) if extension
           rule
         end
       }
@@ -272,9 +271,8 @@ module Citrus
 
     rule :extension do
       any(:tag, :block) {
-        def wrap(rule)
-          rule.ext = value
-          rule
+        def apply(rule)
+          rule.extension = value
         end
       }
     end

@@ -22,7 +22,7 @@ class RuleTest < Test::Unit::TestCase
 
   def test_match_module
     rule = EqualRule.new('a')
-    rule.ext = MatchModule
+    rule.extension = MatchModule
     match = rule.match(input('a'))
     assert(match)
     assert_equal(:test, match.a_test)
@@ -30,7 +30,7 @@ class RuleTest < Test::Unit::TestCase
 
   def test_numeric_proc
     rule = EqualRule.new(1)
-    rule.ext = NumericProc
+    rule.extension = NumericProc
     match = rule.match(input('1'))
     assert(match)
     assert_equal(1, match.to_i)
@@ -39,7 +39,7 @@ class RuleTest < Test::Unit::TestCase
 
   def test_numeric_module
     rule = EqualRule.new(1)
-    rule.ext = NumericModule
+    rule.extension = NumericModule
     match = rule.match(input('1'))
     assert(match)
     assert_equal(1, match.to_i)
