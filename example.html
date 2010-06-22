@@ -106,17 +106,9 @@ way to do this.
 <pre>
   grammar Addition
     rule additive
-      (number plus term) {
+      (number plus term:(additive | number)) {
         def value
           number.value + term.value
-        end
-      }
-    end
-
-    rule term
-      (additive | number) {
-        def value
-          first.value
         end
       }
     end
@@ -139,30 +131,27 @@ way to do this.
   end
 </pre>
 <p>
-In this version of the grammar the additive rule has been refactored to use
-the term rule. This makes it a little cleaner to define our semantic
-blocks. It&#8217;s easiest to explain what is going on here by starting
-with the lowest level block, which is defined within the number rule.
+In this version of the grammar we have added two semantic blocks, one each
+for the <tt>additive</tt> and <tt>number</tt> rules. These blocks contain
+methods that will be present on all match objects that result from matches
+of those particular rules. It&#8217;s easiest to explain what is going on
+here by starting with the lowest level block, which is defined within the
+<tt>number</tt> rule.
 </p>
 <p>
-The semantic block associated with the number rule defines one method,
-value. This method will be present on all matches that result from this
-rule. Inside this method, we can see that the value of a number match is
-determined to be its text value, stripped of white space and converted to
-an integer.
+The semantic block associated with the <tt>number</tt> rule defines one
+method, <tt>value</tt>. Inside this method, we can see that the value of a
+number match is determined to be its text value, stripped of white space
+and converted to an integer.
 </p>
 <p>
-Similarly, the block that is applied to term matches also defines a value
-method. However, this method works a bit differently. Since a term matches
-an additive or a number a term match will contain one submatch, the match
-that resulted from either additive or number. The first method retrieves
-the first submatch. So, the value of a term is determined to be the value
-of its first submatch.
-</p>
-<p>
-Finally, the additive rule also extends its matches with a value method.
-Here, the value of an additive is determined to be the values of its number
-and term matches added together using Ruby&#8217;s addition operator.
+The <tt>additive</tt> rule also extends its matches with a <tt>value</tt>
+method. Notice the use of the &#8220;term&#8221; label within the rule
+definition. This label allows the match that is created by either the
+<tt>additive</tt> or the <tt>number</tt> rule to be retrieved using the
+&#8220;term&#8221; label. The value of an additive is determined to be the
+values of its number and term matches added together using Ruby&#8217;s
+addition operator.
 </p>
 <p>
 Since additive is the first rule defined in the grammar, any match that
