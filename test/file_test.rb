@@ -408,19 +408,23 @@ class CitrusFileTest < Test::Unit::TestCase
 
     match = grammar.parse('[_]')
     assert(match)
-    assert_equal(/[_]/, match.value)
+    assert_equal(/\A[_]/, match.value)
 
     match = grammar.parse('[a-z]')
     assert(match)
-    assert_equal(/[a-z]/, match.value)
+    assert_equal(/\A[a-z]/, match.value)
 
     match = grammar.parse('[a-z0-9]')
     assert(match)
-    assert_equal(/[a-z0-9]/, match.value)
+    assert_equal(/\A[a-z0-9]/, match.value)
+
+    match = grammar.parse('[\[-\]]')
+    assert(match)
+    assert_equal(/\A[\[-\]]/, match.value)
 
     match = grammar.parse('[\\x26-\\x29]')
     assert(match)
-    assert_equal(/[\x26-\x29]/, match.value)
+    assert_equal(/\A[\x26-\x29]/, match.value)
   end
 
   def test_anything_symbol

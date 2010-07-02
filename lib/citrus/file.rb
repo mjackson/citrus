@@ -214,9 +214,9 @@ module Citrus
     end
 
     rule :character_class do
-      all(/\[(?:\\?.)*?\]/, :space) {
+      all(/^\[(?:\\.|[^\\\]])*\]/, :space) {
         def value
-          Regexp.new(first.text)
+          Regexp.new('\A'+first.text)
         end
       }
     end
