@@ -951,8 +951,8 @@ module Citrus
 
     alias eql? ==
 
-    # Uses #match to allow sub-matches of this match to be called by name as
-    # instance methods.
+    # Allows sub-matches of this match to be retrieved by name as instance
+    # methods.
     def method_missing(sym, *args)
       # Extend this object only when needed and immediately redefine
       # #method_missing so that the new version is used on all future calls.
