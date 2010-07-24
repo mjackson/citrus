@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/helper'
+require File.expand_path('../helper', __FILE__)
 Citrus.load(File.dirname(__FILE__) + '/_files/super')
 
 class SuperTest < Test::Unit::TestCase
@@ -20,13 +20,13 @@ class SuperTest < Test::Unit::TestCase
 
     match = grammar2.parse('b')
     assert(match)
-    assert('b', match.text)
-    assert(1, match.length)
+    assert_equal('b', match.text)
+    assert_equal(1, match.length)
 
     match = grammar2.parse('a')
     assert(match)
-    assert('a', match.text)
-    assert(1, match.length)
+    assert_equal('a', match.text)
+    assert_equal(1, match.length)
   end
 
   def test_peg

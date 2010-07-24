@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/helper'
+require File.expand_path('../helper', __FILE__)
 
 class GrammarTest < Test::Unit::TestCase
 
@@ -121,14 +121,14 @@ class GrammarTest < Test::Unit::TestCase
 
     match = grammar.parse('((a))')
     assert(match)
-    assert('((a))', match.text)
-    assert(5, match.length)
+    assert_equal('((a))', match.text)
+    assert_equal(5, match.length)
 
     str = ('(' * 200) + 'a' + (')' * 200)
     match = grammar.parse(str)
     assert(match)
-    assert(str, match.text)
-    assert(str.length, match.length)
+    assert_equal(str, match.text)
+    assert_equal(str.length, match.length)
   end
 
 end

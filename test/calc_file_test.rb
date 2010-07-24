@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/helper'
+require File.expand_path('../helper', __FILE__)
 
 if defined?(Calc)
   Object.__send__(:remove_const, :Calc)

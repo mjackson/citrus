@@ -936,6 +936,26 @@ module Citrus
 
     alias eql? ==
 
+  private
+
+    def redefine_method_missing! # :nodoc:
+      instance_eval(<<-RUBY, __FILE__, __LINE__ + 1)
+        def method_missing(sym, *args)
+          if sym == :to_ary
+            original_method_missing(sym, *args)
+          else
+            m = first(sym)
+            return m if m
+            raise 'No match named "%s" in %s (%s)' % [sym, self, name]
+          end
+        end
+      RUBY
+    end
+
+    alias original_method_missing method_missing
+
+  public
+
     # Allows sub-matches of this match to be retrieved by name as instance
     # methods.
     def method_missing(sym, *args)
@@ -944,18 +964,6 @@ module Citrus
       extensions.each {|e| extend(e) } if @extensions
       redefine_method_missing!
       __send__(sym, *args)
-    end
-
-  private
-
-    def redefine_method_missing! # :nodoc:
-      instance_eval(<<-RUBY, __FILE__, __LINE__ + 1)
-        def method_missing(sym, *args)
-          m = first(sym)
-          return m if m
-          raise 'No match named "%s" in %s (%s)' % [sym, self, name]
-        end
-      RUBY
     end
   end
 end

@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/helper'
+require File.expand_path('../helper', __FILE__)
 Citrus.load(File.dirname(__FILE__) + '/_files/alias')
 
 class AliasTest < Test::Unit::TestCase
@@ -16,8 +16,8 @@ class AliasTest < Test::Unit::TestCase
 
     match = grammar.parse('b')
     assert(match)
-    assert('b', match.text)
-    assert(1, match.length)
+    assert_equal('b', match.text)
+    assert_equal(1, match.length)
   end
 
   def test_match_renamed
