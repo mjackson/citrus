@@ -214,9 +214,9 @@ module Citrus
     end
 
     rule :character_class do
-      all(/^\[(?:\\.|[^\\\]])*\]/, :space) {
+      all(/\[(?:\\?.)*?\]/, :space) {
         def value
-          Regexp.new('\A'+first.text)
+          Regexp.new('\A' + first.text)
         end
       }
     end
@@ -224,7 +224,7 @@ module Citrus
     rule :anything_symbol do
       all('.', :space) {
         def value
-          /./m # The dot matches newlines
+          /./m # Match newlines
         end
       }
     end
