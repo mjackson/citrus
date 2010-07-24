@@ -9,6 +9,12 @@ class GrammarTest < Test::Unit::TestCase
     end
   end
 
+  def test_non_module_fail
+    assert_raise ArgumentError do
+      ''.extend(GrammarMethods)
+    end
+  end
+
   def test_name
     assert_equal("Test::Unit::TestCase::TestGrammar", TestGrammar.name)
   end

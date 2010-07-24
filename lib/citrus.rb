@@ -86,6 +86,11 @@ module Citrus
 
   # Contains methods that are available to Grammar modules at the class level.
   module GrammarMethods
+    def self.extend_object(obj)
+      raise ArgumentError, "Grammars must be Ruby modules" unless Module === obj
+      super
+    end
+
     # Returns the name of this grammar as a string.
     def name
       super.to_s
@@ -972,5 +977,22 @@ module Citrus
         end
       RUBY
     end
+  end
+end
+
+class Object
+  # A sugar method for creating grammars.
+  #
+  #     grammar :Calc do
+  #     end
+  #
+  #     module MyModule
+  #       grammar :Calc do
+  #       end
+  #     end
+  #
+  def grammar(name, &block)
+    obj = respond_to?(:const_set) ? self : Object
+    obj.const_set(name, Citrus::Grammar.new(&block))
   end
 end
