@@ -3,21 +3,19 @@ require 'citrus/file'
 
 class CitrusFileTest < Test::Unit::TestCase
 
-  # A shortcut for creating a grammar that includes Citrus::PEG but uses a
+  # A shortcut for creating a grammar that includes Citrus::File but uses a
   # different root.
-  def peg(root_rule)
-    Grammar.new {
+  def file(root_rule)
+    Grammar.new do
       include Citrus::File
       root root_rule
-    }
+    end
   end
 
   ## File tests
 
-  F = ::File
-
   def run_file_test(file, root)
-    grammar = peg(root)
+    grammar = file(root)
     code = F.read(file)
     match = grammar.parse(code)
     assert(match)
@@ -36,7 +34,7 @@ class CitrusFileTest < Test::Unit::TestCase
   ## Hierarchical syntax
 
   def test_rule_body
-    grammar = peg(:rule_body)
+    grammar = file(:rule_body)
 
     match = grammar.parse('"a" | "b"')
     assert(match)
@@ -137,12 +135,6 @@ class CitrusFileTest < Test::Unit::TestCase
     assert_kind_of(Rule, match.value)
     assert_instance_of(Choice, match.value)
 
-    # Test precedence of Sequence over Choice.
-    match = grammar.parse('"a" "b" | "c"')
-    assert(match)
-    assert_kind_of(Rule, match.value)
-    assert_instance_of(Choice, match.value)
-
     match = grammar.parse('"a" ("b" | /./)* {}')
     assert(match)
     assert_kind_of(Rule, match.value)
@@ -189,8 +181,30 @@ class CitrusFileTest < Test::Unit::TestCase
     assert_instance_of(Repeat, match.value)
   end
 
+  def test_precedence
+    grammar = file(:rule_body)
+
+    # Sequence should bind more tightly than Choice.
+    match = grammar.parse('"a" "b" | "c"')
+    assert(match)
+    assert_kind_of(Rule, match.value)
+    assert_instance_of(Choice, match.value)
+
+    # Parentheses should change binding precedence.
+    match = grammar.parse('"a" ("b" | "c")')
+    assert(match)
+    assert_kind_of(Rule, match.value)
+    assert_instance_of(Sequence, match.value)
+
+    # Repeat should bind more tightly than AndPredicate.
+    match = grammar.parse("&'a'+")
+    assert(match)
+    assert_kind_of(Rule, match.value)
+    assert_instance_of(AndPredicate, match.value)
+  end
+
   def test_sequence
-    grammar = peg(:sequence)
+    grammar = file(:sequence)
 
     match = grammar.parse('"" ""')
     assert(match)
@@ -204,7 +218,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_prefix
-    grammar = peg(:prefix)
+    grammar = file(:prefix)
 
     match = grammar.parse('&""')
     assert(match)
@@ -228,7 +242,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_appendix
-    grammar = peg(:appendix)
+    grammar = file(:appendix)
 
     match = grammar.parse('"" <Module>')
     assert(match)
@@ -247,7 +261,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_suffix
-    grammar = peg(:suffix)
+    grammar = file(:suffix)
 
     match = grammar.parse('""+')
     assert(match)
@@ -266,7 +280,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_primary
-    grammar = peg(:primary)
+    grammar = file(:primary)
 
     match = grammar.parse('rule_name')
     assert(match)
@@ -284,7 +298,7 @@ class CitrusFileTest < Test::Unit::TestCase
 
 
   def test_require
-    grammar = peg(:require)
+    grammar = file(:require)
 
     match = grammar.parse('require "some/file"')
     assert(match)
@@ -300,7 +314,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_include
-    grammar = peg(:include)
+    grammar = file(:include)
 
     match = grammar.parse('include Module')
     assert(match)
@@ -312,7 +326,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_root
-    grammar = peg(:root)
+    grammar = file(:root)
 
     match = grammar.parse('root some_rule')
     assert(match)
@@ -324,7 +338,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_rule_name
-    grammar = peg(:rule_name)
+    grammar = file(:rule_name)
 
     match = grammar.parse('some_rule')
     assert(match)
@@ -340,7 +354,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_terminal
-    grammar = peg(:terminal)
+    grammar = file(:terminal)
 
     match = grammar.parse('"a"')
     assert(match)
@@ -368,7 +382,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_single_quoted_string
-    grammar = peg(:quoted_string)
+    grammar = file(:quoted_string)
 
     match = grammar.parse("'test'")
     assert(match)
@@ -384,7 +398,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_double_quoted_string
-    grammar = peg(:quoted_string)
+    grammar = file(:quoted_string)
 
     match = grammar.parse('"test"')
     assert(match)
@@ -404,7 +418,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_character_class
-    grammar = peg(:character_class)
+    grammar = file(:character_class)
 
     match = grammar.parse('[_]')
     assert(match)
@@ -428,7 +442,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_anything_symbol
-    grammar = peg(:anything_symbol)
+    grammar = file(:anything_symbol)
 
     match = grammar.parse('.')
     assert(match)
@@ -436,7 +450,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_regular_expression
-    grammar = peg(:regular_expression)
+    grammar = file(:regular_expression)
 
     match = grammar.parse('/./')
     assert(match)
@@ -460,7 +474,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_qualifier
-    grammar = peg(:qualifier)
+    grammar = file(:qualifier)
 
     match = grammar.parse('&')
     assert(match)
@@ -472,7 +486,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_and
-    grammar = peg(:and)
+    grammar = file(:and)
 
     match = grammar.parse('&')
     assert(match)
@@ -484,7 +498,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_not
-    grammar = peg(:not)
+    grammar = file(:not)
 
     match = grammar.parse('!')
     assert(match)
@@ -496,7 +510,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_label
-    grammar = peg(:label)
+    grammar = file(:label)
 
     match = grammar.parse('label:')
     assert(match)
@@ -510,7 +524,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_tag
-    grammar = peg(:tag)
+    grammar = file(:tag)
 
     match = grammar.parse('<Module>')
     assert(match)
@@ -526,7 +540,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_block
-    grammar = peg(:block)
+    grammar = file(:block)
 
     match = grammar.parse('{}')
     assert(match)
@@ -561,7 +575,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_quantifier
-    grammar = peg(:quantifier)
+    grammar = file(:quantifier)
 
     match = grammar.parse('?')
     assert(match)
@@ -577,7 +591,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_question
-    grammar = peg(:question)
+    grammar = file(:question)
 
     match = grammar.parse('?')
     assert(match)
@@ -591,7 +605,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_plus
-    grammar = peg(:plus)
+    grammar = file(:plus)
 
     match = grammar.parse('+')
     assert(match)
@@ -605,7 +619,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_repeat
-    grammar = peg(:repeat)
+    grammar = file(:repeat)
 
     match = grammar.parse('*')
     assert(match)
@@ -634,7 +648,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_module_name
-    grammar = peg(:module_name)
+    grammar = file(:module_name)
 
     match = grammar.parse('Module')
     assert(match)
@@ -644,7 +658,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_constant
-    grammar = peg(:constant)
+    grammar = file(:constant)
 
     match = grammar.parse('Math')
     assert(match)
@@ -655,7 +669,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_comment
-    grammar = peg(:comment)
+    grammar = file(:comment)
 
     match = grammar.parse('# A comment.')
     assert(match)
