@@ -216,7 +216,7 @@ module Citrus
     rule :character_class do
       all(/\[(?:\\?.)*?\]/, :space) {
         def value
-          Regexp.new('\A' + first.text)
+          Regexp.new('\A' + first.text, nil, 'n')
         end
       }
     end
