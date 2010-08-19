@@ -1,6 +1,10 @@
+$LOAD_PATH.unshift(File.expand_path('../lib', __FILE__))
+
+require 'citrus'
+
 Gem::Specification.new do |s|
   s.name = 'citrus'
-  s.version = '1.5.1'
+  s.version = Citrus.version
   s.date = '2010-08-17'
 
   s.summary = 'Parsing Expressions for Ruby'
