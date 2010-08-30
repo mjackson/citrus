@@ -10,37 +10,21 @@ module Citrus
 
     rule :file do
       all(:space, zero_or_more(any(:require, :grammar))) {
-        def requires
-          find(:require)
-        end
-
-        def grammars
-          find(:grammar)
-        end
-
         def value
-          requires.each {|r| require r.value }
-          grammars.map {|g| g.value }
+          find(:require).each {|r| require r.value }
+          find(:grammar).map {|g| g.value }
         end
       }
     end
 
     rule :grammar do
       all(:grammar_keyword, :module_name, :grammar_body, :end_keyword) {
-        def includes
-          find(:include)
-        end
-
         def modules
-          includes.map {|inc| eval(inc.value, TOPLEVEL_BINDING) }
+          find(:include).map {|inc| eval(inc.value, TOPLEVEL_BINDING) }
         end
 
         def root
           find(:root).last
-        end
-
-        def rules
-          find(:rule)
         end
 
         def value
@@ -48,7 +32,7 @@ module Citrus
           grammar = eval(code, TOPLEVEL_BINDING)
           modules.each {|mod| grammar.include(mod) }
           grammar.root(root.value) if root
-          rules.each {|rule| grammar.rule(rule.rule_name.value, rule.value) }
+          find(:rule).each {|r| grammar.rule(r.rule_name.value, r.value) }
           grammar
         end
       }
