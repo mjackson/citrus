@@ -70,9 +70,8 @@ class GrammarTest < Test::Unit::TestCase
     grammar = Grammar.new {
       rule(:num) { all(1, 2, 3) }
     }
-    assert_raise ParseError do
-      match = grammar.parse('1234')
-    end
+    match = grammar.parse('1234')
+    assert(match)
   end
 
   def test_parse_sequence_short

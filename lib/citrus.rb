@@ -166,7 +166,7 @@ module Citrus
 
       rules[sym] || super_rule(sym)
     rescue => e
-      raise "Cannot create rule \"#{name}\": " + e.message
+      raise 'Cannot create rule "%s": %s' % [name, e.message]
     end
 
     # Gets/sets the +name+ of the root rule of this grammar. If no root rule is
@@ -250,20 +250,13 @@ module Citrus
     # description of available parse options.
     def parse(string, options={})
       opts = default_parse_options.merge(options)
-
-      raise "No root rule specified" unless opts[:root]
+      raise 'No root rule specified' unless opts[:root]
 
       root_rule = rule(opts[:root])
-      raise "No rule named \"#{root}\"" unless root_rule
+      raise 'No rule named "%s"' % root unless root_rule
 
       input = Input.new(string, opts[:enable_memo])
-      match = input.match(root_rule, opts[:offset])
-
-      if !match || (opts[:consume_all] && match.length != string.length)
-        raise ParseError.new(input)
-      end
-
-      match
+      input.match(root_rule, opts[:offset]) or raise ParseError.new(input)
     end
 
     # The default set of options that is used in #parse. The options hash may
@@ -272,8 +265,6 @@ module Citrus
     # offset::        The offset at which the parse should start. Defaults to 0.
     # root::          The name of the root rule to use for the parse. Defaults
     #                 to the name supplied by calling #root.
-    # consume_all::   If this is +true+ and the entire input string cannot be
-    #                 consumed, a ParseError will be raised. Defaults to +true+.
     # enable_memo::   If this is +true+ the matches generated during a parse are
     #                 memoized. This technique (also known as Packrat parsing)
     #                 guarantees parsers will operate in linear time but costs
@@ -282,7 +273,6 @@ module Citrus
     def default_parse_options
       { :offset => 0,
         :root => root,
-        :consume_all => true,
         :enable_memo => false
       }
     end

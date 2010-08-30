@@ -347,10 +347,6 @@ class CitrusFileTest < Test::Unit::TestCase
     match = grammar.parse('some_rule ')
     assert(match)
     assert('some_rule', match.value)
-
-    assert_raise ParseError do
-      match = grammar.parse('some_rule1')
-    end
   end
 
   def test_terminal
@@ -674,10 +670,6 @@ class CitrusFileTest < Test::Unit::TestCase
     match = grammar.parse('# A comment.')
     assert(match)
     assert_equal('# A comment.', match.text)
-
-    assert_raise ParseError do
-      match = grammar.parse("# A comment.\n")
-    end
   end
 
 end
