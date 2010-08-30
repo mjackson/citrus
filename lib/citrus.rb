@@ -982,5 +982,7 @@ class Object
   def grammar(name, &block)
     obj = respond_to?(:const_set) ? self : Object
     obj.const_set(name, Citrus::Grammar.new(&block))
+  rescue NameError
+    raise ArgumentError, 'Invalid grammar name: %s' % name
   end
 end

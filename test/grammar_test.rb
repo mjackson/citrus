@@ -131,4 +131,10 @@ class GrammarTest < Test::Unit::TestCase
     assert_equal(str.length, match.length)
   end
 
+  def test_global_grammar
+    assert_raise ArgumentError do
+      grammar(:abc)
+    end
+  end
+
 end
