@@ -255,25 +255,25 @@ module Citrus
       root_rule = rule(opts[:root])
       raise 'No rule named "%s"' % root unless root_rule
 
-      input = Input.new(string, opts[:enable_memo])
+      input = Input.new(string, opts[:memoize])
       input.match(root_rule, opts[:offset]) or raise ParseError.new(input)
     end
 
     # The default set of options that is used in #parse. The options hash may
     # have any of the following keys:
     #
-    # offset::        The offset at which the parse should start. Defaults to 0.
-    # root::          The name of the root rule to use for the parse. Defaults
-    #                 to the name supplied by calling #root.
-    # enable_memo::   If this is +true+ the matches generated during a parse are
-    #                 memoized. This technique (also known as Packrat parsing)
-    #                 guarantees parsers will operate in linear time but costs
-    #                 significantly more in terms of time and memory required.
-    #                 Defaults to +false+.
+    # offset::    The offset at which the parse should start. Defaults to 0.
+    # root::      The name of the root rule to use for the parse. Defaults
+    #             to the name supplied by calling #root.
+    # memoize::   If this is +true+ the matches generated during a parse are
+    #             memoized. This technique (also known as Packrat parsing)
+    #             guarantees parsers will operate in linear time but costs
+    #             significantly more in terms of time and memory required.
+    #             Defaults to +false+.
     def default_parse_options
-      { :offset => 0,
-        :root => root,
-        :enable_memo => false
+      { :offset   => 0,
+        :root     => root,
+        :memoize  => false
       }
     end
   end
@@ -281,12 +281,12 @@ module Citrus
   # This class represents the core of the parsing algorithm. It wraps the input
   # string and serves matches to all nonterminals.
   class Input
-    # Takes the input +string+ that is to be parsed. If +enable_memo+ is +true+
+    # Takes the input +string+ that is to be parsed. If +memoize+ is +true+
     # a cache is created that holds references to already generated matches.
-    def initialize(string, enable_memo=false)
+    def initialize(string, memoize=false)
       @string = string
       @max_offset = 0
-      if enable_memo
+      if memoize
         @cache = {}
         @cache_hits = 0
       end
