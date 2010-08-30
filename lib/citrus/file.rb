@@ -158,7 +158,9 @@ module Citrus
     end
 
     rule :rule_name do
-      all(/[a-zA-Z_-]+/, :space) {
+      # Rule names may contain lower and upper-case letters, numbers,
+      # underscores, and dashes. They MUST end with a letter.
+      all(/[a-zA-Z0-9_-]*[a-zA-Z]/, :space) {
         def value
           first.text
         end
