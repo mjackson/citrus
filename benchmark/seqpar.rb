@@ -1,3 +1,5 @@
+$LOAD_PATH << File.expand_path('../../lib', __FILE__)
+
 # Benchmarking written by Bernard Lambeau and Jason Garber of the Treetop
 # project.
 #
@@ -7,8 +9,7 @@
 #   3. Make your modifications to the Citrus code
 #   4. Run ruby seqpar.rb
 #   5. Run gnuplot seqpar.gnuplot
-#
-$LOAD_PATH << File.join(File.dirname(__FILE__), '..', 'lib')
+
 require 'citrus'
 require 'benchmark'
 
