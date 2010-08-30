@@ -105,6 +105,20 @@ class CitrusFileTest < Test::Unit::TestCase
     assert_kind_of(Rule, match.value)
     assert_instance_of(Repeat, match.value)
 
+    match = grammar.parse('"a"*')
+    assert(match)
+    assert_kind_of(Rule, match.value)
+    assert_instance_of(Repeat, match.value)
+    assert_equal(0, match.value.min)
+    assert_equal(Infinity, match.value.max)
+
+    match = grammar.parse('a2')
+    assert(match)
+    assert_kind_of(Rule, match.value)
+    assert_instance_of(Repeat, match.value)
+    assert_equal(2, match.value.min)
+    assert_equal(2, match.value.max)
+
     match = grammar.parse('("a" "b")*')
     assert(match)
     assert_kind_of(Rule, match.value)

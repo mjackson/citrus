@@ -38,6 +38,7 @@ syn cluster ctRegexpSpecial contains=rubyStringEscape,rubyRegexpSpecial,rubyRege
 syn match ctQuantifier "+" contained display
 syn match ctQuantifier "?" contained display
 syn match ctQuantifier "\d*\*\d*" contained display
+syn match ctQuantifier "\d\+" contained display
 
 " Operators
 syn match ctOperator "|" contained

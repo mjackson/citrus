@@ -280,7 +280,7 @@ module Citrus
     end
 
     rule :quantifier do
-      any(:question, :plus, :repeat) {
+      any(:question, :plus, :repeat, :exact_quantity) {
         def wrap(rule)
           Repeat.new(min, max, rule)
         end
@@ -309,6 +309,18 @@ module Citrus
 
         def max
           matches[2] == '' ? Infinity : matches[2].text.to_i
+        end
+      }
+    end
+
+    rule :exact_quantity do
+      all(/[0-9]+/, :space) {
+        def min
+          text.strip.to_i
+        end
+
+        def max
+          min
         end
       }
     end
