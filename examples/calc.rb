@@ -3,6 +3,9 @@ require 'citrus'
 # A grammar for mathematical formulas that apply the basic four operations to
 # non-negative numbers (integers and floats), respecting operator precedence and
 # ignoring whitespace.
+#
+# An identical grammar that is written using Citrus' own grammar syntax can be
+# found in calc.citrus.
 grammar :Calc do
   rule :term do
     any(:additive, :factor)

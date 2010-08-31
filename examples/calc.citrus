@@ -1,6 +1,8 @@
 # A grammar for mathematical formulas that apply the basic four operations to
 # non-negative numbers (integers and floats), respecting operator precedence and
 # ignoring whitespace.
+#
+# An identical grammar that is written using pure Ruby can be found in calc.rb.
 grammar Calc
   rule term
     additive | factor

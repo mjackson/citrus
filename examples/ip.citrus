@@ -1,0 +1,82 @@
+# The grammars in this file conform to the ABNF given in Appendix A of RFC 3986
+# Uniform Resource Identifier (URI): Generic Syntax.
+#
+# See http://tools.ietf.org/html/rfc3986#appendix-A for more information.
+
+grammar IPv4Address
+  # A host identified by an IPv4 literal address is represented in
+  # dotted-decimal notation (a sequence of four decimal numbers in the
+  # range 0 to 255, separated by "."), as described in [RFC1123] by
+  # reference to [RFC0952].  Note that other forms of dotted notation may
+  # be interpreted on some platforms, as described in Section 7.4, but
+  # only the dotted-decimal form of four octets is allowed by this
+  # grammar.
+  rule IPv4address
+    (dec-octet '.' dec-octet '.' dec-octet '.' dec-octet) {
+      def version; 4 end
+    }
+  end
+
+  rule dec-octet
+      '25' [0-5]        # 250-255
+    | '2' [0-4] DIGIT   # 200-249
+    | '1' DIGIT2        # 100-199
+    | [1-9] DIGIT       # 10-99
+    | DIGIT             # 0-9
+  end
+
+  rule DIGIT
+    [0-9]
+  end
+end
+
+grammar IPv6Address
+  include IPv4Address
+
+  # A 128-bit IPv6 address is divided into eight 16-bit pieces. Each
+  # piece is represented numerically in case-insensitive hexadecimal,
+  # using one to four hexadecimal digits (leading zeroes are permitted).
+  # The eight encoded pieces are given most-significant first, separated
+  # by colon characters. Optionally, the least-significant two pieces
+  # may instead be represented in IPv4 address textual format. A
+  # sequence of one or more consecutive zero-valued 16-bit pieces within
+  # the address may be elided, omitting all their digits and leaving
+  # exactly two consecutive colons in their place to mark the elision.
+  rule IPv6address
+    (                               (hexadd ":")6 lsig
+    |                          "::" (hexadd ":")5 lsig
+    |  hexadd                ? "::" (hexadd ":")4 lsig
+    | (hexadd (":" hexadd)*1)? "::" (hexadd ":")3 lsig
+    | (hexadd (":" hexadd)*2)? "::" (hexadd ":")2 lsig
+    | (hexadd (":" hexadd)*3)? "::"  hexadd ":"   lsig
+    | (hexadd (":" hexadd)*4)? "::"               lsig
+    | (hexadd (":" hexadd)*5)? "::"               hexadd
+    | (hexadd (":" hexadd)*6)? "::"
+    ) {
+      def version; 6 end
+    }
+  end
+
+  # 16-bit address represented in hexadecimal.
+  rule hexadd
+    HEXDIG1*4
+  end
+
+  # Least-significant 32 bits of address.
+  rule lsig
+    (hexadd ":" hexadd) | IPv4address
+  end
+
+  rule HEXDIG
+    DIGIT | [a-fA-F] # Hexadecimal should be case-insensitive.
+  end
+end
+
+grammar IPAddress
+  include IPv4Address
+  include IPv6Address
+
+  rule IPaddress
+    IPv4address | IPv6address
+  end
+end
