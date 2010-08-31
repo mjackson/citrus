@@ -483,8 +483,8 @@ class CitrusFileTest < Test::Unit::TestCase
     assert_equal(/a/i, match.value)
   end
 
-  def test_qualifier
-    grammar = file(:qualifier)
+  def test_predicate
+    grammar = file(:predicate)
 
     match = grammar.parse('&')
     assert(match)

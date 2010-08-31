@@ -75,7 +75,7 @@ module Citrus
     end
 
     rule :sequence do
-      zero_or_more(:prefix) {
+      zero_or_more(:appendix) {
         def values
           matches.map {|m| m.value }
         end
@@ -86,23 +86,23 @@ module Citrus
       }
     end
 
-    rule :prefix do
-      all(zero_or_one(:qualifier), :appendix) {
+    rule :appendix do
+      all(:prefix, zero_or_one(:extension)) {
         def value
-          rule = appendix.value
-          qualifier = matches[0].first
-          rule = qualifier.wrap(rule) if qualifier
+          rule = prefix.value
+          extension = matches[1].first
+          extension.apply(rule) if extension
           rule
         end
       }
     end
 
-    rule :appendix do
-      all(:suffix, zero_or_one(:extension)) {
+    rule :prefix do
+      all(zero_or_one(:predicate), :suffix) {
         def value
           rule = suffix.value
-          extension = matches[1].first
-          extension.apply(rule) if extension
+          predicate = matches[0].first
+          rule = predicate.wrap(rule) if predicate
           rule
         end
       }
@@ -120,10 +120,10 @@ module Citrus
     end
 
     rule :primary do
-      any(:super, :alias, :rule_body_paren, :terminal)
+      any(:super, :alias, :grouping, :terminal)
     end
 
-    rule :rule_body_paren do
+    rule :grouping do
       all(:lparen, :rule_body, :rparen) {
         def value
           rule_body.value
@@ -223,7 +223,7 @@ module Citrus
       }
     end
 
-    rule :qualifier do
+    rule :predicate do
       any(:and, :not, :label)
     end
 
@@ -319,9 +319,7 @@ module Citrus
           text.strip.to_i
         end
 
-        def max
-          min
-        end
+        def max; min end
       }
     end
 
