@@ -91,7 +91,7 @@ module Citrus
         def value
           rule = prefix.value
           extension = matches[1].first
-          extension.apply(rule) if extension
+          rule.extension = extension.value if extension
           rule
         end
       }
@@ -256,11 +256,7 @@ module Citrus
     end
 
     rule :extension do
-      any(:tag, :block) {
-        def apply(rule)
-          rule.extension = value
-        end
-      }
+      any(:tag, :block)
     end
 
     rule :tag do
