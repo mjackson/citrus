@@ -157,10 +157,10 @@ module Citrus
       }
     end
 
+    # Rule names may contain letters, numbers, underscores, and dashes. They
+    # MUST start with a letter.
     rule :rule_name do
-      # Rule names may contain lower and upper-case letters, numbers,
-      # underscores, and dashes. They MUST end with a letter.
-      all(/[a-zA-Z0-9_-]*[a-zA-Z]/, :space) {
+      all(/[a-zA-Z][a-zA-Z0-9_-]*/, :space) {
         def value
           first.text
         end
@@ -276,7 +276,7 @@ module Citrus
     end
 
     rule :quantifier do
-      any(:question, :plus, :repeat, :exact_quantity) {
+      any(:question, :plus, :repeat) {
         def wrap(rule)
           Repeat.new(min, max, rule)
         end
@@ -306,16 +306,6 @@ module Citrus
         def max
           matches[2] == '' ? Infinity : matches[2].text.to_i
         end
-      }
-    end
-
-    rule :exact_quantity do
-      all(/[0-9]+/, :space) {
-        def min
-          text.strip.to_i
-        end
-
-        def max; min end
       }
     end
 

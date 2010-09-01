@@ -20,7 +20,7 @@ grammar IPv4Address
   rule dec-octet
       '25' [0-5]        # 250-255
     | '2' [0-4] DIGIT   # 200-249
-    | '1' DIGIT2        # 100-199
+    | '1' DIGIT DIGIT   # 100-199
     | [1-9] DIGIT       # 10-99
     | DIGIT             # 0-9
   end
@@ -43,28 +43,28 @@ grammar IPv6Address
   # the address may be elided, omitting all their digits and leaving
   # exactly two consecutive colons in their place to mark the elision.
   rule IPv6address
-    (                               (hexadd ":")6 lsig
-    |                          "::" (hexadd ":")5 lsig
-    |  hexadd                ? "::" (hexadd ":")4 lsig
-    | (hexadd (":" hexadd)*1)? "::" (hexadd ":")3 lsig
-    | (hexadd (":" hexadd)*2)? "::" (hexadd ":")2 lsig
-    | (hexadd (":" hexadd)*3)? "::"  hexadd ":"   lsig
-    | (hexadd (":" hexadd)*4)? "::"               lsig
-    | (hexadd (":" hexadd)*5)? "::"               hexadd
-    | (hexadd (":" hexadd)*6)? "::"
+    (                         (h16 ":")6*6 ls32
+    |                    "::" (h16 ":")5*5 ls32
+    |  h16             ? "::" (h16 ":")4*4 ls32
+    | (h16 (":" h16)*1)? "::" (h16 ":")3*3 ls32
+    | (h16 (":" h16)*2)? "::" (h16 ":")2*2 ls32
+    | (h16 (":" h16)*3)? "::"  h16 ":"     ls32
+    | (h16 (":" h16)*4)? "::"              ls32
+    | (h16 (":" h16)*5)? "::"              h16
+    | (h16 (":" h16)*6)? "::"
     ) {
       def version; 6 end
     }
   end
 
   # 16-bit address represented in hexadecimal.
-  rule hexadd
-    HEXDIG1*4
+  rule h16
+    HEXDIG 1*4
   end
 
   # Least-significant 32 bits of address.
-  rule lsig
-    (hexadd ":" hexadd) | IPv4address
+  rule ls32
+    (h16 ":" h16) | IPv4address
   end
 
   rule HEXDIG
