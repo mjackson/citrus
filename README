@@ -10,7 +10,7 @@ elegance and expressiveness of the language with the simplicity and power of
 parsing expressions.
 
 
-  ** Installation **
+= Installation
 
 
 Via RubyGems:
@@ -24,7 +24,7 @@ From a local copy:
   $ rake package && sudo rake install
 
 
-  ** Background **
+= Background
 
 
 In order to be able to use Citrus effectively, you must first understand the
@@ -99,7 +99,7 @@ available to them including the text of the match, its position in the input,
 and any submatches.
 
 
-  ** Syntax **
+= Syntax
 
 
 The most straightforward way to compose a Citrus grammar is to use Citrus' own
@@ -187,7 +187,7 @@ The following table contains a list of all operators and their precedence. A
 higher level of precedence indicates tighter binding.
 
 Operator    | Level of Precedence   | Name
-------------------------------------------------------------
+----------------------------------------------------------------
 ''          | 6                     | Literal string
 ""          | 6                     | Literal string
 []          | 6                     | Character class
@@ -205,7 +205,7 @@ e1 e2       | 2                     | Sequence
 e1 | e2     | 1                     | Ordered choice
 
 
-  ** Example **
+= Example
 
 
 Below is an example of a simple grammar that is able to parse strings of
@@ -323,7 +323,7 @@ Take a look at examples/calc.citrus for an example of a calculator that is able
 to parse and evaluate more complex mathematical expressions.
 
 
-  ** Links **
+= Links
 
 
 http://mjijackson.com/citrus
@@ -332,7 +332,7 @@ http://en.wikipedia.org/wiki/Parsing_expression_grammar
 http://treetop.rubyforge.org/index.html
 
 
-  ** License **
+= License
 
 
 Copyright 2010 Michael Jackson
