@@ -577,8 +577,8 @@ class CitrusFileTest < Test::Unit::TestCase
     assert(match.value)
   end
 
-  def test_quantifier
-    grammar = file(:quantifier)
+  def test_repeat
+    grammar = file(:repeat)
 
     match = grammar.parse('?')
     assert(match)

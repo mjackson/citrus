@@ -109,11 +109,11 @@ module Citrus
     end
 
     rule :suffix do
-      all(:primary, zero_or_one(:quantifier)) {
+      all(:primary, zero_or_one(:repeat)) {
         def value
           rule = primary.value
-          quantifier = matches[1].first
-          rule = quantifier.wrap(rule) if quantifier
+          repeat = matches[1].first
+          rule = repeat.wrap(rule) if repeat
           rule
         end
       }
@@ -275,8 +275,8 @@ module Citrus
       }
     end
 
-    rule :quantifier do
-      any(:question, :plus, :repeat) {
+    rule :repeat do
+      any(:question, :plus, :star_quantity) {
         def wrap(rule)
           Repeat.new(min, max, rule)
         end
@@ -297,7 +297,7 @@ module Citrus
       }
     end
 
-    rule :repeat do
+    rule :star_quantity do
       all(/[0-9]*/, '*', /[0-9]*/, :space) {
         def min
           matches[0] == '' ? 0 : matches[0].text.to_i
