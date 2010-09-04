@@ -143,8 +143,8 @@ module Citrus
     end
 
     # Gets/sets the rule with the given +name+. If +obj+ is given the rule
-    # will be set to the value of +obj+ passed through Rule#create. If a block
-    # is given, its return value will be used for the value of +obj+.
+    # will be set to the value of +obj+ passed through Rule#new. If a block is
+    # given, its return value will be used for the value of +obj+.
     #
     # It is important to note that this method will also check any included
     # grammars for a rule with the given +name+ if one cannot be found in this
@@ -156,7 +156,7 @@ module Citrus
       if obj
         rule_names << sym unless has_rule?(sym)
 
-        rule = Rule.create(obj)
+        rule = Rule.new(obj)
         rule.name = name
         setup_super(rule, name)
         rule.grammar = self
@@ -239,7 +239,7 @@ module Citrus
     # the given +rule+. A block may also be given that will be used to create
     # an anonymous module. See Rule#ext=.
     def ext(rule, mod=nil)
-      rule = Rule.create(rule)
+      rule = Rule.new(rule)
       mod = Proc.new if block_given?
       rule.extension = mod if mod
       rule
@@ -341,16 +341,8 @@ module Citrus
   # A Rule is an object that is used by a grammar to create matches on the
   # Input during parsing.
   module Rule
-    # Creates a new rule object from the given expression.
-    #
-    #     Citrus::Rule.new('"a" | "b"')
-    #
-    def self.new(expr)
-      File.parse(expr, :root => :rule_body).value
-    end
-
     # Returns a new Rule object depending on the type of object given.
-    def self.create(obj)
+    def self.new(obj)
       case obj
       when Rule     then obj
       when Symbol   then Alias.new(obj)
@@ -362,6 +354,14 @@ module Citrus
       else
         raise ArgumentError, "Invalid rule object: #{obj.inspect}"
       end
+    end
+
+    # Creates a new rule object from the given expression.
+    #
+    #     Citrus::Rule.create('"a" | "b"')
+    #
+    def self.create(expr)
+      File.parse(expr, :root => :rule_body).value
     end
 
     @unique_id = 0
@@ -595,7 +595,7 @@ module Citrus
     include Rule
 
     def initialize(rules=[])
-      @rules = rules.map {|r| Rule.create(r) }
+      @rules = rules.map {|r| Rule.new(r) }
     end
 
     # An array of the actual Rule objects this rule uses to match.

@@ -186,7 +186,7 @@ module Citrus
     rule :terminal do
       any(:quoted_string, :character_class, :anything_symbol, :regular_expression) {
         def value
-          Rule.create(super)
+          Rule.new(super)
         end
       }
     end
