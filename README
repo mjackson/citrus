@@ -200,7 +200,7 @@ Operator    | Level of Precedence   | Name
 &           | 4                     | And predicate
 !           | 4                     | Not predicate
 :           | 4                     | Label
-{}          | 3                     | Extension
+<>, {}      | 3                     | Extension
 e1 e2       | 2                     | Sequence
 e1 | e2     | 1                     | Ordered choice
 
