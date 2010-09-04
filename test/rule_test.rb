@@ -20,6 +20,13 @@ class RuleTest < Test::Unit::TestCase
 
   NumericModule = Module.new(&NumericProc)
 
+  def test_new
+    rule = Rule.new('"a"')
+    assert(rule)
+    match = rule.match(input('a'))
+    assert(match)
+  end
+
   def test_match_module
     rule = EqualRule.new('a')
     rule.extension = MatchModule

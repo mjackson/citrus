@@ -68,7 +68,7 @@ module Citrus
     # created with this method may be assigned a name by being assigned to some
     # constant, e.g.:
     #
-    #     Calc = Grammar.new {}
+    #     Calc = Citrus::Grammar.new {}
     #
     def self.new(&block)
       mod = Module.new { include Grammar }
@@ -341,6 +341,14 @@ module Citrus
   # A Rule is an object that is used by a grammar to create matches on the
   # Input during parsing.
   module Rule
+    # Creates a new rule object from the given expression.
+    #
+    #     Citrus::Rule.new('"a" | "b"')
+    #
+    def self.new(expr)
+      File.parse(expr, :root => :rule_body).value
+    end
+
     # Returns a new Rule object depending on the type of object given.
     def self.create(obj)
       case obj
