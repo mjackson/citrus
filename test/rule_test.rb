@@ -21,7 +21,7 @@ class RuleTest < Test::Unit::TestCase
   NumericModule = Module.new(&NumericProc)
 
   def test_create
-    rule = Rule.create('"a"')
+    rule = Rule.eval('"a"')
     assert(rule)
     match = rule.match(input('a'))
     assert(match)

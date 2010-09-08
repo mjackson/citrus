@@ -26,7 +26,8 @@ module Citrus
   end
 
   # Evaluates the given Citrus parsing expression grammar +code+ in the global
-  # scope. Returns an array of any grammar modules that were created.
+  # scope. The +code+ may contain the definition of any number of modules.
+  # Returns an array of any grammar modules that are created.
   def self.eval(code)
     File.parse(code).value
   end
@@ -341,6 +342,14 @@ module Citrus
   # A Rule is an object that is used by a grammar to create matches on the
   # Input during parsing.
   module Rule
+    # Evaluates the given expression and creates a new rule object from it.
+    #
+    #     Citrus::Rule.eval('"a" | "b"')
+    #
+    def self.eval(expr)
+      File.parse(expr, :root => :rule_body).value
+    end
+
     # Returns a new Rule object depending on the type of object given.
     def self.new(obj)
       case obj
@@ -354,14 +363,6 @@ module Citrus
       else
         raise ArgumentError, "Invalid rule object: #{obj.inspect}"
       end
-    end
-
-    # Creates a new rule object from the given expression.
-    #
-    #     Citrus::Rule.create('"a" | "b"')
-    #
-    def self.create(expr)
-      File.parse(expr, :root => :rule_body).value
     end
 
     @unique_id = 0
