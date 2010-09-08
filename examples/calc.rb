@@ -1,8 +1,8 @@
 require 'citrus'
 
-# A grammar for mathematical formulas that apply the basic four operations to
-# non-negative numbers (integers and floats), respecting operator precedence and
-# ignoring whitespace.
+# A grammar for mathematical formulas that apply basic mathematical operations
+# to all numbers, respecting operator precedence and grouping of expressions
+# while ignoring whitespace.
 #
 # An identical grammar that is written using Citrus' own grammar syntax can be
 # found in calc.citrus.
@@ -23,13 +23,25 @@ grammar :Calc do
   end
 
   rule :factor do
-    any(:multiplicative, :exponent)
+    any(:multiplicative, :prefix)
   end
 
   rule :multiplicative do
-    all(:exponent, :multiplicative_operator, :factor) {
+    all(:prefix, :multiplicative_operator, :factor) {
       def value
-        multiplicative_operator.apply(primary.value, factor.value)
+        multiplicative_operator.apply(prefix.value, factor.value)
+      end
+    }
+  end
+
+  rule :prefix do
+    any(:prefixed, :exponent)
+  end
+
+  rule :prefixed do
+    all(:unary_operator, :prefix) {
+      def value
+        unary_operator.apply(prefix.value)
       end
     }
   end
@@ -86,24 +98,34 @@ grammar :Calc do
 
   rule :additive_operator do
     all(any('+', '-'), :space) {
-      def apply(factor, term)
-        factor.send(text.strip, term)
+      def apply(n1, n2)
+        n1.send(text.strip, n2)
       end
     }
   end
 
   rule :multiplicative_operator do
     all(any('*', '/', '%'), :space) {
-      def apply(primary, factor)
-        primary.send(text.strip, factor)
+      def apply(n1, n2)
+        n1.send(text.strip, n2)
       end
     }
   end
 
   rule :exponential_operator do
     all('**', :space) {
-      def apply(primary, exponent)
-        primary ** exponent
+      def apply(n1, n2)
+        n1 ** n2
+      end
+    }
+  end
+
+  rule :unary_operator do
+    all(any('~', '+', '-'), :space) {
+      def apply(n)
+        op = text.strip
+        # Unary + and - require an @.
+        n.send(op == '~' ? op : '%s@' % op)
       end
     }
   end

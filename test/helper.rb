@@ -121,5 +121,29 @@ class Test::Unit::TestCase
     def test_exponent_float
       do_test('2**2.2')
     end
+
+    def test_negative
+      do_test('-5')
+    end
+
+    def test_double_negative
+      do_test('--5')
+    end
+
+    def test_complement
+      do_test('~4')
+    end
+
+    def test_double_complement
+      do_test('~~4')
+    end
+
+    def test_mixed_unary
+      do_test('~-4')
+    end
+
+    def test_complex_with_negatives
+      do_test('4 * -7 / (8.0 + 1_2)**2')
+    end
   end
 end
