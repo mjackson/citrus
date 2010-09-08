@@ -268,7 +268,7 @@ module Citrus
     end
 
     rule :block do
-      all(:lcurly, zero_or_more(any(:block, /[^{}]+/)), :rcurly) {
+      all(:lcurly, zero_or_more(any(:block, /[^}]+/)), :rcurly) {
         def value
           eval('Proc.new ' + text)
         end
@@ -276,7 +276,7 @@ module Citrus
     end
 
     rule :repeat do
-      any(:question, :plus, :star_quantity) {
+      any(:question, :plus, :star) {
         def wrap(rule)
           Repeat.new(min, max, rule)
         end
@@ -297,7 +297,7 @@ module Citrus
       }
     end
 
-    rule :star_quantity do
+    rule :star do
       all(/[0-9]*/, '*', /[0-9]*/, :space) {
         def min
           matches[0] == '' ? 0 : matches[0].text.to_i
@@ -317,10 +317,6 @@ module Citrus
       }
     end
 
-    rule :constant do
-      /[A-Z][a-zA-Z0-9_]*/
-    end
-
     rule :require_keyword,  [ 'require', :space ]
     rule :include_keyword,  [ 'include', :space ]
     rule :grammar_keyword,  [ 'grammar', :space ]
@@ -335,6 +331,7 @@ module Citrus
     rule :lt,               [ '<', :space ]
     rule :gt,               [ '>', :space ]
 
+    rule :constant,         /[A-Z][a-zA-Z0-9_]*/
     rule :white,            /[ \t\n\r]/
     rule :comment,          /#.*/
     rule :space,            zero_or_more(any(:white, :comment))
