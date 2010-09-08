@@ -186,23 +186,24 @@ immediately preceding any expression.
 The following table contains a list of all operators and their precedence. A
 higher level of precedence indicates tighter binding.
 
-Operator    | Level of Precedence   | Name
-----------------------------------------------------------------
-''          | 6                     | Literal string
-""          | 6                     | Literal string
-[]          | 6                     | Character class
-.           | 6                     | Any character (dot)
-//          | 6                     | Regular expression
-()          | 6                     | Grouping
-*           | 5                     | Repetition (arbitrary)
-+           | 5                     | Repetition (one or more)
-?           | 5                     | Repetition (zero or one)
-&           | 4                     | And predicate
-!           | 4                     | Not predicate
-:           | 4                     | Label
-<>, {}      | 3                     | Extension
-e1 e2       | 2                     | Sequence
-e1 | e2     | 1                     | Ordered choice
+Operator    | Name                      | Level of Precedence
+--------------------------------------------------------------
+''          | String (single quoted)    | 6
+""          | String (double quoted)    | 6
+[]          | Character class           | 6
+.           | Dot (any character)       | 6
+//          | Regular expression        | 6
+()          | Grouping                  | 6
+*           | Repetition (arbitrary)    | 5
++           | Repetition (one or more)  | 5
+?           | Repetition (zero or one)  | 5
+&           | And predicate             | 4
+!           | Not predicate             | 4
+:           | Label                     | 4
+<>          | Extension (module name)   | 3
+{}          | Extension (literal)       | 3
+e1 e2       | Sequence                  | 2
+e1 | e2     | Ordered choice            | 1
 
 
 = Example
