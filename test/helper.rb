@@ -105,5 +105,21 @@ class Test::Unit::TestCase
     def test_complex_spaced
       do_test('7 * 4 + 3.5 * (4.5 / 3)')
     end
+
+    def test_complex_with_underscores
+      do_test('(12_000 / 3) * 2.5')
+    end
+
+    def test_modulo
+      do_test('3 % 2 + 4')
+    end
+
+    def test_exponent
+      do_test('2**9')
+    end
+
+    def test_exponent_float
+      do_test('2**2.2')
+    end
   end
 end

@@ -7,35 +7,50 @@ require 'citrus'
 # An identical grammar that is written using Citrus' own grammar syntax can be
 # found in calc.citrus.
 grammar :Calc do
+
+  ## Hierarchy
+
   rule :term do
     any(:additive, :factor)
   end
 
   rule :additive do
-    all(:factor, label(any(:plus, :minus), :operator), :term) {
+    all(:factor, :additive_operator, :term) {
       def value
-        operator.apply(factor, term)
+        additive_operator.apply(factor.value, term.value)
       end
     }
   end
 
   rule :factor do
-    any(:multiplicative, :primary)
+    any(:multiplicative, :exponent)
   end
 
   rule :multiplicative do
-    all(:primary, label(any(:star, :slash), :operator), :factor) {
+    all(:exponent, :multiplicative_operator, :factor) {
       def value
-        operator.apply(primary, factor)
+        multiplicative_operator.apply(primary.value, factor.value)
+      end
+    }
+  end
+
+  rule :exponent do
+    any(:exponential, :primary)
+  end
+
+  rule :exponential do
+    all(:primary, :exponential_operator, :exponent) {
+      def value
+        exponential_operator.apply(primary.value, exponent.value)
       end
     }
   end
 
   rule :primary do
-    any(:term_paren, :number)
+    any(:group, :number)
   end
 
-  rule :term_paren do
+  rule :group do
     all(:lparen, :term, :rparen) {
       def value
         term.value
@@ -43,12 +58,14 @@ grammar :Calc do
     }
   end
 
+  ## Syntax
+
   rule :number do
     any(:float, :integer)
   end
 
   rule :float do
-    all(/[0-9]+/, '.', /[0-9]+/, :space) {
+    all(:digits, '.', :digits, :space) {
       def value
         text.strip.to_f
       end
@@ -56,41 +73,37 @@ grammar :Calc do
   end
 
   rule :integer do
-    all(/[0-9]+/, :space) {
+    all(:digits, :space) {
       def value
         text.strip.to_i
       end
     }
   end
 
-  rule :plus do
-    all('+', :space) {
+  rule :digits do
+    /[0-9]+(?:_[0-9]+)*/
+  end
+
+  rule :additive_operator do
+    all(any('+', '-'), :space) {
       def apply(factor, term)
-        factor.value + term.value
+        factor.send(text.strip, term)
       end
     }
   end
 
-  rule :minus do
-    all('-', :space) {
-      def apply(factor, term)
-        factor.value - term.value
-      end
-    }
-  end
-
-  rule :star do
-    all('*', :space) {
+  rule :multiplicative_operator do
+    all(any('*', '/', '%'), :space) {
       def apply(primary, factor)
-        primary.value * factor.value
+        primary.send(text.strip, factor)
       end
     }
   end
 
-  rule :slash do
-    all('/', :space) {
-      def apply(primary, factor)
-        primary.value / factor.value
+  rule :exponential_operator do
+    all('**', :space) {
+      def apply(primary, exponent)
+        primary ** exponent
       end
     }
   end

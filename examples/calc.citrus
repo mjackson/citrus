@@ -4,35 +4,50 @@
 #
 # An identical grammar that is written using pure Ruby can be found in calc.rb.
 grammar Calc
+
+  ## Hierarchy
+
   rule term
     additive | factor
   end
 
   rule additive
-    (factor operator:(plus | minus) term) {
+    (factor additive_operator term) {
       def value
-        operator.apply(factor, term)
+        additive_operator.apply(factor.value, term.value)
       end
     }
   end
 
   rule factor
-    multiplicative | primary
+    multiplicative | exponent
   end
 
   rule multiplicative
-    (primary operator:(star | slash) factor) {
+    (exponent multiplicative_operator factor) {
       def value
-        operator.apply(primary, factor)
+        multiplicative_operator.apply(primary.value, factor.value)
+      end
+    }
+  end
+
+  rule exponent
+    exponential | primary
+  end
+
+  rule exponential
+    (primary exponential_operator exponent) {
+      def value
+        exponential_operator.apply(primary.value, exponent.value)
       end
     }
   end
 
   rule primary
-    term_paren | number
+    group | number
   end
 
-  rule term_paren
+  rule group
     (lparen term rparen) {
       def value
         term.value
@@ -40,12 +55,14 @@ grammar Calc
     }
   end
 
+  ## Syntax
+
   rule number
     float | integer
   end
 
   rule float
-    ([0-9]+ '.' [0-9]+ space) {
+    (digits '.' digits space) {
       def value
         text.strip.to_f
       end
@@ -53,41 +70,37 @@ grammar Calc
   end
 
   rule integer
-    ([0-9]+ space) {
+    (digits space) {
       def value
         text.strip.to_i
       end
     }
   end
 
-  rule plus
-    ('+' space) {
+  rule digits
+    [0-9]+ ('_' [0-9]+)*
+  end
+
+  rule additive_operator
+    (('+' | '-') space) {
       def apply(factor, term)
-        factor.value + term.value
+        factor.send(text.strip, term)
       end
     }
   end
 
-  rule minus
-    ('-' space) {
-      def apply(factor, term)
-        factor.value - term.value
-      end
-    }
-  end
-
-  rule star
-    ('*' space) {
+  rule multiplicative_operator
+    (('*' | '/' | '%') space) {
       def apply(primary, factor)
-        primary.value * factor.value
+        primary.send(text.strip, factor)
       end
     }
   end
 
-  rule slash
-    ('/' space) {
-      def apply(primary, factor)
-        primary.value / factor.value
+  rule exponential_operator
+    ('**' space) {
+      def apply(primary, exponent)
+        primary ** exponent
       end
     }
   end
