@@ -7,7 +7,7 @@ require 'citrus'
 
 # Load and evaluate the grammars contained in ip.citrus into the global
 # namespace.
-Citrus.load(File.expand_path('../ip.citrus', __FILE__))
+Citrus.load(File.expand_path('../ip', __FILE__))
 
 if $0 == __FILE__
   require 'test/unit'
