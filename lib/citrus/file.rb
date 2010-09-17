@@ -210,7 +210,7 @@ module Citrus
     rule :anything_symbol do
       all('.', :space) {
         def value
-          /./m # Match newlines
+          ANY # Match newlines
         end
       }
     end

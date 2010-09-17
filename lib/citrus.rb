@@ -7,6 +7,9 @@ module Citrus
   VERSION = [1, 7, 0]
 
   Infinity = 1.0 / 0
+  
+  # A pattern to match any character, including \n.
+  ANY = /./m
 
   autoload :File, 'citrus/file'
 
@@ -257,7 +260,13 @@ module Citrus
       raise 'No rule named "%s"' % root unless root_rule
 
       input = Input.new(string, opts[:memoize])
-      input.match(root_rule, opts[:offset]) or raise ParseError.new(input)
+      match = input.match(root_rule, opts[:offset])
+
+      if match.nil? || (opts[:consume] && input.length != match.length)
+        raise ParseError.new(input)
+      end
+
+      match
     end
 
     # The default set of options that is used in #parse. The options hash may
@@ -271,10 +280,14 @@ module Citrus
     #             guarantees parsers will operate in linear time but costs
     #             significantly more in terms of time and memory required.
     #             Defaults to +false+.
+    # consume::   If this is +true+ a ParseError will be raised during a parse
+    #             unless the entire input string is consumed. Defaults to
+    #             +false+.
     def default_parse_options
       { :offset   => 0,
         :root     => root,
-        :memoize  => false
+        :memoize  => false,
+        :consume  => false
       }
     end
   end
