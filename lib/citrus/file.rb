@@ -184,7 +184,7 @@ module Citrus
     end
 
     rule :terminal do
-      any(:quoted_string, :character_class, :anything_symbol, :regular_expression) {
+      any(:quoted_string, :character_class, :dot, :regular_expression) {
         def value
           Rule.new(super)
         end
@@ -207,10 +207,10 @@ module Citrus
       }
     end
 
-    rule :anything_symbol do
+    rule :dot do
       all('.', :space) {
         def value
-          ANY
+          DOT
         end
       }
     end

@@ -14,7 +14,7 @@ module Citrus
   end
 
   # A pattern to match any character, including \n.
-  ANY = /./m
+  DOT = /./m
 
   Infinity = 1.0 / 0
 
@@ -692,7 +692,7 @@ module Citrus
   class ButPredicate
     include Predicate
 
-    ANY_RULE = Rule.new(ANY)
+    DOT_RULE = Rule.new(DOT)
 
     # Returns the Match for this rule on +input+ at the given +offset+, +nil+ if
     # no match can be made.
@@ -700,7 +700,7 @@ module Citrus
       matches = []
       os = offset
       while input.match(rule, os).nil?
-        m = input.match(ANY_RULE, os)
+        m = input.match(DOT_RULE, os)
         break unless m
         matches << m
         os += m.length

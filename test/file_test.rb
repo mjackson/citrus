@@ -93,7 +93,7 @@ class CitrusFileTest < Test::Unit::TestCase
     assert_instance_of(Choice, match.value)
     assert_equal(1, match.find(:bar).length)
     assert_equal(2, match.find(:regular_expression).length)
-    assert_equal(0, match.find(:anything_symbol).length)
+    assert_equal(0, match.find(:dot).length)
 
     match = grammar.parse('"" {}')
     assert(match)
@@ -444,12 +444,12 @@ class CitrusFileTest < Test::Unit::TestCase
     assert_equal(/\A[\x26-\x29]/, match.value)
   end
 
-  def test_anything_symbol
-    grammar = file(:anything_symbol)
+  def test_dot
+    grammar = file(:dot)
 
     match = grammar.parse('.')
     assert(match)
-    assert_equal(/./m, match.value)
+    assert_equal(DOT, match.value)
   end
 
   def test_regular_expression
