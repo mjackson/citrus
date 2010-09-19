@@ -15,7 +15,16 @@ class ButPredicateTest < Test::Unit::TestCase
     assert_equal('b', match.text)
     assert_equal(1, match.length)
 
+    match = rule.match(input('bbba'))
+    assert(match)
+    assert_equal('bbb', match.text)
+    assert_equal(3, match.length)
+
     match = rule.match(input('a'))
+    assert_equal(nil, match)
+
+    # ButPredicate must match at least one character.
+    match = rule.match(input(''))
     assert_equal(nil, match)
   end
 
