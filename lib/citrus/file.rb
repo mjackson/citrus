@@ -210,7 +210,7 @@ module Citrus
     rule :anything_symbol do
       all('.', :space) {
         def value
-          ANY # Match newlines
+          ANY
         end
       }
     end
@@ -224,7 +224,7 @@ module Citrus
     end
 
     rule :predicate do
-      any(:and, :not, :label)
+      any(:and, :not, :but, :label)
     end
 
     rule :and do
@@ -239,6 +239,14 @@ module Citrus
       all('!', :space) {
         def wrap(rule)
           NotPredicate.new(rule)
+        end
+      }
+    end
+
+    rule :but do
+      all('~', :space) {
+        def wrap(rule)
+          ButPredicate.new(rule)
         end
       }
     end

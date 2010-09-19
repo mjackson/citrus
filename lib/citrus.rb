@@ -4,19 +4,19 @@
 #
 # http://mjijackson.com/citrus
 module Citrus
-  VERSION = [1, 7, 0]
-
-  Infinity = 1.0 / 0
-  
-  # A pattern to match any character, including \n.
-  ANY = /./m
-
   autoload :File, 'citrus/file'
+
+  VERSION = [1, 7, 0]
 
   # Returns the current version of Citrus as a string.
   def self.version
     VERSION.join('.')
   end
+
+  # A pattern to match any character, including \n.
+  ANY = /./m
+
+  Infinity = 1.0 / 0
 
   F = ::File
 
@@ -197,6 +197,12 @@ module Citrus
     # to specify semantic behavior (via #ext).
     def notp(rule, &block)
       ext(NotPredicate.new(rule), block)
+    end
+
+    # Creates a new ButPredicate using the given +rule+. A block may be provided
+    # to specify semantic behavior (via #ext).
+    def butp(rule, &block)
+      ext(ButPredicate.new(rule), block)
     end
 
     # Creates a new Label using the given +rule+ and +label+. A block may be
@@ -568,7 +574,7 @@ module Citrus
     # Returns the Match for this rule on +input+ at the given +offset+, +nil+ if
     # no match can be made.
     def match(input, offset=0)
-      create_match(rule.dup, offset) if rule == input[offset, rule.length]
+      create_match(rule.dup, offset) if input[offset, rule.length] == rule
     end
   end
 
@@ -626,7 +632,7 @@ module Citrus
     include Nonterminal
 
     def initialize(rule='')
-      super([ rule ])
+      super([rule])
     end
 
     # Returns the Rule object this rule uses to match.
@@ -677,6 +683,38 @@ module Citrus
     end
   end
 
+  # A ButPredicate is a Predicate that consumes all characters until its rule
+  # matches. It must match at least one character in order to succeed. The
+  # Citrus notation is any expression preceded by a tilde, e.g.:
+  #
+  #     ~expr
+  #
+  class ButPredicate
+    include Predicate
+
+    ANY_RULE = Rule.new(ANY)
+
+    # Returns the Match for this rule on +input+ at the given +offset+, +nil+ if
+    # no match can be made.
+    def match(input, offset=0)
+      matches = []
+      os = offset
+      while input.match(rule, os).nil?
+        m = input.match(ANY_RULE, os)
+        break unless m
+        matches << m
+        os += m.length
+      end
+      # Create a single match from the aggregate text value of all submatches.
+      create_match(matches.map {|m| m.text }.join, offset) if matches.any?
+    end
+
+    # Returns the Citrus notation of this rule as a string.
+    def to_s
+      '~' + rule.embed
+    end
+  end
+
   # A Label is a Predicate that applies a new name to any matches made by its
   # rule. The Citrus notation is any sequence of word characters (i.e.
   # <tt>[a-zA-Z0-9_]</tt>) followed by a colon, followed by any other
@@ -704,7 +742,7 @@ module Citrus
     # no match can be made. When a Label makes a match, it re-names the match to
     # the value of its label.
     def match(input, offset=0)
-      m = rule.match(input, offset)
+      m = input.match(rule, offset)
       extend_match(m, label_name) if m
     end
 

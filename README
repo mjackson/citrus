@@ -149,6 +149,12 @@ neither case is any input consumed.
   !'a' 'b'      # match a "b" that is not preceded by an "a"
   !'a' .        # match any character except for "a"
 
+A special form of lookahead is also supported which will match any character
+that does not match a given expression.
+
+  ~'a'          # match all characters until an "a"
+  ~/xyz/        # match all characters until /xyz/ matches
+
 == Sequences
 
 Sequences of expressions may be separated by a space to indicate that the rules
@@ -183,11 +189,11 @@ immediately preceding any expression.
 
 == Precedence
 
-The following table contains a list of all operators and their precedence. A
-higher level of precedence indicates tighter binding.
+The following table contains a list of all Citrus operators and their 
+precedence. A higher precedence indicates tighter binding.
 
-Operator    | Name                      | Level of Precedence
---------------------------------------------------------------
+Operator    | Name                      | Precedence
+-----------------------------------------------------
 ''          | String (single quoted)    | 6
 ""          | String (double quoted)    | 6
 []          | Character class           | 6
@@ -199,6 +205,7 @@ Operator    | Name                      | Level of Precedence
 ?           | Repetition (zero or one)  | 5
 &           | And predicate             | 4
 !           | Not predicate             | 4
+~           | But predicate             | 4
 :           | Label                     | 4
 <>          | Extension (module name)   | 3
 {}          | Extension (literal)       | 3
