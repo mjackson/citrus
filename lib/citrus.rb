@@ -181,6 +181,12 @@ module Citrus
       @root || rule_names.first
     end
 
+    # Creates a new rule that will match any single character. A block may be
+    # provided to specify semantic behavior (via #ext).
+    def dot(&block)
+      ext(Rule.new(DOT), block)
+    end
+
     # Creates a new Super for the rule currently being defined in the grammar. A
     # block may be provided to specify semantic behavior (via #ext).
     def sup(&block)
@@ -201,9 +207,11 @@ module Citrus
 
     # Creates a new ButPredicate using the given +rule+. A block may be provided
     # to specify semantic behavior (via #ext).
-    def butp(rule, &block)
+    def but(rule, &block)
       ext(ButPredicate.new(rule), block)
     end
+
+    alias butp but # For consistency with #andp and #notp.
 
     # Creates a new Label using the given +rule+ and +label+. A block may be
     # provided to specify semantic behavior (via #ext).
