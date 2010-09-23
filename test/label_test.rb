@@ -8,7 +8,7 @@ class LabelTest < Test::Unit::TestCase
   end
 
   def test_match
-    rule = Label.new('label', 'a')
+    rule = Label.new('a', 'label')
 
     match = rule.match(input('a'))
     assert(match)
@@ -16,10 +16,10 @@ class LabelTest < Test::Unit::TestCase
   end
 
   def test_to_s
-    rule = Label.new('label', 'a')
+    rule = Label.new('a', 'label')
     assert_equal('label:"a"', rule.to_s)
 
-    rule = Label.new('label', Sequence.new(%w< a b >))
+    rule = Label.new(Sequence.new(%w< a b >), 'label')
     assert_equal('label:("a" "b")', rule.to_s)
   end
 

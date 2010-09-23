@@ -8,7 +8,7 @@ class RepeatTest < Test::Unit::TestCase
   end
 
   def test_match_zero_or_one
-    rule = Repeat.new(0, 1, 'a')
+    rule = Repeat.new('a', 0, 1)
 
     match = rule.match(input(''))
     assert(match)
@@ -22,7 +22,7 @@ class RepeatTest < Test::Unit::TestCase
   end
 
   def test_match_one_or_more
-    rule = Repeat.new(1, Infinity, 'a')
+    rule = Repeat.new('a', 1, Infinity)
 
     match = rule.match(input(''))
     assert_equal(nil, match)
@@ -39,7 +39,7 @@ class RepeatTest < Test::Unit::TestCase
   end
 
   def test_match_one
-    rule = Repeat.new(1, 1, 'a')
+    rule = Repeat.new('a', 1, 1)
 
     match = rule.match(input(''))
     assert_equal(nil, match)
@@ -51,47 +51,47 @@ class RepeatTest < Test::Unit::TestCase
   end
 
   def test_operator
-    rule = Repeat.new(1, 2)
+    rule = Repeat.new('', 1, 2)
     assert_equal('1*2', rule.operator)
   end
 
   def test_operator_empty
-    rule = Repeat.new(0, 0)
+    rule = Repeat.new('', 0, 0)
     assert_equal('', rule.operator)
   end
 
   def test_operator_asterisk
-    rule = Repeat.new(0, Infinity)
+    rule = Repeat.new('', 0, Infinity)
     assert_equal('*', rule.operator)
   end
 
   def test_operator_question_mark
-    rule = Repeat.new(0, 1)
+    rule = Repeat.new('', 0, 1)
     assert_equal('?', rule.operator)
   end
 
   def test_operator_plus
-    rule = Repeat.new(1, Infinity)
+    rule = Repeat.new('', 1, Infinity)
     assert_equal('+', rule.operator)
   end
 
   def test_to_s
-    rule = Repeat.new(1, 2, /a/)
+    rule = Repeat.new(/a/, 1, 2)
     assert_equal('/a/1*2', rule.to_s)
   end
 
   def test_to_s_asterisk
-    rule = Repeat.new(0, Infinity, 'a')
+    rule = Repeat.new('a', 0, Infinity)
     assert_equal('"a"*', rule.to_s)
   end
 
   def test_to_s_question_mark
-    rule = Repeat.new(0, 1, 'a')
+    rule = Repeat.new('a', 0, 1)
     assert_equal('"a"?', rule.to_s)
   end
 
   def test_to_s_plus
-    rule = Repeat.new(1, Infinity, 'a')
+    rule = Repeat.new('a', 1, Infinity)
     assert_equal('"a"+', rule.to_s)
   end
 

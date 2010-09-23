@@ -216,14 +216,14 @@ module Citrus
     # Creates a new Label using the given +rule+ and +label+. A block may be
     # provided to specify semantic behavior (via #ext).
     def label(rule, label, &block)
-      ext(Label.new(label, rule), block)
+      ext(Label.new(rule, label), block)
     end
 
     # Creates a new Repeat using the given +rule+. +min+ and +max+ specify the
     # minimum and maximum number of times the rule must match. A block may be
     # provided to specify semantic behavior (via #ext).
     def rep(rule, min=1, max=Infinity, &block)
-      ext(Repeat.new(min, max, rule), block)
+      ext(Repeat.new(rule, min, max), block)
     end
 
     # An alias for #rep.
@@ -422,9 +422,9 @@ module Citrus
       if Proc === mod
         begin
           tmp = Module.new(&mod)
-          raise NoMethodError unless tmp.instance_methods.any?
+          raise ArgumentError unless tmp.instance_methods.any?
           mod = tmp
-        rescue NameError, NoMethodError
+        rescue ArgumentError, NameError, NoMethodError
           mod = Module.new { define_method(:value, &mod) }
         end
       end
@@ -744,30 +744,30 @@ module Citrus
   class Label
     include Predicate
 
-    def initialize(label_name='<label>', rule='')
+    def initialize(rule='', label='<label>')
       super(rule)
-      self.label_name = label_name
+      self.label = label
     end
 
     # Sets the name of this label.
-    def label_name=(label_name)
-      @label_name = label_name.to_sym
+    def label=(label)
+      @label = label.to_sym
     end
 
-    # The name this rule adds to all its matches.
-    attr_reader :label_name
+    # The label this rule adds to all its matches.
+    attr_reader :label
 
     # Returns the Match for this rule on +input+ at the given +offset+, +nil+ if
     # no match can be made. When a Label makes a match, it re-names the match to
     # the value of its label.
     def match(input, offset=0)
       m = input.match(rule, offset)
-      extend_match(m, label_name) if m
+      extend_match(m, label) if m
     end
 
     # Returns the Citrus notation of this rule as a string.
     def to_s
-      label_name.to_s + ':' + rule.embed
+      label.to_s + ':' + rule.embed
     end
   end
 
@@ -793,10 +793,10 @@ module Citrus
   class Repeat
     include Predicate
 
-    def initialize(min=1, max=Infinity, rule='')
+    def initialize(rule='', min=1, max=Infinity)
+      super(rule)
       raise ArgumentError, "Min cannot be greater than max" if min > max
       @range = Range.new(min, max)
-      super(rule)
     end
 
     # Returns the Match for this rule on +input+ at the given +offset+, +nil+ if

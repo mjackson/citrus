@@ -10,20 +10,24 @@ module Citrus
 
     rule :file do
       all(:space, zero_or_more(any(:require, :grammar))) {
-        find(:require).each {|r| require r.value }
-        find(:grammar).map {|g| g.value }
+        find(:require).each { |r| require r.value }
+        find(:grammar).map { |g| g.value }
       }
     end
 
     rule :grammar do
       all(:grammar_keyword, :module_name, :grammar_body, :end_keyword) {
-        modules = find(:include).map { |inc| eval(inc.value, TOPLEVEL_BINDING) }
-        root = find(:root).last
         code = '%s = Citrus::Grammar.new' % module_name.value
         grammar = eval(code, TOPLEVEL_BINDING)
-        modules.each {|mod| grammar.include(mod) }
+
+        modules = find(:include).map { |inc| eval(inc.value, TOPLEVEL_BINDING) }
+        modules.each { |mod| grammar.include(mod) }
+
+        root = find(:root).last
         grammar.root(root.value) if root
-        find(:rule).each {|r| grammar.rule(r.rule_name.value, r.value) }
+
+        find(:rule).each { |r| grammar.rule(r.rule_name.value, r.value) }
+
         grammar
       }
     end
@@ -33,13 +37,15 @@ module Citrus
     end
 
     rule :rule do
-      all(:rule_keyword, :rule_name, :rule_body, :end_keyword) { rule_body.value }
+      all(:rule_keyword, :rule_name, :rule_body, :end_keyword) {
+        rule_body.value
+      }
     end
 
     rule :rule_body do
       all(:sequence, :choice) {
         @choices ||= [ sequence ] + choice.value
-        values = @choices.map {|c| c.value }
+        values = @choices.map { |c| c.value }
         values.length > 1 ? Choice.new(values) : values[0]
       }
     end
@@ -135,15 +141,21 @@ module Citrus
     end
 
     rule :quoted_string do
-      all(/(["'])(?:\\?.)*?\1/, :space) { eval(first.text) }
+      all(/(["'])(?:\\?.)*?\1/, :space) {
+        eval(first.text)
+      }
     end
 
     rule :character_class do
-      all(/\[(?:\\?.)*?\]/, :space) { Regexp.new('\A' + first.text, nil, 'n') }
+      all(/\[(?:\\?.)*?\]/, :space) {
+        Regexp.new('\A' + first.text, nil, 'n')
+      }
     end
 
     rule :dot do
-      all('.', :space) { DOT }
+      all('.', :space) {
+        DOT
+      }
     end
 
     rule :regular_expression do
@@ -176,7 +188,7 @@ module Citrus
 
     rule :label do
       all(/[a-zA-Z0-9_]+/, :space, ':', :space) { |rule|
-        Label.new(first.text, rule)
+        Label.new(rule, first.text)
       }
     end
 
@@ -198,7 +210,7 @@ module Citrus
 
     rule :repeat do
       any(:question, :plus, :star) { |rule|
-        Repeat.new(min, max, rule)
+        Repeat.new(rule, min, max)
       }
     end
 

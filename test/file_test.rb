@@ -519,13 +519,13 @@ class CitrusFileTest < Test::Unit::TestCase
     assert(match)
     v = match.value('')
     assert_instance_of(Label, v)
-    assert_equal(:label, v.label_name)
+    assert_equal(:label, v.label)
 
     match = grammar.parse('a_label : ')
     assert(match)
     v = match.value('')
     assert_instance_of(Label, v)
-    assert_equal(:a_label, v.label_name)
+    assert_equal(:a_label, v.label)
   end
 
   def test_tag
