@@ -16,9 +16,7 @@ grammar :Calc do
 
   rule :additive do
     all(:factor, :additive_operator, :term) {
-      def value
-        additive_operator.apply(factor.value, term.value)
-      end
+      additive_operator.value(factor.value, term.value)
     }
   end
 
@@ -28,9 +26,7 @@ grammar :Calc do
 
   rule :multiplicative do
     all(:prefix, :multiplicative_operator, :factor) {
-      def value
-        multiplicative_operator.apply(prefix.value, factor.value)
-      end
+      multiplicative_operator.value(prefix.value, factor.value)
     }
   end
 
@@ -40,9 +36,7 @@ grammar :Calc do
 
   rule :prefixed do
     all(:unary_operator, :prefix) {
-      def value
-        unary_operator.apply(prefix.value)
-      end
+      unary_operator.value(prefix.value)
     }
   end
 
@@ -52,9 +46,7 @@ grammar :Calc do
 
   rule :exponential do
     all(:primary, :exponential_operator, :exponent) {
-      def value
-        exponential_operator.apply(primary.value, exponent.value)
-      end
+      exponential_operator.value(primary.value, exponent.value)
     }
   end
 
@@ -63,11 +55,7 @@ grammar :Calc do
   end
 
   rule :group do
-    all(:lparen, :term, :rparen) {
-      def value
-        term.value
-      end
-    }
+    all(:lparen, :term, :rparen) { term.value }
   end
 
   ## Syntax
@@ -77,19 +65,11 @@ grammar :Calc do
   end
 
   rule :float do
-    all(:digits, '.', :digits, :space) {
-      def value
-        text.strip.to_f
-      end
-    }
+    all(:digits, '.', :digits, :space) { text.strip.to_f }
   end
 
   rule :integer do
-    all(:digits, :space) {
-      def value
-        text.strip.to_i
-      end
-    }
+    all(:digits, :space) { text.strip.to_i }
   end
 
   rule :digits do
@@ -97,36 +77,22 @@ grammar :Calc do
   end
 
   rule :additive_operator do
-    all(any('+', '-'), :space) {
-      def apply(n1, n2)
-        n1.send(text.strip, n2)
-      end
-    }
+    all(any('+', '-'), :space) { |a, b| a.send(text.strip, b) }
   end
 
   rule :multiplicative_operator do
-    all(any('*', '/', '%'), :space) {
-      def apply(n1, n2)
-        n1.send(text.strip, n2)
-      end
-    }
+    all(any('*', '/', '%'), :space) { |a, b| a.send(text.strip, b) }
   end
 
   rule :exponential_operator do
-    all('**', :space) {
-      def apply(n1, n2)
-        n1 ** n2
-      end
-    }
+    all('**', :space) { |a, b| a ** b }
   end
 
   rule :unary_operator do
-    all(any('~', '+', '-'), :space) {
-      def apply(n)
-        op = text.strip
-        # Unary + and - require an @.
-        n.send(op == '~' ? op : '%s@' % op)
-      end
+    all(any('~', '+', '-'), :space) { |n|
+      op = text.strip
+      # Unary + and - require an @.
+      n.send(op == '~' ? op : '%s@' % op)
     }
   end
 

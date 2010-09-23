@@ -13,9 +13,7 @@ grammar Calc
 
   rule additive
     (factor additive_operator term) {
-      def value
-        additive_operator.apply(factor.value, term.value)
-      end
+      additive_operator.value(factor.value, term.value)
     }
   end
 
@@ -25,9 +23,7 @@ grammar Calc
 
   rule multiplicative
     (prefix multiplicative_operator factor) {
-      def value
-        multiplicative_operator.apply(prefix.value, factor.value)
-      end
+      multiplicative_operator.value(prefix.value, factor.value)
     }
   end
 
@@ -37,9 +33,7 @@ grammar Calc
 
   rule prefixed
     (unary_operator prefix) {
-      def value
-        unary_operator.apply(prefix.value)
-      end
+      unary_operator.value(prefix.value)
     }
   end
 
@@ -49,9 +43,7 @@ grammar Calc
 
   rule exponential
     (primary exponential_operator exponent) {
-      def value
-        exponential_operator.apply(primary.value, exponent.value)
-      end
+      exponential_operator.value(primary.value, exponent.value)
     }
   end
 
@@ -60,11 +52,7 @@ grammar Calc
   end
 
   rule group
-    (lparen term rparen) {
-      def value
-        term.value
-      end
-    }
+    (lparen term rparen) { term.value }
   end
 
   ## Syntax
@@ -74,19 +62,11 @@ grammar Calc
   end
 
   rule float
-    (digits '.' digits space) {
-      def value
-        text.strip.to_f
-      end
-    }
+    (digits '.' digits space) { text.strip.to_f }
   end
 
   rule integer
-    (digits space) {
-      def value
-        text.strip.to_i
-      end
-    }
+    (digits space) { text.strip.to_i }
   end
 
   rule digits
@@ -94,36 +74,22 @@ grammar Calc
   end
 
   rule additive_operator
-    (('+' | '-') space) {
-      def apply(n1, n2)
-        n1.send(text.strip, n2)
-      end
-    }
+    (('+' | '-') space) { |a, b| a.send(text.strip, b) }
   end
 
   rule multiplicative_operator
-    (('*' | '/' | '%') space) {
-      def apply(n1, n2)
-        n1.send(text.strip, n2)
-      end
-    }
+    (('*' | '/' | '%') space) { |a, b| a.send(text.strip, b) }
   end
 
   rule exponential_operator
-    ('**' space) {
-      def apply(n1, n2)
-        n1 ** n2
-      end
-    }
+    ('**' space) { |a, b| a ** b }
   end
 
   rule unary_operator
-    (('~' | '+' | '-') space) {
-      def apply(n)
-        op = text.strip
-        # Unary + and - require an @.
-        n.send(op == '~' ? op : '%s@' % op)
-      end
+    (('~' | '+' | '-') space) { |n|
+      op = text.strip
+      # Unary + and - require an @.
+      n.send(op == '~' ? op : '%s@' % op)
     }
   end
 

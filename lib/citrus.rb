@@ -419,7 +419,18 @@ module Citrus
     # result from this rule. If +mod+ is a Proc, it is used to create an
     # anonymous module.
     def extension=(mod)
-      mod = Module.new(&mod) if Proc === mod
+      if Proc === mod
+        begin
+          tmp = Module.new(&mod)
+          raise NoMethodError unless tmp.instance_methods.any?
+          mod = tmp
+        rescue NameError, NoMethodError
+          mod = Module.new { define_method(:value, &mod) }
+        end
+      end
+
+      raise ArgumentError unless Module === mod
+
       @extension = mod
     end
 

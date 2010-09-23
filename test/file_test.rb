@@ -481,11 +481,11 @@ class CitrusFileTest < Test::Unit::TestCase
 
     match = grammar.parse('&')
     assert(match)
-    assert_kind_of(Rule, match.wrap(''))
+    assert_kind_of(Rule, match.value(''))
 
     match = grammar.parse('!')
     assert(match)
-    assert_kind_of(Rule, match.wrap(''))
+    assert_kind_of(Rule, match.value(''))
   end
 
   def test_and
@@ -493,11 +493,11 @@ class CitrusFileTest < Test::Unit::TestCase
 
     match = grammar.parse('&')
     assert(match)
-    assert_instance_of(AndPredicate, match.wrap(''))
+    assert_instance_of(AndPredicate, match.value(''))
 
     match = grammar.parse('& ')
     assert(match)
-    assert_instance_of(AndPredicate, match.wrap(''))
+    assert_instance_of(AndPredicate, match.value(''))
   end
 
   def test_not
@@ -505,11 +505,11 @@ class CitrusFileTest < Test::Unit::TestCase
 
     match = grammar.parse('!')
     assert(match)
-    assert_instance_of(NotPredicate, match.wrap(''))
+    assert_instance_of(NotPredicate, match.value(''))
 
     match = grammar.parse('! ')
     assert(match)
-    assert_instance_of(NotPredicate, match.wrap(''))
+    assert_instance_of(NotPredicate, match.value(''))
   end
 
   def test_label
@@ -517,13 +517,15 @@ class CitrusFileTest < Test::Unit::TestCase
 
     match = grammar.parse('label:')
     assert(match)
-    assert_equal('label', match.value)
-    assert_instance_of(Label, match.wrap(''))
+    v = match.value('')
+    assert_instance_of(Label, v)
+    assert_equal(:label, v.label_name)
 
     match = grammar.parse('a_label : ')
     assert(match)
-    assert_equal('a_label', match.value)
-    assert_instance_of(Label, match.wrap(''))
+    v = match.value('')
+    assert_instance_of(Label, v)
+    assert_equal(:a_label, v.label_name)
   end
 
   def test_tag

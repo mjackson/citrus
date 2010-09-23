@@ -10,31 +10,21 @@ module Citrus
 
     rule :file do
       all(:space, zero_or_more(any(:require, :grammar))) {
-        def value
-          find(:require).each {|r| require r.value }
-          find(:grammar).map {|g| g.value }
-        end
+        find(:require).each {|r| require r.value }
+        find(:grammar).map {|g| g.value }
       }
     end
 
     rule :grammar do
       all(:grammar_keyword, :module_name, :grammar_body, :end_keyword) {
-        def modules
-          find(:include).map {|inc| eval(inc.value, TOPLEVEL_BINDING) }
-        end
-
-        def root
-          find(:root).last
-        end
-
-        def value
-          code = '%s = Citrus::Grammar.new' % module_name.value
-          grammar = eval(code, TOPLEVEL_BINDING)
-          modules.each {|mod| grammar.include(mod) }
-          grammar.root(root.value) if root
-          find(:rule).each {|r| grammar.rule(r.rule_name.value, r.value) }
-          grammar
-        end
+        modules = find(:include).map { |inc| eval(inc.value, TOPLEVEL_BINDING) }
+        root = find(:root).last
+        code = '%s = Citrus::Grammar.new' % module_name.value
+        grammar = eval(code, TOPLEVEL_BINDING)
+        modules.each {|mod| grammar.include(mod) }
+        grammar.root(root.value) if root
+        find(:rule).each {|r| grammar.rule(r.rule_name.value, r.value) }
+        grammar
       }
     end
 
@@ -43,183 +33,122 @@ module Citrus
     end
 
     rule :rule do
-      all(:rule_keyword, :rule_name, :rule_body, :end_keyword) {
-        def value
-          rule_body.value
-        end
-      }
+      all(:rule_keyword, :rule_name, :rule_body, :end_keyword) { rule_body.value }
     end
 
     rule :rule_body do
       all(:sequence, :choice) {
-        def choices
-          @choices ||= [ sequence ] + choice.sequences
-        end
-
-        def values
-          choices.map {|c| c.value }
-        end
-
-        def value
-          choices.length > 1 ? Choice.new(values) : values[0]
-        end
+        @choices ||= [ sequence ] + choice.value
+        values = @choices.map {|c| c.value }
+        values.length > 1 ? Choice.new(values) : values[0]
       }
     end
 
     rule :choice do
       zero_or_more([ :bar, :sequence ]) {
-        def sequences
-          matches.map {|m| m.matches[1] }
-        end
+        matches.map { |m| m.matches[1] }
       }
     end
 
     rule :sequence do
       zero_or_more(:appendix) {
-        def values
-          matches.map {|m| m.value }
-        end
-
-        def value
-          matches.length > 1 ? Sequence.new(values) : values[0]
-        end
+        values = matches.map { |m| m.value }
+        values.length > 1 ? Sequence.new(values) : values[0]
       }
     end
 
     rule :appendix do
       all(:prefix, zero_or_one(:extension)) {
-        def value
-          rule = prefix.value
-          extension = matches[1].first
-          rule.extension = extension.value if extension
-          rule
-        end
+        rule = prefix.value
+        extension = matches[1].first
+        rule.extension = extension.value if extension
+        rule
       }
     end
 
     rule :prefix do
       all(zero_or_one(:predicate), :suffix) {
-        def value
-          rule = suffix.value
-          predicate = matches[0].first
-          rule = predicate.wrap(rule) if predicate
-          rule
-        end
+        rule = suffix.value
+        predicate = matches[0].first
+        rule = predicate.value(rule) if predicate
+        rule
       }
     end
 
     rule :suffix do
       all(:primary, zero_or_one(:repeat)) {
-        def value
-          rule = primary.value
-          repeat = matches[1].first
-          rule = repeat.wrap(rule) if repeat
-          rule
-        end
+        rule = primary.value
+        repeat = matches[1].first
+        rule = repeat.value(rule) if repeat
+        rule
       }
     end
 
     rule :primary do
-      any(:super, :alias, :grouping, :terminal)
+      any(:grouping, :proxy, :terminal)
     end
 
     rule :grouping do
-      all(:lparen, :rule_body, :rparen) {
-        def value
-          rule_body.value
-        end
-      }
+      all(:lparen, :rule_body, :rparen) { rule_body.value }
     end
 
     ## Lexical syntax
 
     rule :require do
-      all(:require_keyword, :quoted_string) {
-        def value
-          quoted_string.value
-        end
-      }
+      all(:require_keyword, :quoted_string) { quoted_string.value }
     end
 
     rule :include do
-      all(:include_keyword, :module_name) {
-        def value
-          module_name.value
-        end
-      }
+      all(:include_keyword, :module_name) { module_name.value }
     end
 
     rule :root do
-      all(:root_keyword, :rule_name) {
-        def value
-          rule_name.value
-        end
-      }
+      all(:root_keyword, :rule_name) { rule_name.value }
     end
 
     # Rule names may contain letters, numbers, underscores, and dashes. They
     # MUST start with a letter.
     rule :rule_name do
-      all(/[a-zA-Z][a-zA-Z0-9_-]*/, :space) {
-        def value
-          first.text
-        end
-      }
+      all(/[a-zA-Z][a-zA-Z0-9_-]*/, :space) { first.text }
+    end
+
+    rule :proxy do
+      any(:super, :alias)
     end
 
     rule :super do
       all('super', :space) {
-        def value
-          Super.new
-        end
+        Super.new
       }
     end
 
     rule :alias do
       all(notp(:end_keyword), :rule_name) {
-        def value
-          Alias.new(rule_name.value)
-        end
+        Alias.new(rule_name.value)
       }
     end
 
     rule :terminal do
       any(:quoted_string, :character_class, :dot, :regular_expression) {
-        def value
-          Rule.new(super)
-        end
+        Rule.new(super())
       }
     end
 
     rule :quoted_string do
-      all(/(["'])(?:\\?.)*?\1/, :space) {
-        def value
-          eval(first.text)
-        end
-      }
+      all(/(["'])(?:\\?.)*?\1/, :space) { eval(first.text) }
     end
 
     rule :character_class do
-      all(/\[(?:\\?.)*?\]/, :space) {
-        def value
-          Regexp.new('\A' + first.text, nil, 'n')
-        end
-      }
+      all(/\[(?:\\?.)*?\]/, :space) { Regexp.new('\A' + first.text, nil, 'n') }
     end
 
     rule :dot do
-      all('.', :space) {
-        def value
-          DOT
-        end
-      }
+      all('.', :space) { DOT }
     end
 
     rule :regular_expression do
       all(/\/(?:\\?.)*?\/[imxouesn]*/, :space) {
-        def value
-          eval(first.text)
-        end
+        eval(first.text)
       }
     end
 
@@ -228,38 +157,26 @@ module Citrus
     end
 
     rule :and do
-      all('&', :space) {
-        def wrap(rule)
-          AndPredicate.new(rule)
-        end
+      all('&', :space) { |rule|
+        AndPredicate.new(rule)
       }
     end
 
     rule :not do
-      all('!', :space) {
-        def wrap(rule)
-          NotPredicate.new(rule)
-        end
+      all('!', :space) { |rule|
+        NotPredicate.new(rule)
       }
     end
 
     rule :but do
-      all('~', :space) {
-        def wrap(rule)
-          ButPredicate.new(rule)
-        end
+      all('~', :space) { |rule|
+        ButPredicate.new(rule)
       }
     end
 
     rule :label do
-      all(/[a-zA-Z0-9_]+/, :space, ':', :space) {
-        def wrap(rule)
-          Label.new(value, rule)
-        end
-
-        def value
-          first.text
-        end
+      all(/[a-zA-Z0-9_]+/, :space, ':', :space) { |rule|
+        Label.new(first.text, rule)
       }
     end
 
@@ -269,25 +186,19 @@ module Citrus
 
     rule :tag do
       all(:lt, :module_name, :gt) {
-        def value
-          eval(module_name.value, TOPLEVEL_BINDING)
-        end
+        eval(module_name.value, TOPLEVEL_BINDING)
       }
     end
 
     rule :block do
       all(:lcurly, zero_or_more(any(:block, /[^}]+/)), :rcurly) {
-        def value
-          eval('Proc.new ' + text)
-        end
+        eval('Proc.new ' + text)
       }
     end
 
     rule :repeat do
-      any(:question, :plus, :star) {
-        def wrap(rule)
-          Repeat.new(min, max, rule)
-        end
+      any(:question, :plus, :star) { |rule|
+        Repeat.new(min, max, rule)
       }
     end
 
@@ -307,21 +218,14 @@ module Citrus
 
     rule :star do
       all(/[0-9]*/, '*', /[0-9]*/, :space) {
-        def min
-          matches[0] == '' ? 0 : matches[0].text.to_i
-        end
-
-        def max
-          matches[2] == '' ? Infinity : matches[2].text.to_i
-        end
+        def min; matches[0] == '' ? 0 : matches[0].text.to_i end
+        def max; matches[2] == '' ? Infinity : matches[2].text.to_i end
       }
     end
 
     rule :module_name do
       all(one_or_more([ zero_or_one('::'), :constant ]), :space) {
-        def value
-          first.text
-        end
+        first.text
       }
     end
 
