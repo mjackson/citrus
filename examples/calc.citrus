@@ -74,15 +74,21 @@ grammar Calc
   end
 
   rule additive_operator
-    (('+' | '-') space) { |a, b| a.send(text.strip, b) }
+    (('+' | '-') space) { |a, b|
+      a.send(text.strip, b)
+    }
   end
 
   rule multiplicative_operator
-    (('*' | '/' | '%') space) { |a, b| a.send(text.strip, b) }
+    (('*' | '/' | '%') space) { |a, b|
+      a.send(text.strip, b)
+    }
   end
 
   rule exponential_operator
-    ('**' space) { |a, b| a ** b }
+    ('**' space) { |a, b|
+      a ** b
+    }
   end
 
   rule unary_operator

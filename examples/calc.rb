@@ -77,15 +77,21 @@ grammar :Calc do
   end
 
   rule :additive_operator do
-    all(any('+', '-'), :space) { |a, b| a.send(text.strip, b) }
+    all(any('+', '-'), :space) { |a, b|
+      a.send(text.strip, b)
+    }
   end
 
   rule :multiplicative_operator do
-    all(any('*', '/', '%'), :space) { |a, b| a.send(text.strip, b) }
+    all(any('*', '/', '%'), :space) { |a, b|
+      a.send(text.strip, b)
+    }
   end
 
   rule :exponential_operator do
-    all('**', :space) { |a, b| a ** b }
+    all('**', :space) { |a, b|
+      a ** b
+    }
   end
 
   rule :unary_operator do
