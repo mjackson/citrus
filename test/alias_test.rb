@@ -16,16 +16,14 @@ class AliasTest < Test::Unit::TestCase
 
     match = grammar.parse('b')
     assert(match)
-    assert_equal('b', match.text)
+    assert_equal('b', match)
     assert_equal(1, match.length)
   end
 
   def test_match_renamed
     grammar = Grammar.new {
       rule :a, ext(:b) {
-        def value
-          'a' + text
-        end
+        'a' + to_s
       }
       rule :b, 'b'
     }

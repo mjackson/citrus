@@ -11,7 +11,7 @@ class FixedWidthTest < Test::Unit::TestCase
     rule = FixedWidth.new('abc')
     match = rule.match(input('abc'))
     assert(match)
-    assert_equal('abc', match.text)
+    assert_equal('abc', match)
     assert_equal(3, match.length)
   end
 
@@ -25,7 +25,7 @@ class FixedWidthTest < Test::Unit::TestCase
     rule = FixedWidth.new('abc')
     match = rule.match(input('abcd'))
     assert(match)
-    assert_equal('abc', match.text)
+    assert_equal('abc', match)
     assert_equal(3, match.length)
   end
 

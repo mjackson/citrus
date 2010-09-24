@@ -11,7 +11,7 @@ class ExpressionTest < Test::Unit::TestCase
     rule = Expression.new(/\d+/)
     match = rule.match(input('123 456'))
     assert(match)
-    assert_equal('123', match.text)
+    assert_equal('123', match)
     assert_equal(3, match.length)
   end
 

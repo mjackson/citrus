@@ -62,11 +62,11 @@ grammar Calc
   end
 
   rule float
-    (digits '.' digits space) { text.strip.to_f }
+    (digits '.' digits space) { strip.to_f }
   end
 
   rule integer
-    (digits space) { text.strip.to_i }
+    (digits space) { strip.to_i }
   end
 
   rule digits
@@ -75,13 +75,13 @@ grammar Calc
 
   rule additive_operator
     (('+' | '-') space) { |a, b|
-      a.send(text.strip, b)
+      a.send(strip, b)
     }
   end
 
   rule multiplicative_operator
     (('*' | '/' | '%') space) { |a, b|
-      a.send(text.strip, b)
+      a.send(strip, b)
     }
   end
 
@@ -93,9 +93,8 @@ grammar Calc
 
   rule unary_operator
     (('~' | '+' | '-') space) { |n|
-      op = text.strip
       # Unary + and - require an @.
-      n.send(op == '~' ? op : '%s@' % op)
+      n.send(strip == '~' ? strip : '%s@' % strip)
     }
   end
 

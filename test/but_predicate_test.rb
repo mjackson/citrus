@@ -12,12 +12,12 @@ class ButPredicateTest < Test::Unit::TestCase
 
     match = rule.match(input('b'))
     assert(match)
-    assert_equal('b', match.text)
+    assert_equal('b', match)
     assert_equal(1, match.length)
 
     match = rule.match(input('bbba'))
     assert(match)
-    assert_equal('bbb', match.text)
+    assert_equal('bbb', match)
     assert_equal(3, match.length)
 
     match = rule.match(input('a'))

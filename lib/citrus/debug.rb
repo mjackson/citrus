@@ -13,7 +13,7 @@ module Citrus
         xml.instruct!
       end
 
-      attrs = { "names" => names.join(','), "text" => text, "offset" => offset }
+      attrs = { "names" => names.join(','), "text" => to_s, "offset" => offset }
 
       if matches.empty?
         xml.match(attrs)

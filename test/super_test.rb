@@ -20,12 +20,12 @@ class SuperTest < Test::Unit::TestCase
 
     match = grammar2.parse('b')
     assert(match)
-    assert_equal('b', match.text)
+    assert_equal('b', match)
     assert_equal(1, match.length)
 
     match = grammar2.parse('a')
     assert(match)
-    assert_equal('a', match.text)
+    assert_equal('a', match)
     assert_equal(1, match.length)
   end
 

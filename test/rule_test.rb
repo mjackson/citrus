@@ -9,12 +9,8 @@ class RuleTest < Test::Unit::TestCase
   end
 
   NumericProc = Proc.new {
-    def to_i
-      text.to_i
-    end
-
-    def to_f
-      text.to_f
+    def add_one
+      to_i + 1
     end
   }
 
@@ -40,7 +36,7 @@ class RuleTest < Test::Unit::TestCase
     rule.extension = NumericProc
     match = rule.match(input('1'))
     assert(match)
-    assert_equal(1, match.to_i)
+    assert_equal(2, match.add_one)
     assert_instance_of(Float, match.to_f)
   end
 
@@ -49,7 +45,7 @@ class RuleTest < Test::Unit::TestCase
     rule.extension = NumericModule
     match = rule.match(input('1'))
     assert(match)
-    assert_equal(1, match.to_i)
+    assert_equal(2, match.add_one)
     assert_instance_of(Float, match.to_f)
   end
 

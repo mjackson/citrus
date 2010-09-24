@@ -115,7 +115,7 @@ module Citrus
     # Rule names may contain letters, numbers, underscores, and dashes. They
     # MUST start with a letter.
     rule :rule_name do
-      all(/[a-zA-Z][a-zA-Z0-9_-]*/, :space) { first.text }
+      all(/[a-zA-Z][a-zA-Z0-9_-]*/, :space) { first.to_s }
     end
 
     rule :proxy do
@@ -142,13 +142,13 @@ module Citrus
 
     rule :quoted_string do
       all(/(["'])(?:\\?.)*?\1/, :space) {
-        eval(first.text)
+        eval(first.to_s)
       }
     end
 
     rule :character_class do
       all(/\[(?:\\?.)*?\]/, :space) {
-        Regexp.new('\A' + first.text, nil, 'n')
+        Regexp.new('\A' + first.to_s, nil, 'n')
       }
     end
 
@@ -160,7 +160,7 @@ module Citrus
 
     rule :regular_expression do
       all(/\/(?:\\?.)*?\/[imxouesn]*/, :space) {
-        eval(first.text)
+        eval(first.to_s)
       }
     end
 
@@ -188,7 +188,7 @@ module Citrus
 
     rule :label do
       all(/[a-zA-Z0-9_]+/, :space, ':', :space) { |rule|
-        Label.new(rule, first.text)
+        Label.new(rule, first.to_s)
       }
     end
 
@@ -204,7 +204,7 @@ module Citrus
 
     rule :block do
       all(:lcurly, zero_or_more(any(:block, /[^}]+/)), :rcurly) {
-        eval('Proc.new ' + text)
+        eval('Proc.new ' + to_s)
       }
     end
 
@@ -230,14 +230,14 @@ module Citrus
 
     rule :star do
       all(/[0-9]*/, '*', /[0-9]*/, :space) {
-        def min; matches[0] == '' ? 0 : matches[0].text.to_i end
-        def max; matches[2] == '' ? Infinity : matches[2].text.to_i end
+        def min; matches[0] == '' ? 0 : matches[0].to_i end
+        def max; matches[2] == '' ? Infinity : matches[2].to_i end
       }
     end
 
     rule :module_name do
       all(one_or_more([ zero_or_one('::'), :constant ]), :space) {
-        first.text
+        first.to_s
       }
     end
 

@@ -19,11 +19,7 @@ class Test::Unit::TestCase
     end
 
     rule :num do
-      ext(/[0-9]/) {
-        def value
-          text.to_i
-        end
-      }
+      ext(/[0-9]/) { to_i }
     end
 
     rule :alphanum do
@@ -49,7 +45,7 @@ class Test::Unit::TestCase
     def do_test(expr)
       match = Calc.parse(expr)
       assert(match)
-      assert_equal(expr, match.text)
+      assert_equal(expr, match)
       assert_equal(expr.length, match.length)
       assert_equal(eval(expr), match.value)
     end

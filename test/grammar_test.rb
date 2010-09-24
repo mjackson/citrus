@@ -42,7 +42,7 @@ class GrammarTest < Test::Unit::TestCase
     }
     match = grammar.parse('abc')
     assert(match)
-    assert_equal('abc', match.text)
+    assert_equal('abc', match)
     assert_equal(3, match.length)
   end
 
@@ -52,7 +52,7 @@ class GrammarTest < Test::Unit::TestCase
     }
     match = grammar.parse('abc')
     assert(match)
-    assert_equal('abc', match.text)
+    assert_equal('abc', match)
     assert_equal(3, match.length)
   end
 
@@ -62,7 +62,7 @@ class GrammarTest < Test::Unit::TestCase
     }
     match = grammar.parse('123')
     assert(match)
-    assert_equal('123', match.text)
+    assert_equal('123', match)
     assert_equal(3, match.length)
   end
 
@@ -90,12 +90,12 @@ class GrammarTest < Test::Unit::TestCase
 
     match = grammar.parse('a')
     assert(match)
-    assert_equal('a', match.text)
+    assert_equal('a', match)
     assert_equal(1, match.length)
 
     match = grammar.parse('1')
     assert(match)
-    assert_equal('1', match.text)
+    assert_equal('1', match)
     assert_equal(1, match.length)
   end
 
@@ -115,18 +115,18 @@ class GrammarTest < Test::Unit::TestCase
 
     match = grammar.parse('a')
     assert(match)
-    assert_equal('a', match.text)
+    assert_equal('a', match)
     assert_equal(1, match.length)
 
     match = grammar.parse('((a))')
     assert(match)
-    assert_equal('((a))', match.text)
+    assert_equal('((a))', match)
     assert_equal(5, match.length)
 
     str = ('(' * 200) + 'a' + (')' * 200)
     match = grammar.parse(str)
     assert(match)
-    assert_equal(str, match.text)
+    assert_equal(str, match)
     assert_equal(str.length, match.length)
   end
 

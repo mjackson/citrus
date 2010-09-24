@@ -678,7 +678,7 @@ class CitrusFileTest < Test::Unit::TestCase
 
     match = grammar.parse('# A comment.')
     assert(match)
-    assert_equal('# A comment.', match.text)
+    assert_equal('# A comment.', match)
   end
 
 end

@@ -65,11 +65,11 @@ grammar :Calc do
   end
 
   rule :float do
-    all(:digits, '.', :digits, :space) { text.strip.to_f }
+    all(:digits, '.', :digits, :space) { strip.to_f }
   end
 
   rule :integer do
-    all(:digits, :space) { text.strip.to_i }
+    all(:digits, :space) { strip.to_i }
   end
 
   rule :digits do
@@ -78,13 +78,13 @@ grammar :Calc do
 
   rule :additive_operator do
     all(any('+', '-'), :space) { |a, b|
-      a.send(text.strip, b)
+      a.send(strip, b)
     }
   end
 
   rule :multiplicative_operator do
     all(any('*', '/', '%'), :space) { |a, b|
-      a.send(text.strip, b)
+      a.send(strip, b)
     }
   end
 
@@ -96,9 +96,8 @@ grammar :Calc do
 
   rule :unary_operator do
     all(any('~', '+', '-'), :space) { |n|
-      op = text.strip
       # Unary + and - require an @.
-      n.send(op == '~' ? op : '%s@' % op)
+      n.send(strip == '~' ? strip : '%s@' % strip)
     }
   end
 

@@ -461,7 +461,7 @@ module Citrus
   private
 
     def extend_match(match, name)
-      match.extensions << extension if extension
+      match.extend(extension) if extension
       match.names << name if name
       match
     end
@@ -725,7 +725,7 @@ module Citrus
         os += m.length
       end
       # Create a single match from the aggregate text value of all submatches.
-      create_match(matches.map {|m| m.text }.join, offset) if matches.any?
+      create_match(matches.join, offset) if matches.any?
     end
 
     # Returns the Citrus notation of this rule as a string.
@@ -906,15 +906,16 @@ module Citrus
   # The base class for all matches. Matches are organized into a tree where any
   # match may contain any number of other matches. This class provides several
   # convenient tree traversal methods that help when examining parse results.
-  class Match
+  class Match < String
     def initialize(data, offset=0)
       case data
       when String
-        @text = data
+        super(data)
       when MatchData
-        @text = data[0]
+        super(data[0])
         @captures = data.captures
       when Array
+        super(data.join)
         @matches = data
       end
 
@@ -941,11 +942,6 @@ module Citrus
       names.include?(name)
     end
 
-    # An array of all extension modules of this match.
-    def extensions
-      @extensions ||= []
-    end
-
     # An array of all sub-matches of this match.
     def matches
       @matches ||= []
@@ -957,31 +953,13 @@ module Citrus
       @captures ||= []
     end
 
-    # Returns the raw text value of this match, which may simply be an
-    # aggregate of the text of all sub-matches if this match is not #terminal?.
-    def text
-      @text ||= matches.inject('') {|s, m| s << m.text }
-    end
-
-    alias to_s text
-
-    # Returns the length of this match's #text value as an Integer.
-    def length
-      text.length
-    end
-
-    # Passes all arguments to the #text of this match.
-    def [](*args)
-      text.__send__(:[], *args)
-    end
-
     # Returns an array of all sub-matches with the given +name+. If +deep+ is
     # +false+, returns only sub-matches that are immediate descendants of this
     # match.
     def find(name, deep=true)
       sym = name.to_sym
       ms = matches.select {|m| m.has_name?(sym) }
-      ms.concat(matches.map {|m| m.find(name, deep) }.flatten) if deep
+      matches.each {|m| ms.concat(m.find(name, deep)) } if deep
       ms
     end
 
@@ -998,41 +976,21 @@ module Citrus
       matches.length == 0
     end
 
-    # Checks equality by comparing this match's #text value to +obj+.
-    def ==(obj)
-      obj == text
+    # Creates a new String object from the contents of this match.
+    def to_s
+      String.new(self)
     end
-
-    alias eql? ==
-
-  private
-
-    def redefine_method_missing! # :nodoc:
-      instance_eval(<<-RUBY, __FILE__, __LINE__ + 1)
-        def method_missing(sym, *args)
-          if sym == :to_ary
-            original_method_missing(sym, *args)
-          else
-            m = first(sym)
-            return m if m
-            raise 'No match named "%s" in %s (%s)' % [sym, self, name]
-          end
-        end
-      RUBY
-    end
-
-    alias original_method_missing method_missing
-
-  public
 
     # Allows sub-matches of this match to be retrieved by name as instance
     # methods.
     def method_missing(sym, *args)
-      # Extend this object only when needed and immediately redefine
-      # #method_missing so that the new version is used on all future calls.
-      extensions.each {|e| extend(e) } if @extensions
-      redefine_method_missing!
-      __send__(sym, *args)
+      m = first(sym)
+      return m if m
+      raise 'No match named "%s" in %s (%s)' % [sym, self, name]
+    end
+
+    def to_ary
+      # This method intentionally left blank to work around a bug in Ruby 1.9.
     end
   end
 end
