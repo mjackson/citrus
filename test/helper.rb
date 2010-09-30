@@ -122,6 +122,18 @@ class Test::Unit::TestCase
       do_test('2**2.2')
     end
 
+    def test_negative_exponent
+      do_test('2**-3')
+    end
+
+    def test_exponent_exponent
+      do_test('2**2**2')
+    end
+
+    def test_exponent_group
+      do_test('2**(3+1)')
+    end
+
     def test_negative
       do_test('-5')
     end

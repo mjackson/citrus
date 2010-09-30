@@ -45,8 +45,8 @@ grammar :Calc do
   end
 
   rule :exponential do
-    all(:primary, :exponential_operator, :exponent) {
-      exponential_operator.value(primary.value, exponent.value)
+    all(:primary, :exponential_operator, :prefix) {
+      exponential_operator.value(primary.value, prefix.value)
     }
   end
 
