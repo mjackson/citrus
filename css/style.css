@@ -25,7 +25,8 @@ h3{font-size:12pt;}
 pre,code{font-family:Menlo,monospace;font-size:8pt;}
 a:link,a:visited{color:#cc6600;}
 th{text-align:left;}
-td{padding:2px;}
+th,td{padding:2px 4px;}
+th{background-color:#efefef;}
 
 #wrapper{position:relative;width:700px;margin:0 auto;}
 
@@ -53,6 +54,7 @@ td{padding:2px;}
   -moz-box-shadow:0px 0px 10px #cc6600;
 }
 #body ul{list-style-type:disc;margin-left:36px;}
-#body table{width:464px;}
+#body table{width:464px;border-top:1px solid #ddd;border-left:1px solid #ddd;}
+#body table td, #body table th{border-right:1px solid #ddd;border-bottom:1px solid #ddd;}
 
 .copyright{padding-top:36px;text-align:right;font-size:8pt;}

@@ -146,112 +146,94 @@ precedence. A higher precedence indicates tighter binding.</p>
 <table>
 <thead>
 <tr>
-<th></th>
-<th> Operator     </th>
+<th>Operator                  </th>
 <th> Name                      </th>
 <th> Precedence</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td></td>
-<td> &lsquo;&rsquo;           </td>
+<td><code>''</code>                      </td>
 <td> String (single quoted)    </td>
 <td> 6</td>
 </tr>
 <tr>
-<td></td>
-<td> &ldquo;&rdquo;           </td>
+<td><code>""</code>                      </td>
 <td> String (double quoted)    </td>
 <td> 6</td>
 </tr>
 <tr>
-<td></td>
-<td> []           </td>
+<td><code>[]</code>                      </td>
 <td> Character class           </td>
 <td> 6</td>
 </tr>
 <tr>
-<td></td>
-<td> .            </td>
+<td><code>.</code>                       </td>
 <td> Dot (any character)       </td>
 <td> 6</td>
 </tr>
 <tr>
-<td></td>
-<td> //           </td>
+<td><code>//</code>                      </td>
 <td> Regular expression        </td>
 <td> 6</td>
 </tr>
 <tr>
-<td></td>
-<td> ()           </td>
+<td><code>()</code>                      </td>
 <td> Grouping                  </td>
 <td> 6</td>
 </tr>
 <tr>
-<td></td>
-<td> *            </td>
+<td><code>*</code>                       </td>
 <td> Repetition (arbitrary)    </td>
 <td> 5</td>
 </tr>
 <tr>
-<td></td>
-<td> +            </td>
+<td><code>+</code>                       </td>
 <td> Repetition (one or more)  </td>
 <td> 5</td>
 </tr>
 <tr>
-<td></td>
-<td> ?            </td>
+<td><code>?</code>                       </td>
 <td> Repetition (zero or one)  </td>
 <td> 5</td>
 </tr>
 <tr>
-<td></td>
-<td> &amp;            </td>
+<td><code>&amp;</code>                       </td>
 <td> And predicate             </td>
 <td> 4</td>
 </tr>
 <tr>
-<td></td>
-<td> !            </td>
+<td><code>!</code>                       </td>
 <td> Not predicate             </td>
 <td> 4</td>
 </tr>
 <tr>
-<td></td>
-<td> ~            </td>
+<td><code>~</code>                       </td>
 <td> But predicate             </td>
 <td> 4</td>
 </tr>
 <tr>
-<td></td>
-<td> :            </td>
+<td><code>:</code>                       </td>
 <td> Label                     </td>
 <td> 4</td>
 </tr>
 <tr>
-<td></td>
-<td> &lt;>           </td>
+<td><code>&lt;&gt;</code>                      </td>
 <td> Extension (module name)   </td>
 <td> 3</td>
 </tr>
 <tr>
-<td></td>
-<td> {}           </td>
+<td><code>{}</code>                      </td>
 <td> Extension (literal)       </td>
 <td> 3</td>
 </tr>
 <tr>
-<td></td>
-<td> e1 e2        </td>
+<td><code>e1 e2</code>                   </td>
 <td> Sequence                  </td>
 <td> 2</td>
 </tr>
 <tr>
-<td></td>
-<td> e1 &#124; e2 </td>
+<td><code>e1 &#124; e2</code> </td>
 <td> Ordered choice            </td>
 <td> 1</td>
 </tr>
