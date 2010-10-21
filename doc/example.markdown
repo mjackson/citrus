@@ -87,7 +87,7 @@ The semantic block associated with the number rule defines one method, value.
 Inside this method, we can see that the value of a number match is determined to
 be its text value, stripped of white space and converted to an integer. Remember
 that matches are simply strings, so the `strip` method in this case is actually
-`String#strip`.
+[String#strip](http://ruby-doc.org/core/classes/String.html#M000820).
 
 The `additive` rule also extends its matches with a value method. Notice the use
 of the `term` label within the rule definition. This label allows the match that

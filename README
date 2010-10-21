@@ -212,25 +212,25 @@ See [Label](api/classes/Citrus/Label.html) for more information.
 The following table contains a list of all Citrus operators and their 
 precedence. A higher precedence indicates tighter binding.
 
-| Operator    | Name                      | Precedence |
-| ----------- | ------------------------- | ---------- |
-| ''          | String (single quoted)    | 6          |
-| ""          | String (double quoted)    | 6          |
-| []          | Character class           | 6          |
-| .           | Dot (any character)       | 6          |
-| //          | Regular expression        | 6          |
-| ()          | Grouping                  | 6          |
-| *           | Repetition (arbitrary)    | 5          |
-| +           | Repetition (one or more)  | 5          |
-| ?           | Repetition (zero or one)  | 5          |
-| &           | And predicate             | 4          |
-| !           | Not predicate             | 4          |
-| ~           | But predicate             | 4          |
-| :           | Label                     | 4          |
-| <>          | Extension (module name)   | 3          |
-| {}          | Extension (literal)       | 3          |
-| e1 e2       | Sequence                  | 2          |
-| e1 | e2     | Ordered choice            | 1          |
+Operator    | Name                      | Precedence
+----------- | ------------------------- | ----------
+''          | String (single quoted)    | 6
+""          | String (double quoted)    | 6
+[]          | Character class           | 6
+.           | Dot (any character)       | 6
+//          | Regular expression        | 6
+()          | Grouping                  | 6
+*           | Repetition (arbitrary)    | 5
++           | Repetition (one or more)  | 5
+?           | Repetition (zero or one)  | 5
+&           | And predicate             | 4
+!           | Not predicate             | 4
+~           | But predicate             | 4
+:           | Label                     | 4
+<>          | Extension (module name)   | 3
+{}          | Extension (literal)       | 3
+e1 e2       | Sequence                  | 2
+e1 | e2     | Ordered choice            | 1
 
 
 # Example
@@ -322,7 +322,7 @@ The semantic block associated with the number rule defines one method, value.
 Inside this method, we can see that the value of a number match is determined to
 be its text value, stripped of white space and converted to an integer. Remember
 that matches are simply strings, so the `strip` method in this case is actually
-`String#strip`.
+[String#strip](http://ruby-doc.org/core/classes/String.html#M000820).
 
 The `additive` rule also extends its matches with a value method. Notice the use
 of the `term` label within the rule definition. This label allows the match that

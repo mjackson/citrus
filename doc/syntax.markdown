@@ -108,22 +108,22 @@ See [Label](api/classes/Citrus/Label.html) for more information.
 The following table contains a list of all Citrus operators and their 
 precedence. A higher precedence indicates tighter binding.
 
-| Operator     | Name                      | Precedence
-| ------------ | ------------------------- | ----------
-| ''           | String (single quoted)    | 6
-| ""           | String (double quoted)    | 6
-| []           | Character class           | 6
-| .            | Dot (any character)       | 6
-| //           | Regular expression        | 6
-| ()           | Grouping                  | 6
-| *            | Repetition (arbitrary)    | 5
-| +            | Repetition (one or more)  | 5
-| ?            | Repetition (zero or one)  | 5
-| &            | And predicate             | 4
-| !            | Not predicate             | 4
-| ~            | But predicate             | 4
-| :            | Label                     | 4
-| <>           | Extension (module name)   | 3
-| {}           | Extension (literal)       | 3
-| e1 e2        | Sequence                  | 2
-| e1 &#124; e2 | Ordered choice            | 1
+Operator                  | Name                      | Precedence
+------------------------- | ------------------------- | ----------
+`''`                      | String (single quoted)    | 6
+`""`                      | String (double quoted)    | 6
+`[]`                      | Character class           | 6
+`.`                       | Dot (any character)       | 6
+`//`                      | Regular expression        | 6
+`()`                      | Grouping                  | 6
+`*`                       | Repetition (arbitrary)    | 5
+`+`                       | Repetition (one or more)  | 5
+`?`                       | Repetition (zero or one)  | 5
+`&`                       | And predicate             | 4
+`!`                       | Not predicate             | 4
+`~`                       | But predicate             | 4
+`:`                       | Label                     | 4
+`<>`                      | Extension (module name)   | 3
+`{}`                      | Extension (literal)       | 3
+`e1 e2`                   | Sequence                  | 2
+<code>e1 &#124; e2</code> | Ordered choice            | 1
