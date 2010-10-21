@@ -50,12 +50,12 @@
             <h2>Methods</h2>
             <h3>public class</h3>
             <ol>
-              <li><a href="#M000046">new</a></li>
+              <li><a href="#M000052">new</a></li>
             </ol>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000048">consumed</a></li>
-              <li><a href="#M000047">max_offset</a></li>
+              <li><a href="#M000054">consumed</a></li>
+              <li><a href="#M000053">max_offset</a></li>
             </ol>
           </div>
           <div id='section'>
@@ -76,22 +76,22 @@
             </div>
             <div id='methods'>
               <h2>Public class methods</h2>
-              <div class='method public-class' id='method-M000046'>
-                <a name='M000046'></a>
+              <div class='method public-class' id='method-M000052'>
+                <a name='M000052'></a>
                 <div class='synopsis'>
                   <span class='name'>new</span>
                   <span class='arguments'>(input)</span>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000046-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000052-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000046-source'>    <span class="ruby-comment cmt"># File lib/citrus.rb, line 36</span>&#x000A;36:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">input</span>)&#x000A;37:       <span class="ruby-ivar">@input</span> = <span class="ruby-identifier">input</span>&#x000A;38:       <span class="ruby-identifier">c</span> = <span class="ruby-identifier">consumed</span>&#x000A;39:       <span class="ruby-identifier">s</span> = [<span class="ruby-value">0</span>, <span class="ruby-identifier">c</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">-</span> <span class="ruby-value">40</span>].<span class="ruby-identifier">max</span>&#x000A;40:       <span class="ruby-identifier">msg</span>  = <span class="ruby-value str">&quot;Failed to parse input at offset %d&quot;</span> <span class="ruby-operator">%</span> <span class="ruby-identifier">max_offset</span>&#x000A;41:       <span class="ruby-identifier">msg</span> <span class="ruby-operator">+=</span> <span class="ruby-value str">&quot;, just after %s&quot;</span> <span class="ruby-operator">%</span> <span class="ruby-identifier">c</span>[<span class="ruby-identifier">s</span>, <span class="ruby-identifier">c</span>.<span class="ruby-identifier">length</span>].<span class="ruby-identifier">inspect</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;\n&quot;</span>&#x000A;42:       <span class="ruby-keyword kw">super</span>(<span class="ruby-identifier">msg</span>)&#x000A;43:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000052-source'>    <span class="ruby-comment cmt"># File lib/citrus.rb, line 40</span>&#x000A;40:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">input</span>)&#x000A;41:       <span class="ruby-ivar">@input</span> = <span class="ruby-identifier">input</span>&#x000A;42:       <span class="ruby-identifier">c</span> = <span class="ruby-identifier">consumed</span>&#x000A;43:       <span class="ruby-identifier">s</span> = [<span class="ruby-value">0</span>, <span class="ruby-identifier">c</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">-</span> <span class="ruby-value">40</span>].<span class="ruby-identifier">max</span>&#x000A;44:       <span class="ruby-identifier">msg</span>  = <span class="ruby-value str">&quot;Failed to parse input at offset %d&quot;</span> <span class="ruby-operator">%</span> <span class="ruby-identifier">max_offset</span>&#x000A;45:       <span class="ruby-identifier">msg</span> <span class="ruby-operator">+=</span> <span class="ruby-value str">&quot;, just after %s&quot;</span> <span class="ruby-operator">%</span> <span class="ruby-identifier">c</span>[<span class="ruby-identifier">s</span>, <span class="ruby-identifier">c</span>.<span class="ruby-identifier">length</span>].<span class="ruby-identifier">inspect</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;\n&quot;</span>&#x000A;46:       <span class="ruby-keyword kw">super</span>(<span class="ruby-identifier">msg</span>)&#x000A;47:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <h2>Public instance methods</h2>
-              <div class='method public-instance' id='method-M000048'>
-                <a name='M000048'></a>
+              <div class='method public-instance' id='method-M000054'>
+                <a name='M000054'></a>
                 <div class='synopsis'>
                   <span class='name'>consumed</span>
                   <span class='arguments'>()</span>
@@ -103,14 +103,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000048-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000054-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000048-source'>    <span class="ruby-comment cmt"># File lib/citrus.rb, line 55</span>&#x000A;55:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">consumed</span>&#x000A;56:       <span class="ruby-identifier">input</span>[<span class="ruby-value">0</span>, <span class="ruby-identifier">max_offset</span>]&#x000A;57:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000054-source'>    <span class="ruby-comment cmt"># File lib/citrus.rb, line 59</span>&#x000A;59:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">consumed</span>&#x000A;60:       <span class="ruby-identifier">input</span>[<span class="ruby-value">0</span>, <span class="ruby-identifier">max_offset</span>]&#x000A;61:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='method public-instance' id='method-M000047'>
-                <a name='M000047'></a>
+              <div class='method public-instance' id='method-M000053'>
+                <a name='M000053'></a>
                 <div class='synopsis'>
                   <span class='name'>max_offset</span>
                   <span class='arguments'>()</span>
@@ -121,10 +121,10 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000047-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000053-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000047-source'>    <span class="ruby-comment cmt"># File lib/citrus.rb, line 49</span>&#x000A;49:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">max_offset</span>&#x000A;50:       <span class="ruby-identifier">input</span>.<span class="ruby-identifier">max_offset</span>&#x000A;51:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000053-source'>    <span class="ruby-comment cmt"># File lib/citrus.rb, line 53</span>&#x000A;53:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">max_offset</span>&#x000A;54:       <span class="ruby-identifier">input</span>.<span class="ruby-identifier">max_offset</span>&#x000A;55:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

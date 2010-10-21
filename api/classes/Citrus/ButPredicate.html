@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>: Citrus::ButPredicate [Citrus API Documentation]</title>
+    <meta content='text/html; charset=utf8' http-equiv='Content-Type'>
+    <link href='../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>Class</span>
+          Citrus::ButPredicate
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../files/lib/citrus_rb.html">lib/citrus.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a href="../Object.html">Object</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <p>
+            A <a href="ButPredicate.html">ButPredicate</a> is a <a
+            href="Predicate.html">Predicate</a> that consumes all characters until its
+            rule matches. It must match at least one character in order to succeed. The
+            <a href="../Citrus.html">Citrus</a> notation is any expression preceded by
+            a tilde, e.g.:
+            </p>
+            <pre>~expr</pre>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>public instance</h3>
+            <ol>
+              <li><a href="#M000069">match</a></li>
+              <li><a href="#M000070">to_s</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+            <div id='includes'>
+              <h2>Included modules</h2>
+              <ol>
+                <li><a href="Predicate.html">Predicate</a></li>
+              </ol>
+            </div>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DOT_RULE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Rule.new(DOT)</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public instance methods</h2>
+              <div class='method public-instance' id='method-M000069'>
+                <a name='M000069'></a>
+                <div class='synopsis'>
+                  <span class='name'>match</span>
+                  <span class='arguments'>(input, offset=0)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Returns the <a href="Match.html">Match</a> for this rule on <tt>input</tt>
+                  at the given <tt>offset</tt>, <tt>nil</tt> if no match can be made.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000069-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000069-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 718</span>&#x000A;718:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">match</span>(<span class="ruby-identifier">input</span>, <span class="ruby-identifier">offset</span>=<span class="ruby-value">0</span>)&#x000A;719:       <span class="ruby-identifier">matches</span> = []&#x000A;720:       <span class="ruby-identifier">os</span> = <span class="ruby-identifier">offset</span>&#x000A;721:       <span class="ruby-keyword kw">while</span> <span class="ruby-identifier">input</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">os</span>).<span class="ruby-identifier">nil?</span>&#x000A;722:         <span class="ruby-identifier">m</span> = <span class="ruby-identifier">input</span>.<span class="ruby-identifier">match</span>(<span class="ruby-constant">DOT_RULE</span>, <span class="ruby-identifier">os</span>)&#x000A;723:         <span class="ruby-keyword kw">break</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">m</span>&#x000A;724:         <span class="ruby-identifier">matches</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">m</span>&#x000A;725:         <span class="ruby-identifier">os</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">length</span>&#x000A;726:       <span class="ruby-keyword kw">end</span>&#x000A;727:       <span class="ruby-comment cmt"># Create a single match from the aggregate text value of all submatches.</span>&#x000A;728:       <span class="ruby-identifier">create_match</span>(<span class="ruby-identifier">matches</span>.<span class="ruby-identifier">join</span>, <span class="ruby-identifier">offset</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">matches</span>.<span class="ruby-identifier">any?</span>&#x000A;729:     <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-M000070'>
+                <a name='M000070'></a>
+                <div class='synopsis'>
+                  <span class='name'>to_s</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Returns the <a href="../Citrus.html">Citrus</a> notation of this rule as a
+                  string.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000070-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000070-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 732</span>&#x000A;732:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">to_s</span>&#x000A;733:       <span class="ruby-value str">'~'</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">rule</span>.<span class="ruby-identifier">embed</span>&#x000A;734:     <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

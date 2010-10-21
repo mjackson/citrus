@@ -24,6 +24,8 @@ h2{font-size:18pt;}
 h3{font-size:12pt;}
 pre,code{font-family:Menlo,monospace;font-size:8pt;}
 a:link,a:visited{color:#cc6600;}
+th{text-align:left;}
+td{padding:2px;}
 
 #wrapper{position:relative;width:700px;margin:0 auto;}
 
@@ -51,5 +53,6 @@ a:link,a:visited{color:#cc6600;}
   -moz-box-shadow:0px 0px 10px #cc6600;
 }
 #body ul{list-style-type:disc;margin-left:36px;}
+#body table{width:464px;}
 
 .copyright{padding-top:36px;text-align:right;font-size:8pt;}

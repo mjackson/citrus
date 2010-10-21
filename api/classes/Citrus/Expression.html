@@ -36,7 +36,7 @@
         </ol>
         <div class='parent'>
           Parent:
-          <strong>Object</strong>
+          <strong><a href="../Object.html">Object</a></strong>
         </div>
       </div>
       <div id='content'>
@@ -61,11 +61,11 @@
             <h2>Methods</h2>
             <h3>public class</h3>
             <ol>
-              <li><a href="#M000057">new</a></li>
+              <li><a href="#M000063">new</a></li>
             </ol>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000058">match</a></li>
+              <li><a href="#M000064">match</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -79,22 +79,22 @@
           <div id='section'>
             <div id='methods'>
               <h2>Public class methods</h2>
-              <div class='method public-class' id='method-M000057'>
-                <a name='M000057'></a>
+              <div class='method public-class' id='method-M000063'>
+                <a name='M000063'></a>
                 <div class='synopsis'>
                   <span class='name'>new</span>
                   <span class='arguments'>(rule=/^/)</span>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000057-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000063-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000057-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 574</span>&#x000A;574:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">rule</span>=<span class="ruby-regexp re">/^/</span>)&#x000A;575:       <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-value str">&quot;Expression must be a Regexp&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">Regexp</span> <span class="ruby-operator">===</span> <span class="ruby-identifier">rule</span>&#x000A;576:       <span class="ruby-keyword kw">super</span>&#x000A;577:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000063-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 616</span>&#x000A;616:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">rule</span>=<span class="ruby-regexp re">/^/</span>)&#x000A;617:       <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-value str">&quot;Expression must be a Regexp&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">Regexp</span> <span class="ruby-operator">===</span> <span class="ruby-identifier">rule</span>&#x000A;618:       <span class="ruby-keyword kw">super</span>&#x000A;619:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <h2>Public instance methods</h2>
-              <div class='method public-instance' id='method-M000058'>
-                <a name='M000058'></a>
+              <div class='method public-instance' id='method-M000064'>
+                <a name='M000064'></a>
                 <div class='synopsis'>
                   <span class='name'>match</span>
                   <span class='arguments'>(input, offset=0)</span>
@@ -106,10 +106,10 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000058-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000064-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000058-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 581</span>&#x000A;581:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">match</span>(<span class="ruby-identifier">input</span>, <span class="ruby-identifier">offset</span>=<span class="ruby-value">0</span>)&#x000A;582:       <span class="ruby-identifier">m</span> = <span class="ruby-identifier">input</span>[<span class="ruby-identifier">offset</span>, <span class="ruby-identifier">input</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">offset</span>].<span class="ruby-identifier">match</span>(<span class="ruby-identifier">rule</span>)&#x000A;583:       <span class="ruby-identifier">create_match</span>(<span class="ruby-identifier">m</span>, <span class="ruby-identifier">offset</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">m</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">begin</span>(<span class="ruby-value">0</span>) <span class="ruby-operator">==</span> <span class="ruby-value">0</span>&#x000A;584:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000064-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 623</span>&#x000A;623:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">match</span>(<span class="ruby-identifier">input</span>, <span class="ruby-identifier">offset</span>=<span class="ruby-value">0</span>)&#x000A;624:       <span class="ruby-identifier">m</span> = <span class="ruby-identifier">input</span>[<span class="ruby-identifier">offset</span>, <span class="ruby-identifier">input</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">offset</span>].<span class="ruby-identifier">match</span>(<span class="ruby-identifier">rule</span>)&#x000A;625:       <span class="ruby-identifier">create_match</span>(<span class="ruby-identifier">m</span>, <span class="ruby-identifier">offset</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">m</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">begin</span>(<span class="ruby-value">0</span>) <span class="ruby-operator">==</span> <span class="ruby-value">0</span>&#x000A;626:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

@@ -26,124 +26,238 @@
         </ul>
         <div id="body">
             <h1>Syntax</h1>
-<p>
-The most straightforward way to compose a Citrus grammar is to use
-Citrus&#8217; own custom grammar syntax. This syntax borrows heavily from
-Ruby, so it should already be familiar to Ruby programmers.
-</p>
+
+<p>The most straightforward way to compose a Citrus grammar is to use Citrus' own
+custom grammar syntax. This syntax borrows heavily from Ruby, so it should
+already be familiar to Ruby programmers.</p>
+
 <h2>Terminals</h2>
-<p>
-Terminals may be represented by a string or a regular expression. Both
-follow the same rules as Ruby string and regular expression literals.
-</p>
-<pre>
-  'abc'
-  &quot;abc\n&quot;
-  /\xFF/
-</pre>
-<p>
-Character classes and the dot (match anything) symbol are supported as well
-for compatibility with other parsing expression implementations.
-</p>
-<pre>
-  [a-z0-9]      # match any lowercase letter or digit
-  [\x00-\xFF]   # match any octet
-  .             # match anything, even new lines
-</pre>
-<p>
-See <a href="api/classes/Citrus/FixedWidth.html">FixedWidth</a> and <a
-href="api/classes/Citrus/Expression.html">Expression</a> for more
-information.
-</p>
+
+<p>Terminals may be represented by a string or a regular expression. Both follow
+the same rules as Ruby string and regular expression literals.</p>
+
+<pre><code>'abc'
+"abc\n"
+/\xFF/
+</code></pre>
+
+<p>Character classes and the dot (match anything) symbol are supported as well for
+compatibility with other parsing expression implementations.</p>
+
+<pre><code>[a-z0-9]      # match any lowercase letter or digit
+[\x00-\xFF]   # match any octet
+.             # match anything, even new lines
+</code></pre>
+
+<p>See <a href="api/classes/Citrus/FixedWidth.html">FixedWidth</a> and
+<a href="api/classes/Citrus/Expression.html">Expression</a> for more information.</p>
+
 <h2>Repetition</h2>
-<p>
-Quantifiers may be used after any expression to specify a number of times
-it must match. The universal form of a quantifier is N*M where N is the
-minimum and M is the maximum number of times the expression may match.
-</p>
-<pre>
-  'abc'1*2      # match &quot;abc&quot; a minimum of one, maximum
-                # of two times
-  'abc'1*       # match &quot;abc&quot; at least once
-  'abc'*2       # match &quot;abc&quot; a maximum of twice
-</pre>
-<p>
-The + and ? operators are supported as well for the common cases of 1* and
-*1 respectively.
-</p>
-<pre>
-  'abc'+        # match &quot;abc&quot; at least once
-  'abc'?        # match &quot;abc&quot; a maximum of once
-</pre>
-<p>
-See <a href="api/classes/Citrus/Repeat.html">Repeat</a> for more
-information.
-</p>
+
+<p>Quantifiers may be used after any expression to specify a number of times it
+must match. The universal form of a quantifier is N*M where N is the minimum and
+M is the maximum number of times the expression may match.</p>
+
+<pre><code>'abc'1*2      # match "abc" a minimum of one, maximum
+              # of two times
+'abc'1*       # match "abc" at least once
+'abc'*2       # match "abc" a maximum of twice
+</code></pre>
+
+<p>The + and ? operators are supported as well for the common cases of 1<em> and </em>1
+respectively.</p>
+
+<pre><code>'abc'+        # match "abc" at least once
+'abc'?        # match "abc" a maximum of once
+</code></pre>
+
+<p>See <a href="api/classes/Citrus/Repeat.html">Repeat</a> for more information.</p>
+
 <h2>Lookahead</h2>
-<p>
-Both positive and negative lookahead are supported in Citrus. Use the &amp;
-and ! operators to indicate that an expression either should or should not
-match. In neither case is any input consumed.
-</p>
-<pre>
-  &amp;'a' 'b'      # match a &quot;b&quot; preceded by an &quot;a&quot;
-  !'a' 'b'      # match a &quot;b&quot; that is not preceded by an &quot;a&quot;
-  !'a' .        # match any character except for &quot;a&quot;
-</pre>
-<p>
-See <a href="api/classes/Citrus/AndPredicate.html">AndPredicate</a> and <a
-href="api/classes/Citrus/NotPredicate.html">NotPredicate</a> for more
-information.
-</p>
+
+<p>Both positive and negative lookahead are supported in Citrus. Use the &amp; and !
+operators to indicate that an expression either should or should not match. In
+neither case is any input consumed.</p>
+
+<pre><code>&amp;'a' 'b'      # match a "b" preceded by an "a"
+!'a' 'b'      # match a "b" that is not preceded by an "a"
+!'a' .        # match any character except for "a"
+</code></pre>
+
+<p>A special form of lookahead is also supported which will match any character
+that does not match a given expression.</p>
+
+<pre><code>~'a'          # match all characters until an "a"
+~/xyz/        # match all characters until /xyz/ matches
+</code></pre>
+
+<p>See <a href="api/classes/Citrus/AndPredicate.html">AndPredicate</a>,
+<a href="api/classes/Citrus/NotPredicate.html">NotPredicate</a>, and
+<a href="api/classes/Citrus/ButPredicate.html">ButPredicate</a> for more information.</p>
+
 <h2>Sequences</h2>
-<p>
-Sequences of expressions may be separated by a space to indicate that the
-rules should match in that order.
-</p>
-<pre>
-  'a' 'b' 'c'   # match &quot;a&quot;, then &quot;b&quot;, then &quot;c&quot;
-  'a' [0-9]     # match &quot;a&quot;, then a numeric digit
-</pre>
-<p>
-See <a href="api/classes/Citrus/Sequence.html">Sequence</a> for more
-information.
-</p>
+
+<p>Sequences of expressions may be separated by a space to indicate that the rules
+should match in that order.</p>
+
+<pre><code>'a' 'b' 'c'   # match "a", then "b", then "c"
+'a' [0-9]     # match "a", then a numeric digit
+</code></pre>
+
+<p>See <a href="api/classes/Citrus/Sequence.html">Sequence</a> for more information.</p>
+
 <h2>Choices</h2>
-<p>
-Ordered choice is indicated by a vertical bar that separates two
-expressions. Note that any operator binds more tightly than the bar.
-</p>
-<pre>
-  'a' | 'b'       # match &quot;a&quot; or &quot;b&quot;
-  'a' 'b' | 'c'   # match &quot;a&quot; then &quot;b&quot; (in sequence), or &quot;c&quot;
-</pre>
-<p>
-See <a href="api/classes/Citrus/Choice.html">Choice</a> for more
-information.
-</p>
+
+<p>Ordered choice is indicated by a vertical bar that separates two expressions.
+Note that any operator binds more tightly than the bar.</p>
+
+<pre><code>'a' | 'b'       # match "a" or "b"
+'a' 'b' | 'c'   # match "a" then "b" (in sequence), or "c"
+</code></pre>
+
+<p>See <a href="api/classes/Citrus/Choice.html">Choice</a> for more information.</p>
+
 <h2>Super</h2>
-<p>
-When including a grammar inside another, all rules in the child that have
-the same name as a rule in the parent also have access to the super keyword
-to invoke the parent rule.
-</p>
-<p>
-See <a href="api/classes/Citrus/Super.html">Super</a> for more information.
-</p>
+
+<p>When including a grammar inside another, all rules in the child that have the
+same name as a rule in the parent also have access to the &ldquo;super&rdquo; keyword to
+invoke the parent rule.</p>
+
+<p>See <a href="api/classes/Citrus/Super.html">Super</a> for more information.</p>
+
 <h2>Labels</h2>
-<p>
-Match objects may be referred to by a different name than the rule that
-originally generated them. Labels are created by placing the label and a
-colon immediately preceding any expression.
-</p>
-<pre>
-  chars:/[a-z]+/  # the characters matched by the regular
-                  # expression may be referred to as &quot;chars&quot;
-                  # in a block method
-</pre>
-<p>
-See <a href="api/classes/Citrus/Label.html">Label</a> for more information.
-</p>
+
+<p>Match objects may be referred to by a different name than the rule that
+originally generated them. Labels are created by placing the label and a colon
+immediately preceding any expression.</p>
+
+<pre><code>chars:/[a-z]+/  # the characters matched by the regular
+                # expression may be referred to as "chars"
+                # in a block method
+</code></pre>
+
+<p>See <a href="api/classes/Citrus/Label.html">Label</a> for more information.</p>
+
+<h2>Precedence</h2>
+
+<p>The following table contains a list of all Citrus operators and their
+precedence. A higher precedence indicates tighter binding.</p>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th> Operator     </th>
+<th> Name                      </th>
+<th> Precedence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td> &lsquo;&rsquo;           </td>
+<td> String (single quoted)    </td>
+<td> 6</td>
+</tr>
+<tr>
+<td></td>
+<td> &ldquo;&rdquo;           </td>
+<td> String (double quoted)    </td>
+<td> 6</td>
+</tr>
+<tr>
+<td></td>
+<td> []           </td>
+<td> Character class           </td>
+<td> 6</td>
+</tr>
+<tr>
+<td></td>
+<td> .            </td>
+<td> Dot (any character)       </td>
+<td> 6</td>
+</tr>
+<tr>
+<td></td>
+<td> //           </td>
+<td> Regular expression        </td>
+<td> 6</td>
+</tr>
+<tr>
+<td></td>
+<td> ()           </td>
+<td> Grouping                  </td>
+<td> 6</td>
+</tr>
+<tr>
+<td></td>
+<td> *            </td>
+<td> Repetition (arbitrary)    </td>
+<td> 5</td>
+</tr>
+<tr>
+<td></td>
+<td> +            </td>
+<td> Repetition (one or more)  </td>
+<td> 5</td>
+</tr>
+<tr>
+<td></td>
+<td> ?            </td>
+<td> Repetition (zero or one)  </td>
+<td> 5</td>
+</tr>
+<tr>
+<td></td>
+<td> &amp;            </td>
+<td> And predicate             </td>
+<td> 4</td>
+</tr>
+<tr>
+<td></td>
+<td> !            </td>
+<td> Not predicate             </td>
+<td> 4</td>
+</tr>
+<tr>
+<td></td>
+<td> ~            </td>
+<td> But predicate             </td>
+<td> 4</td>
+</tr>
+<tr>
+<td></td>
+<td> :            </td>
+<td> Label                     </td>
+<td> 4</td>
+</tr>
+<tr>
+<td></td>
+<td> &lt;>           </td>
+<td> Extension (module name)   </td>
+<td> 3</td>
+</tr>
+<tr>
+<td></td>
+<td> {}           </td>
+<td> Extension (literal)       </td>
+<td> 3</td>
+</tr>
+<tr>
+<td></td>
+<td> e1 e2        </td>
+<td> Sequence                  </td>
+<td> 2</td>
+</tr>
+<tr>
+<td></td>
+<td> e1 &#124; e2 </td>
+<td> Ordered choice            </td>
+<td> 1</td>
+</tr>
+</tbody>
+</table>
+
 
             <p class="copyright"><a href="license.html">Copyright</a> &copy; 2010 <a href="http://mjijackson.com/">Michael Jackson</a></p>
         </div>

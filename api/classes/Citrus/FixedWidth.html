@@ -36,7 +36,7 @@
         </ol>
         <div class='parent'>
           Parent:
-          <strong>Object</strong>
+          <strong><a href="../Object.html">Object</a></strong>
         </div>
       </div>
       <div id='content'>
@@ -54,11 +54,11 @@
             <h2>Methods</h2>
             <h3>public class</h3>
             <ol>
-              <li><a href="#M000055">new</a></li>
+              <li><a href="#M000061">new</a></li>
             </ol>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000056">match</a></li>
+              <li><a href="#M000062">match</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -72,22 +72,22 @@
           <div id='section'>
             <div id='methods'>
               <h2>Public class methods</h2>
-              <div class='method public-class' id='method-M000055'>
-                <a name='M000055'></a>
+              <div class='method public-class' id='method-M000061'>
+                <a name='M000061'></a>
                 <div class='synopsis'>
                   <span class='name'>new</span>
                   <span class='arguments'>(rule='')</span>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000055-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000061-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000055-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 546</span>&#x000A;546:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">rule</span>=<span class="ruby-value str">''</span>)&#x000A;547:       <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-value str">&quot;FixedWidth must be a String&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">String</span> <span class="ruby-operator">===</span> <span class="ruby-identifier">rule</span>&#x000A;548:       <span class="ruby-keyword kw">super</span>&#x000A;549:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000061-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 588</span>&#x000A;588:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">rule</span>=<span class="ruby-value str">''</span>)&#x000A;589:       <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-value str">&quot;FixedWidth must be a String&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">String</span> <span class="ruby-operator">===</span> <span class="ruby-identifier">rule</span>&#x000A;590:       <span class="ruby-keyword kw">super</span>&#x000A;591:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <h2>Public instance methods</h2>
-              <div class='method public-instance' id='method-M000056'>
-                <a name='M000056'></a>
+              <div class='method public-instance' id='method-M000062'>
+                <a name='M000062'></a>
                 <div class='synopsis'>
                   <span class='name'>match</span>
                   <span class='arguments'>(input, offset=0)</span>
@@ -99,10 +99,10 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000056-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000062-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000056-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 553</span>&#x000A;553:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">match</span>(<span class="ruby-identifier">input</span>, <span class="ruby-identifier">offset</span>=<span class="ruby-value">0</span>)&#x000A;554:       <span class="ruby-identifier">create_match</span>(<span class="ruby-identifier">rule</span>.<span class="ruby-identifier">dup</span>, <span class="ruby-identifier">offset</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">rule</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">input</span>[<span class="ruby-identifier">offset</span>, <span class="ruby-identifier">rule</span>.<span class="ruby-identifier">length</span>]&#x000A;555:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000062-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 595</span>&#x000A;595:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">match</span>(<span class="ruby-identifier">input</span>, <span class="ruby-identifier">offset</span>=<span class="ruby-value">0</span>)&#x000A;596:       <span class="ruby-identifier">create_match</span>(<span class="ruby-identifier">rule</span>.<span class="ruby-identifier">dup</span>, <span class="ruby-identifier">offset</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">input</span>[<span class="ruby-identifier">offset</span>, <span class="ruby-identifier">rule</span>.<span class="ruby-identifier">length</span>] <span class="ruby-operator">==</span> <span class="ruby-identifier">rule</span>&#x000A;597:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

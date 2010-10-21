@@ -23,7 +23,7 @@ end
 
 # Fetch contents of RDoc files.
 def fetch_docs
-  Dir['doc/*.rdoc'].inject({}) do |m, file|
+  Dir['doc/*.markdown'].inject({}) do |m, file|
     m[file] = File.read(file)
     m
   end
@@ -32,13 +32,12 @@ end
 # Generate the HTML docs.
 def generate_docs(docs)
   require 'erb'
-  require 'rdoc/markup/to_html'
-  layout = ERB.new(File.read('layout.html.erb'), 0, '%<>')
-  html = RDoc::Markup::ToHtml.new
+  require 'rdiscount'
+  layout = ERB.new(File.read('etc/layout.html.erb'), 0, '%<>')
   docs.each do |file, source|
-    content = html.convert(source)
+    content = RDiscount.new(source, :smart).to_html
     output = layout.result(binding)
-    File.open(File.basename(file, '.rdoc') + '.html', 'w') do |f|
+    File.open(File.basename(file, '.markdown') + '.html', 'w') do |f|
       f.write(output)
     end
   end
