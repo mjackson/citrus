@@ -6,7 +6,7 @@
 module Citrus
   autoload :File, 'citrus/file'
 
-  VERSION = [1, 7, 0]
+  VERSION = [1, 8, 0]
 
   # Returns the current version of Citrus as a string.
   def self.version
