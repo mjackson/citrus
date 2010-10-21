@@ -5,26 +5,27 @@
                           Parsing Expressions for Ruby
 
 
-Citrus is a compact and powerful parsing library for Ruby that combines the
-elegance and expressiveness of the language with the simplicity and power of
-parsing expressions.
+Citrus is a compact and powerful parsing library for 
+[Ruby](http://ruby-lang.org/) that combines the elegance and expressiveness of 
+the language with the simplicity and power of
+[parsing expressions](http://en.wikipedia.org/wiki/Parsing_expression_grammar).
 
 
-= Installation
+# Installation
 
 
-Via RubyGems:
+Via [RubyGems](http://rubygems.org/):
 
-  $ sudo gem install citrus
+    $ sudo gem install citrus
 
 From a local copy:
 
-  $ git clone git://github.com/mjijackson/citrus.git
-  $ cd citrus
-  $ rake package && sudo rake install
+    $ git clone git://github.com/mjijackson/citrus.git
+    $ cd citrus
+    $ rake package && sudo rake install
 
 
-= Background
+# Background
 
 
 In order to be able to use Citrus effectively, you must first understand the
@@ -36,8 +37,8 @@ sentences should end with a period.
 Semantics are the rules by which meaning may be derived in a language. For
 example, as you read a book you are able to make some sense of the particular
 way in which words on a page are combined to form thoughts and express ideas
-because you understand what the words themselves mean and you can understand
-what they mean collectively.
+because you understand what the words themselves mean and you understand what
+they mean collectively.
 
 Computers use a similar process when interpreting code. First, the code must be
 parsed into recognizable symbols or tokens. These tokens may then be passed to
@@ -49,14 +50,15 @@ powerful parsers that are simple to understand and easy to create and maintain.
 
 In Citrus, there are three main types of objects: rules, grammars, and matches.
 
-== Rules
+## Rules
 
-A rule is an object that specifies some matching behavior on a string. There are
-two types of rules: terminals and non-terminals. Terminals can be either Ruby
-strings or regular expressions that specify some input to match. For example, a
-terminal created from the string "end" would match any sequence of the
-characters "e", "n", and "d", in that order. A terminal created from a regular
-expression uses Ruby's regular expression engine to attempt to create a match.
+A [Rule](api/classes/Citrus/Rule.html) is an object that specifies some matching
+behavior on a string. There are two types of rules: terminals and non-terminals.
+Terminals can be either Ruby strings or regular expressions that specify some
+input to match. For example, a terminal created from the string "end" would
+match any sequence of the characters "e", "n", and "d", in that order. A
+terminal created from a regular expression uses Ruby's regular expression engine
+to attempt to create a match.
 
 Non-terminals are rules that may contain other rules but do not themselves match
 directly on the input. For example, a Repeat is a non-terminal that may contain
@@ -64,34 +66,35 @@ one other rule that will try and match a certain number of times. Several other
 types of non-terminals are available that will be discussed later.
 
 Rule objects may also have semantic information associated with them in the form
-of Ruby modules. These modules contain methods that will be used to extend any
-match objects created by the rule with which they are associated.
+of Ruby modules. Rules use these modules to extend the matches they create.
 
-== Grammars
+## Grammars
 
 A grammar is a container for rules. Usually the rules in a grammar collectively
 form a complete specification for some language, or a well-defined subset
 thereof.
 
-A Citrus grammar is really just a souped-up Ruby module. These modules may be
+A Citrus grammar is really just a souped-up Ruby
+[module](http://ruby-doc.org/core/classes/Module.html). These modules may be
 included in other grammar modules in the same way that Ruby modules are normally
-used. This property allows you to divide a complex grammar into reusable pieces
-that may be combined dynamically at runtime. Any grammar rule with the same name
-as a rule in an included grammar may access that rule with a mechanism similar
-to Ruby's super keyword.
+used. This property allows you to divide a complex grammar into more manageable, 
+reusable pieces that may be combined at runtime. Any grammar rule with the same 
+name as a rule in an included grammar may access that rule with a mechanism 
+similar to Ruby's super keyword.
 
-== Matches
+## Matches
 
-Matches are created by rule objects when they match on the input. A match
-contains the string of text that made up the match as well as its offset in the
-original input string. During a parse, matches are arranged in a tree structure
-where any match may contain any number of other matches. This structure is
-determined by the way in which the rule that generated each match is used in the
-grammar.
+Matches are created by rule objects when they match on the input. A 
+[Match](api/classes/Citrus/Match.html) in Citrus is actually a 
+[String](http://ruby-doc.org/core/classes/String.html) with some extra 
+information attached such as the name(s) of the rule(s) which generated the 
+match as well as its offset in the original input string.
 
-For example, a match that is created from a non-terminal rule that contains
-several other terminals will likewise contain several matches, one for each
-terminal.
+During a parse, matches are arranged in a tree structure where any match may
+contain any number of other matches. This structure is determined by the way in
+which the rule that generated each match is used in the grammar. For example, a 
+match that is created from a non-terminal rule that contains several other 
+terminals will likewise contain several matches, one for each terminal.
 
 Match objects may be extended with semantic information in the form of methods.
 These methods can interpret the text of a match using the wealth of information
@@ -99,147 +102,164 @@ available to them including the text of the match, its position in the input,
 and any submatches.
 
 
-= Syntax
+# Syntax
 
 
 The most straightforward way to compose a Citrus grammar is to use Citrus' own
 custom grammar syntax. This syntax borrows heavily from Ruby, so it should
 already be familiar to Ruby programmers.
 
-== Terminals
+## Terminals
 
 Terminals may be represented by a string or a regular expression. Both follow
 the same rules as Ruby string and regular expression literals.
 
-  'abc'
-  "abc\n"
-  /\xFF/
+    'abc'
+    "abc\n"
+    /\xFF/
 
 Character classes and the dot (match anything) symbol are supported as well for
 compatibility with other parsing expression implementations.
 
-  [a-z0-9]      # match any lowercase letter or digit
-  [\x00-\xFF]   # match any octet
-  .             # match anything, even new lines
+    [a-z0-9]      # match any lowercase letter or digit
+    [\x00-\xFF]   # match any octet
+    .             # match anything, even new lines
 
-== Repetition
+See [FixedWidth](api/classes/Citrus/FixedWidth.html) and
+[Expression](api/classes/Citrus/Expression.html) for more information.
+
+## Repetition
 
 Quantifiers may be used after any expression to specify a number of times it
 must match. The universal form of a quantifier is N*M where N is the minimum and
 M is the maximum number of times the expression may match.
 
-  'abc'1*2      # match "abc" a minimum of one, maximum
-                # of two times
-  'abc'1*       # match "abc" at least once
-  'abc'*2       # match "abc" a maximum of twice
+    'abc'1*2      # match "abc" a minimum of one, maximum
+                  # of two times
+    'abc'1*       # match "abc" at least once
+    'abc'*2       # match "abc" a maximum of twice
 
 The + and ? operators are supported as well for the common cases of 1* and *1
 respectively.
 
-  'abc'+        # match "abc" at least once
-  'abc'?        # match "abc" a maximum of once
+    'abc'+        # match "abc" at least once
+    'abc'?        # match "abc" a maximum of once
 
-== Lookahead
+See [Repeat](api/classes/Citrus/Repeat.html) for more information.
+
+## Lookahead
 
 Both positive and negative lookahead are supported in Citrus. Use the & and !
 operators to indicate that an expression either should or should not match. In
 neither case is any input consumed.
 
-  &'a' 'b'      # match a "b" preceded by an "a"
-  !'a' 'b'      # match a "b" that is not preceded by an "a"
-  !'a' .        # match any character except for "a"
+    &'a' 'b'      # match a "b" preceded by an "a"
+    !'a' 'b'      # match a "b" that is not preceded by an "a"
+    !'a' .        # match any character except for "a"
 
 A special form of lookahead is also supported which will match any character
 that does not match a given expression.
 
-  ~'a'          # match all characters until an "a"
-  ~/xyz/        # match all characters until /xyz/ matches
+    ~'a'          # match all characters until an "a"
+    ~/xyz/        # match all characters until /xyz/ matches
 
-== Sequences
+See [AndPredicate](api/classes/Citrus/AndPredicate.html),
+[NotPredicate](api/classes/Citrus/NotPredicate.html), and
+[ButPredicate](api/classes/Citrus/ButPredicate.html) for more information.
+
+## Sequences
 
 Sequences of expressions may be separated by a space to indicate that the rules
 should match in that order.
 
-  'a' 'b' 'c'   # match "a", then "b", then "c"
-  'a' [0-9]     # match "a", then a numeric digit
+    'a' 'b' 'c'   # match "a", then "b", then "c"
+    'a' [0-9]     # match "a", then a numeric digit
 
-== Choices
+See [Sequence](api/classes/Citrus/Sequence.html) for more information.
+
+## Choices
 
 Ordered choice is indicated by a vertical bar that separates two expressions.
 Note that any operator binds more tightly than the bar.
 
-  'a' | 'b'       # match "a" or "b"
-  'a' 'b' | 'c'   # match "a" then "b" (in sequence), or "c"
+    'a' | 'b'       # match "a" or "b"
+    'a' 'b' | 'c'   # match "a" then "b" (in sequence), or "c"
 
-== Super
+See [Choice](api/classes/Citrus/Choice.html) for more information.
+
+## Super
 
 When including a grammar inside another, all rules in the child that have the
 same name as a rule in the parent also have access to the "super" keyword to
 invoke the parent rule.
 
-== Labels
+See [Super](api/classes/Citrus/Super.html) for more information.
+
+## Labels
 
 Match objects may be referred to by a different name than the rule that
 originally generated them. Labels are created by placing the label and a colon
 immediately preceding any expression.
 
-  chars:/[a-z]+/  # the characters matched by the regular
-                  # expression may be referred to as "chars"
-                  # in a block method
+    chars:/[a-z]+/  # the characters matched by the regular
+                    # expression may be referred to as "chars"
+                    # in a block method
 
-== Precedence
+See [Label](api/classes/Citrus/Label.html) for more information.
+
+## Precedence
 
 The following table contains a list of all Citrus operators and their 
 precedence. A higher precedence indicates tighter binding.
 
-Operator    | Name                      | Precedence
------------------------------------------------------
-''          | String (single quoted)    | 6
-""          | String (double quoted)    | 6
-[]          | Character class           | 6
-.           | Dot (any character)       | 6
-//          | Regular expression        | 6
-()          | Grouping                  | 6
-*           | Repetition (arbitrary)    | 5
-+           | Repetition (one or more)  | 5
-?           | Repetition (zero or one)  | 5
-&           | And predicate             | 4
-!           | Not predicate             | 4
-~           | But predicate             | 4
-:           | Label                     | 4
-<>          | Extension (module name)   | 3
-{}          | Extension (literal)       | 3
-e1 e2       | Sequence                  | 2
-e1 | e2     | Ordered choice            | 1
+| Operator    | Name                      | Precedence |
+| ----------- | ------------------------- | ---------- |
+| ''          | String (single quoted)    | 6          |
+| ""          | String (double quoted)    | 6          |
+| []          | Character class           | 6          |
+| .           | Dot (any character)       | 6          |
+| //          | Regular expression        | 6          |
+| ()          | Grouping                  | 6          |
+| *           | Repetition (arbitrary)    | 5          |
+| +           | Repetition (one or more)  | 5          |
+| ?           | Repetition (zero or one)  | 5          |
+| &           | And predicate             | 4          |
+| !           | Not predicate             | 4          |
+| ~           | But predicate             | 4          |
+| :           | Label                     | 4          |
+| <>          | Extension (module name)   | 3          |
+| {}          | Extension (literal)       | 3          |
+| e1 e2       | Sequence                  | 2          |
+| e1 | e2     | Ordered choice            | 1          |
 
 
-= Example
+# Example
 
 
 Below is an example of a simple grammar that is able to parse strings of
-integers separated by any amount of white space and a + symbol.
+integers separated by any amount of white space and a `+` symbol.
 
-  grammar Addition
-    rule additive
-      number plus (additive | number)
-    end
+    grammar Addition
+      rule additive
+        number plus (additive | number)
+      end
 
-    rule number
-      [0-9]+ space
-    end
+      rule number
+        [0-9]+ space
+      end
 
-    rule plus
-      '+' space
-    end
+      rule plus
+        '+' space
+      end
 
-    rule space
-      [ \t]*
+      rule space
+        [ \t]*
+      end
     end
-  end
 
 Several things to note about the above example:
 
-* Grammar and rule declarations end with the "end" keyword
+* Grammar and rule declarations end with the `end` keyword
 * A Sequence of rules is created by separating expressions with a space
 * Likewise, ordered choice is represented with a vertical bar
 * Parentheses may be used to override the natural binding order
@@ -247,15 +267,16 @@ Several things to note about the above example:
   other rule's name
 * Any expression may be followed by a quantifier
 
-== Interpretation
+## Interpretation
 
 The grammar above is able to parse simple mathematical expressions such as "1+2"
 and "1 + 2+3", but it does not have enough semantic information to be able to
 actually interpret these expressions.
 
-At this point, when the grammar parses a string it generates a tree of Match
-objects. Each match is created by a rule. A match will know what text it
-contains, its offset in the original input, and what submatches it contains.
+At this point, when the grammar parses a string it generates a tree of
+[Match](api/classes/Citrus/Match.html) objects. Each match is created by a rule.
+A match knows what text it contains, its offset in the original input, and what
+submatches it contains.
 
 Submatches are created whenever a rule contains another rule. For example, in
 the grammar above the number rule matches a string of digits followed by white
@@ -265,31 +286,31 @@ We can use Ruby's block syntax to create a module that will be attached to these
 matches when they are created and is used to lazily extend them when we want to
 interpret them. The following example shows one way to do this.
 
-  grammar Addition
-    rule additive
-      (number plus term:(additive | number)) {
-        def value
-          number.value + term.value
-        end
-      }
-    end
+    grammar Addition
+      rule additive
+        (number plus term:(additive | number)) {
+          def value
+            number.value + term.value
+          end
+        }
+      end
 
-    rule number
-      ([0-9]+ space) {
-        def value
-          text.strip.to_i
-        end
-      }
-    end
+      rule number
+        ([0-9]+ space) {
+          def value
+            strip.to_i
+          end
+        }
+      end
 
-    rule plus
-      '+' space
-    end
+      rule plus
+        '+' space
+      end
 
-    rule space
-      [ \t]*
+      rule space
+        [ \t]*
+      end
     end
-  end
 
 In this version of the grammar we have added two semantic blocks, one each for
 the additive and number rules. These blocks contain methods that will be present
@@ -299,48 +320,82 @@ block, which is defined within the number rule.
 
 The semantic block associated with the number rule defines one method, value.
 Inside this method, we can see that the value of a number match is determined to
-be its text value, stripped of white space and converted to an integer.
+be its text value, stripped of white space and converted to an integer. Remember
+that matches are simply strings, so the `strip` method in this case is actually
+`String#strip`.
 
-The additive rule also extends its matches with a value method. Notice the use
-of the "term" label within the rule definition. This label allows the match that
+The `additive` rule also extends its matches with a value method. Notice the use
+of the `term` label within the rule definition. This label allows the match that
 is created by either the additive or the number rule to be retrieved using the
-"term" label. The value of an additive is determined to be the values of its
-number and term matches added together using Ruby's addition operator.
+`term` label. The value of an additive is determined to be the values of its
+`number` and `term` matches added together using Ruby's addition operator.
 
 Since additive is the first rule defined in the grammar, any match that results
-from parsing a string with this grammar will have a value method that can be
+from parsing a string with this grammar will have a `value` method that can be
 used to recursively calculate the collective value of the entire match tree.
 
 To give it a try, save the code for the Addition grammar in a file called
 addition.citrus. Next, assuming you have the Citrus gem installed, try the
 following sequence of commands in a terminal.
 
-  $ irb
-  > require 'citrus'
-   => true
-  > Citrus.load 'addition'
-   => [Addition]
-  > m = Addition.parse '1 + 2 + 3'
-   => #<Citrus::Match ...
-  > m.value
-   => 6
+    $ irb
+    > require 'citrus'
+     => true
+    > Citrus.load 'addition'
+     => [Addition]
+    > m = Addition.parse '1 + 2 + 3'
+     => #<Citrus::Match ...
+    > m.value
+     => 6
 
 Congratulations! You just ran your first piece of Citrus code.
 
-Take a look at examples/calc.citrus for an example of a calculator that is able
-to parse and evaluate more complex mathematical expressions.
+Take a look at 
+[examples/calc.citrus](http://github.com/mjijackson/citrus/blob/master/examples/calc.citrus)
+for an example of a calculator that is able to parse and evaluate more complex 
+mathematical expressions.
+
+## Implicit Value
+
+It is very common for a grammar to only have one interpretation for a given
+symbol. For this reason, you may find yourself writing a `value` method for
+every rule in your grammar. Because this can be tedious, Citrus allows you to
+omit defining such a method if you choose. For example, the `additive` and
+`number` rules from the simple calculator example above could also be written
+as:
+
+    rule additive
+      (number plus term:(additive | number)) {
+        number.value + term.value
+      }
+    end
+
+    rule number
+      ([0-9]+ space) {
+        strip.to_i
+      }
+    end
+
+Since no method name is explicitly specified in the semantic blocks, they may be 
+called using the `value` method.
 
 
-= Links
+# Links
 
 
-http://mjijackson.com/citrus
-http://pdos.csail.mit.edu/~baford/packrat/
-http://en.wikipedia.org/wiki/Parsing_expression_grammar
-http://treetop.rubyforge.org/index.html
+The primary resource for all things to do with parsing expressions can be found
+on the original [Packrat and Parsing Expression Grammars page](http://pdos.csail.mit.edu/~baford/packrat) at MIT.
+
+Also, a useful summary of parsing expression grammars can be found on 
+[Wikipedia](http://en.wikipedia.org/wiki/Parsing_expression_grammar).
+
+Citrus draws inspiration from another Ruby library for writing parsing
+expression grammars, Treetop. While Citrus' syntax is similar to that of
+[Treetop](http://treetop.rubyforge.org), it's not identical. The link is 
+included here for those who may wish toexplore an alternative implementation.
 
 
-= License
+# License
 
 
 Copyright 2010 Michael Jackson

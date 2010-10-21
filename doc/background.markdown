@@ -1,4 +1,5 @@
-= Background
+# Background
+
 
 In order to be able to use Citrus effectively, you must first understand the
 difference between syntax and semantics. Syntax is a set of rules that govern
@@ -9,8 +10,8 @@ sentences should end with a period.
 Semantics are the rules by which meaning may be derived in a language. For
 example, as you read a book you are able to make some sense of the particular
 way in which words on a page are combined to form thoughts and express ideas
-because you understand what the words themselves mean and you can understand
-what they mean collectively.
+because you understand what the words themselves mean and you understand what
+they mean collectively.
 
 Computers use a similar process when interpreting code. First, the code must be
 parsed into recognizable symbols or tokens. These tokens may then be passed to
@@ -22,14 +23,15 @@ powerful parsers that are simple to understand and easy to create and maintain.
 
 In Citrus, there are three main types of objects: rules, grammars, and matches.
 
-== Rules
+## Rules
 
-A Rule[link:api/classes/Citrus/Rule.html] is an object that specifies some matching behavior on a string. There are
-two types of rules: terminals and non-terminals. Terminals can be either Ruby
-strings or regular expressions that specify some input to match. For example, a
-terminal created from the string "end" would match any sequence of the
-characters "e", "n", and "d", in that order. A terminal created from a regular
-expression uses Ruby's regular expression engine to attempt to create a match.
+A [Rule](api/classes/Citrus/Rule.html) is an object that specifies some matching
+behavior on a string. There are two types of rules: terminals and non-terminals.
+Terminals can be either Ruby strings or regular expressions that specify some
+input to match. For example, a terminal created from the string "end" would
+match any sequence of the characters "e", "n", and "d", in that order. A
+terminal created from a regular expression uses Ruby's regular expression engine
+to attempt to create a match.
 
 Non-terminals are rules that may contain other rules but do not themselves match
 directly on the input. For example, a Repeat is a non-terminal that may contain
@@ -37,34 +39,35 @@ one other rule that will try and match a certain number of times. Several other
 types of non-terminals are available that will be discussed later.
 
 Rule objects may also have semantic information associated with them in the form
-of Ruby modules. These modules contain methods that will be used to extend any
-match objects created by the rule with which they are associated.
+of Ruby modules. Rules use these modules to extend the matches they create.
 
-== Grammars
+## Grammars
 
-A Grammar[link:api/classes/Citrus/Grammar.html] is a container for rules. Usually the rules in a grammar collectively
+A grammar is a container for rules. Usually the rules in a grammar collectively
 form a complete specification for some language, or a well-defined subset
 thereof.
 
-A Citrus grammar is really just a souped-up Ruby module. These modules may be
+A Citrus grammar is really just a souped-up Ruby
+[module](http://ruby-doc.org/core/classes/Module.html). These modules may be
 included in other grammar modules in the same way that Ruby modules are normally
-used. This property allows you to divide a complex grammar into reusable pieces
-that may be combined dynamically at runtime. Any grammar rule with the same name
-as a rule in an included grammar may access that rule with a mechanism similar
-to Ruby's super keyword.
+used. This property allows you to divide a complex grammar into more manageable, 
+reusable pieces that may be combined at runtime. Any grammar rule with the same 
+name as a rule in an included grammar may access that rule with a mechanism 
+similar to Ruby's super keyword.
 
-== Matches
+## Matches
 
-Matches are created by rule objects when they match on the input. A Match[link:api/classes/Citrus/Match.html]
-contains the string of text that made up the match as well as its offset in the
-original input string. During a parse, matches are arranged in a tree structure
-where any match may contain any number of other matches. This structure is
-determined by the way in which the rule that generated each match is used in the
-grammar.
+Matches are created by rule objects when they match on the input. A 
+[Match](api/classes/Citrus/Match.html) in Citrus is actually a 
+[String](http://ruby-doc.org/core/classes/String.html) with some extra 
+information attached such as the name(s) of the rule(s) which generated the 
+match as well as its offset in the original input string.
 
-For example, a match that is created from a non-terminal rule that contains
-several other terminals will likewise contain several matches, one for each
-terminal.
+During a parse, matches are arranged in a tree structure where any match may
+contain any number of other matches. This structure is determined by the way in
+which the rule that generated each match is used in the grammar. For example, a 
+match that is created from a non-terminal rule that contains several other 
+terminals will likewise contain several matches, one for each terminal.
 
 Match objects may be extended with semantic information in the form of methods.
 These methods can interpret the text of a match using the wealth of information
