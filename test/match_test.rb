@@ -2,25 +2,6 @@ require File.expand_path('../helper', __FILE__)
 
 class MatchTest < Test::Unit::TestCase
 
-  Double = Grammar.new {
-    include MatchTest::TestGrammar
-    root :double
-    rule :double do
-      one_or_more(:num)
-    end
-  }
-
-  Sentence = Grammar.new {
-    include MatchTest::TestGrammar
-    root :sentence
-    rule :word do
-      one_or_more(:alpha)
-    end
-    rule :sentence do
-      [ :word, zero_or_more([ ' ', :word ]) ]
-    end
-  }
-
   def test_string
     match = Match.new('hello')
     assert_equal('hello', match)
@@ -33,20 +14,7 @@ class MatchTest < Test::Unit::TestCase
     match = Match.new([match1, match2])
     assert_equal('ab', match)
     assert_equal(2, match.length)
-  end
-
-  def test_match_data
-    match = Match.new('hello world'.match(/^(\w+) /))
-    assert_equal('hello ', match)
-    assert_equal(6, match.length)
-  end
-
-  def test_array_match_data
-    match1 = Match.new('hello')
-    match2 = Match.new(' world'.match(/.+/))
-    match = Match.new([match1, match2])
-    assert_equal('hello world', match)
-    assert_equal(11, match.length)
+    assert_equal(2, match.matches.length)
   end
 
   def test_equality
@@ -80,9 +48,25 @@ class MatchTest < Test::Unit::TestCase
   end
 
   def test_matches_deep
-    match = Sentence.parse('one two three four')
+    match = Words.parse('one two three four')
     assert(match)
     assert_equal(15, match.find(:alpha).length)
+  end
+
+  def test_offset
+    match = Words.parse('one two')
+    assert(match)
+    assert_equal(0, match.offset)
+
+    words = match.find(:word)
+    assert(match)
+    assert_equal(2, words.length)
+
+    assert_equal('one', words[0])
+    assert_equal(0, words[0].offset)
+
+    assert_equal('two', words[1])
+    assert_equal(4, words[1].offset)
   end
 
 end

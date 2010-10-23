@@ -21,8 +21,7 @@ compatibility with other parsing expression implementations.
     [\x00-\xFF]   # match any octet
     .             # match anything, even new lines
 
-See [FixedWidth](api/classes/Citrus/FixedWidth.html) and
-[Expression](api/classes/Citrus/Expression.html) for more information.
+See [Terminal](api/classes/Citrus/Terminal.html) for more information.
 
 ## Repetition
 

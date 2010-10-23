@@ -49,12 +49,12 @@ class CitrusFileTest < Test::Unit::TestCase
     match = grammar.parse('""')
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_instance_of(FixedWidth, match.value)
+    assert_instance_of(Terminal, match.value)
 
     match = grammar.parse('"a"')
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_instance_of(FixedWidth, match.value)
+    assert_instance_of(Terminal, match.value)
 
     match = grammar.parse('"a" "b"')
     assert(match)
@@ -69,17 +69,17 @@ class CitrusFileTest < Test::Unit::TestCase
     match = grammar.parse('.')
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_instance_of(Expression, match.value)
+    assert_instance_of(Terminal, match.value)
 
     match = grammar.parse('[a-z]')
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_instance_of(Expression, match.value)
+    assert_instance_of(Terminal, match.value)
 
     match = grammar.parse('/./')
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_instance_of(Expression, match.value)
+    assert_instance_of(Terminal, match.value)
 
     match = grammar.parse('/./ /./')
     assert(match)
@@ -98,7 +98,7 @@ class CitrusFileTest < Test::Unit::TestCase
     match = grammar.parse('"" {}')
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_instance_of(FixedWidth, match.value)
+    assert_instance_of(Terminal, match.value)
 
     match = grammar.parse('""* {}')
     assert(match)
@@ -180,7 +180,7 @@ class CitrusFileTest < Test::Unit::TestCase
     match = grammar.parse("[0-9] {\n  def value\n    text.to_i\n  end\n}\n")
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_instance_of(Expression, match.value)
+    assert_instance_of(Terminal, match.value)
 
     match = grammar.parse("[0-9]+ {\n  def value\n    text.to_i\n  end\n}\n")
     assert(match)
@@ -297,7 +297,7 @@ class CitrusFileTest < Test::Unit::TestCase
     match = grammar.parse('"a"')
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_instance_of(FixedWidth, match.value)
+    assert_instance_of(Terminal, match.value)
   end
 
 
@@ -362,25 +362,25 @@ class CitrusFileTest < Test::Unit::TestCase
     match = grammar.parse('"a"')
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_instance_of(FixedWidth, match.value)
+    assert_instance_of(Terminal, match.value)
     assert(match.value.terminal?)
 
     match = grammar.parse('[a-z]')
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_instance_of(Expression, match.value)
+    assert_instance_of(Terminal, match.value)
     assert(match.value.terminal?)
 
     match = grammar.parse('.')
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_instance_of(Expression, match.value)
+    assert_instance_of(Terminal, match.value)
     assert(match.value.terminal?)
 
     match = grammar.parse('/./')
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_instance_of(Expression, match.value)
+    assert_instance_of(Terminal, match.value)
     assert(match.value.terminal?)
   end
 

@@ -11,9 +11,7 @@ class Test::Unit::TestCase
     Input.new(str)
   end
 
-  module TestGrammar
-    include Citrus::Grammar
-
+  TestGrammar = Grammar.new do
     rule :alpha do
       /[a-zA-Z]/
     end
@@ -27,6 +25,30 @@ class Test::Unit::TestCase
     end
   end
 
+  Double = Grammar.new do
+    include TestGrammar
+
+    root :double
+
+    rule :double do
+      one_or_more(:num)
+    end
+  end
+
+  Words = Grammar.new do
+    include TestGrammar
+
+    root :words
+
+    rule :word do
+      one_or_more(:alpha)
+    end
+
+    rule :words do
+      [ :word, zero_or_more([ ' ', :word ]) ]
+    end
+  end
+
   class EqualRule
     include Citrus::Rule
 
@@ -34,8 +56,8 @@ class Test::Unit::TestCase
       @value = value
     end
 
-    def match(input, offset=0)
-      create_match(@value.to_s.dup, offset) if @value.to_s == input.string
+    def match(input)
+      create_match(@value.to_s.dup, input) if @value.to_s == input.string
     end
   end
 
