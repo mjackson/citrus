@@ -56,9 +56,34 @@ module Citrus
       input.max_offset
     end
 
+    # Returns the 0-based offset at which the error occurred on the line on
+    # which it occurred.
+    def line_offset
+      pos = 0
+      input.each_line do |line|
+        len = line.length
+        return (offset - pos) if pos + len >= offset
+        pos += len
+      end
+      0
+    end
+
     # Returns the text of the line on which the error occurred.
     def line
-      lines[line_index]
+      input.lines[line_index]
+    end
+
+    # Returns the 0-based number of the line in the input where the error
+    # occurred.
+    def line_index
+      pos = 0
+      idx = 0
+      input.each_line do |line|
+        pos += line.length
+        return idx if pos >= offset
+        idx += 1
+      end
+      0
     end
 
     # Returns the 1-based number of the line in the input where the error
@@ -69,49 +94,10 @@ module Citrus
 
     alias lineno line_number
 
-    # Returns the 0-based offset at which the error occurred on the line on
-    # which it occurred.
-    def line_offset
-      pos = 0
-      each_line do |line|
-        len = line.length
-        return (offset - pos) if pos + len >= offset
-        pos += len
-      end
-      0
-    end
-
     # Returns a string that, when printed, gives a visual representation of
     # exactly where the error occurred on its line in the input.
     def detail
       "%s\n%s^" % [line, ' ' * line_offset]
-    end
-
-  private
-
-    def string
-      input.string
-    end
-
-    def lines
-      string.send(string.respond_to?(:lines) ? :lines : :to_s).to_a
-    end
-
-    def each_line(&block)
-      string.each_line(&block)
-    end
-
-    # Returns the 0-based number of the line in the input where the error
-    # occurred.
-    def line_index
-      pos = 0
-      idx = 0
-      each_line do |line|
-        pos += line.length
-        return idx if pos >= offset
-        idx += 1
-      end
-      0
     end
   end
 
@@ -382,6 +368,16 @@ module Citrus
     # Returns the length of this input.
     def length
       string.length
+    end
+
+    # Returns an array containing the lines of text in this input.
+    def lines
+      string.send(string.respond_to?(:lines) ? :lines : :to_s).to_a
+    end
+
+    # Returns an iterator for the lines of text in this input.
+    def each_line(&block)
+      string.each_line(&block)
     end
 
     # Returns the match for a given +rule+ at the current position in the input.

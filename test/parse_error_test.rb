@@ -26,6 +26,7 @@ class ParseErrorTest < Test::Unit::TestCase
     rescue ParseError => e
       assert_equal(0, e.offset)
       assert_equal('#', e.line)
+      assert_equal(0, e.line_index)
       assert_equal(1, e.line_number)
       assert_equal(0, e.line_offset)
     end
@@ -37,6 +38,7 @@ class ParseErrorTest < Test::Unit::TestCase
     rescue ParseError => e
       assert_equal(10, e.offset)
       assert_equal('Once upon 4 time.', e.line)
+      assert_equal(0, e.line_index)
       assert_equal(1, e.line_number)
       assert_equal(10, e.line_offset)
     end
@@ -48,6 +50,7 @@ class ParseErrorTest < Test::Unit::TestCase
     rescue ParseError => e
       assert_equal(16, e.offset)
       assert_equal('tim3.', e.line)
+      assert_equal(2, e.line_index)
       assert_equal(3, e.line_number)
       assert_equal(3, e.line_offset)
     end

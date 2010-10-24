@@ -58,7 +58,7 @@ module Citrus
   ].each do |rule_class|
     rule_class.class_eval do
       alias original_match match
-  
+
       def match(input)
         m = original_match(input)
         m.offset = input.pos - m.length if m
