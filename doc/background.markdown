@@ -29,9 +29,9 @@ A [Rule](api/classes/Citrus/Rule.html) is an object that specifies some matching
 behavior on a string. There are two types of rules: terminals and non-terminals.
 Terminals can be either Ruby strings or regular expressions that specify some
 input to match. For example, a terminal created from the string "end" would
-match any sequence of the characters "e", "n", and "d", in that order. A
-terminal created from a regular expression uses Ruby's regular expression engine
-to attempt to create a match.
+match any sequence of the characters "e", "n", and "d", in that order. Terminals
+created from regular expressions may match any sequence of characters that can
+be generated from that expression.
 
 Non-terminals are rules that may contain other rules but do not themselves match
 directly on the input. For example, a Repeat is a non-terminal that may contain
@@ -58,10 +58,10 @@ similar to Ruby's super keyword.
 ## Matches
 
 Matches are created by rule objects when they match on the input. A 
-[Match](api/classes/Citrus/Match.html) in Citrus is actually a 
-[String](http://ruby-doc.org/core/classes/String.html) with some extra 
-information attached such as the name(s) of the rule(s) which generated the 
-match as well as its offset in the original input string.
+[Match](api/classes/Citrus/Match.html) is actually a 
+[String](http://ruby-doc.org/core/classes/String.html) object with some extra 
+information attached such as the name(s) of the rule(s) from which it was
+generated and any submatches it may contain.
 
 During a parse, matches are arranged in a tree structure where any match may
 contain any number of other matches. This structure is determined by the way in
@@ -70,6 +70,5 @@ match that is created from a non-terminal rule that contains several other
 terminals will likewise contain several matches, one for each terminal.
 
 Match objects may be extended with semantic information in the form of methods.
-These methods can interpret the text of a match using the wealth of information
-available to them including the text of the match, its position in the input,
-and any submatches.
+These methods should provide various interpretations for the semantic value of a
+match.

@@ -539,10 +539,8 @@ module Citrus
       match
     end
 
-    def create_match(data, input)
-      match = Match.new(data)
-      match.offset = input.pos - match.length
-      extend_match(match, name)
+    def create_match(data)
+      extend_match(Match.new(data), name)
     end
   end
 
@@ -671,7 +669,7 @@ module Citrus
     # Returns the Match for this rule on +input+, +nil+ if no match can be made.
     def match(input)
       m = input.scan(@rule)
-      create_match(m, input) if m
+      create_match(m) if m
     end
 
     # Returns the Citrus notation of this rule as a string.
@@ -725,7 +723,7 @@ module Citrus
 
     # Returns the Match for this rule on +input+, +nil+ if no match can be made.
     def match(input)
-      create_match('', input) if input.match(rule)
+      create_match('') if input.match(rule)
     end
 
     # Returns the Citrus notation of this rule as a string.
@@ -745,7 +743,7 @@ module Citrus
 
     # Returns the Match for this rule on +input+, +nil+ if no match can be made.
     def match(input)
-      create_match('', input) unless input.match(rule)
+      create_match('') unless input.match(rule)
     end
 
     # Returns the Citrus notation of this rule as a string.
@@ -774,7 +772,7 @@ module Citrus
         matches << m
       end
       # Create a single match from the aggregate text value of all submatches.
-      create_match(matches.join, input) if matches.any?
+      create_match(matches.join) if matches.any?
     end
 
     # Returns the Citrus notation of this rule as a string.
@@ -856,7 +854,7 @@ module Citrus
         break unless m
         matches << m
       end
-      create_match(matches, input) if @range.include?(matches.length)
+      create_match(matches) if @range.include?(matches.length)
     end
 
     # The minimum number of times this rule must match.
@@ -937,7 +935,7 @@ module Citrus
         break unless m
         matches << m
       end
-      create_match(matches, input) if matches.length == rules.length
+      create_match(matches) if matches.length == rules.length
     end
 
     # Returns the Citrus notation of this rule as a string.
@@ -962,9 +960,6 @@ module Citrus
           data.inspect
       end
     end
-
-    # The offset in the input at which this match occurred.
-    attr_accessor :offset
 
     # An array of all names of this match. A name is added to a match object
     # for each rule that returns that object when matching. These names can then

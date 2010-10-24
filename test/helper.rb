@@ -57,7 +57,7 @@ class Test::Unit::TestCase
     end
 
     def match(input)
-      create_match(@value.to_s.dup, input) if @value.to_s == input.string
+      create_match(@value.to_s.dup) if @value.to_s == input.string
     end
   end
 
