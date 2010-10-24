@@ -26,7 +26,7 @@
     <div class='class' id='wrapper'>
       <div class='header'>
         <h1 class='name'>
-          <span class='type'>Module</span>
+          <span class='type'>Class</span>
           Citrus::Terminal
         </h1>
         <ol class='paths'>
@@ -34,6 +34,10 @@
             <a href="../../files/lib/citrus_rb.html">lib/citrus.rb</a>
           </li>
         </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a href="../Object.html">Object</a></strong>
+        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -41,18 +45,35 @@
             <p>
             A <a href="Terminal.html">Terminal</a> is a <a href="Rule.html">Rule</a>
             that matches directly on the input stream and may not contain any other
-            rule.
+            rule. Terminals may be created from either a String or a Regexp object.
+            When created from strings, the <a href="../Citrus.html">Citrus</a> notation
+            is any sequence of characters enclosed in either single or double quotes,
+            e.g.:
             </p>
+            <pre>'expr'&#x000A;&quot;expr&quot;</pre>
+            <p>
+            When created from a regular expression, the <a
+            href="../Citrus.html">Citrus</a> notation is identical to Ruby&#8217;s
+            regular expression notation, e.g.:
+            </p>
+            <pre>/expr/</pre>
+            <p>
+            Character classes and the dot symbol may also be used in <a
+            href="../Citrus.html">Citrus</a> notation for compatibility with other
+            parsing expression implementations, e.g.:
+            </p>
+            <pre>[a-zA-Z]&#x000A;.</pre>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
             <h3>public class</h3>
             <ol>
-              <li><a href="#M000045">new</a></li>
+              <li><a href="#M000066">new</a></li>
             </ol>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000046">to_s</a></li>
+              <li><a href="#M000067">match</a></li>
+              <li><a href="#M000068">to_s</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -73,7 +94,7 @@
                     <td class='context-item-value'>[R]</td>
                     <td class='context-item-desc'>
                       
-                      The actual String or Regexp object this rule uses to match.
+                      The actual Regexp object this rule uses to match.
                     </td>
                   </tr>
                 </table>
@@ -81,22 +102,41 @@
             </div>
             <div id='methods'>
               <h2>Public class methods</h2>
-              <div class='method public-class' id='method-M000045'>
-                <a name='M000045'></a>
+              <div class='method public-class' id='method-M000066'>
+                <a name='M000066'></a>
                 <div class='synopsis'>
                   <span class='name'>new</span>
-                  <span class='arguments'>(rule)</span>
+                  <span class='arguments'>(rule='')</span>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000045-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000066-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000045-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 565</span>&#x000A;565:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">rule</span>)&#x000A;566:       <span class="ruby-ivar">@rule</span> = <span class="ruby-identifier">rule</span>&#x000A;567:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000066-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 653</span>&#x000A;653:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">rule</span>=<span class="ruby-value str">''</span>)&#x000A;654:       <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">rule</span>&#x000A;655:       <span class="ruby-keyword kw">when</span> <span class="ruby-constant">String</span>&#x000A;656:         <span class="ruby-ivar">@string</span> = <span class="ruby-identifier">rule</span>&#x000A;657:         <span class="ruby-ivar">@rule</span> = <span class="ruby-constant">Regexp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Regexp</span>.<span class="ruby-identifier">escape</span>(<span class="ruby-identifier">rule</span>))&#x000A;658:       <span class="ruby-keyword kw">when</span> <span class="ruby-constant">Regexp</span>&#x000A;659:         <span class="ruby-ivar">@rule</span> = <span class="ruby-identifier">rule</span>&#x000A;660:       <span class="ruby-keyword kw">else</span>&#x000A;661:         <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-value str">&quot;Cannot create terminal from object: %s&quot;</span> <span class="ruby-operator">%</span> &#x000A;662:           <span class="ruby-identifier">rule</span>.<span class="ruby-identifier">inspect</span>&#x000A;663:       <span class="ruby-keyword kw">end</span>&#x000A;664:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <h2>Public instance methods</h2>
-              <div class='method public-instance' id='method-M000046'>
-                <a name='M000046'></a>
+              <div class='method public-instance' id='method-M000067'>
+                <a name='M000067'></a>
+                <div class='synopsis'>
+                  <span class='name'>match</span>
+                  <span class='arguments'>(input)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Returns the <a href="Match.html">Match</a> for this rule on <tt>input</tt>,
+                  <tt>nil</tt> if no match can be made.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000067-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000067-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 670</span>&#x000A;670:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">match</span>(<span class="ruby-identifier">input</span>)&#x000A;671:       <span class="ruby-identifier">m</span> = <span class="ruby-identifier">input</span>.<span class="ruby-identifier">scan</span>(<span class="ruby-ivar">@rule</span>)&#x000A;672:       <span class="ruby-identifier">create_match</span>(<span class="ruby-identifier">m</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">m</span>&#x000A;673:     <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-M000068'>
+                <a name='M000068'></a>
                 <div class='synopsis'>
                   <span class='name'>to_s</span>
                   <span class='arguments'>()</span>
@@ -108,10 +148,10 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000046-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000068-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000046-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 573</span>&#x000A;573:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">to_s</span>&#x000A;574:       <span class="ruby-identifier">rule</span>.<span class="ruby-identifier">inspect</span>&#x000A;575:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000068-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 676</span>&#x000A;676:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">to_s</span>&#x000A;677:       (<span class="ruby-ivar">@string</span> <span class="ruby-operator">||</span> <span class="ruby-ivar">@rule</span>).<span class="ruby-identifier">inspect</span>&#x000A;678:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

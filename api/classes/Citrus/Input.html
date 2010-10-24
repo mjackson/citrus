@@ -36,7 +36,7 @@
         </ol>
         <div class='parent'>
           Parent:
-          <strong><a href="../Object.html">Object</a></strong>
+          <strong>StringScanner</strong>
         </div>
       </div>
       <div id='content'>
@@ -51,13 +51,16 @@
             <h2>Methods</h2>
             <h3>public class</h3>
             <ol>
-              <li><a href="#M000055">new</a></li>
+              <li><a href="#M000057">new</a></li>
             </ol>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000056">[]</a></li>
-              <li><a href="#M000057">length</a></li>
-              <li><a href="#M000058">match</a></li>
+              <li><a href="#M000058">length</a></li>
+              <li><a href="#M000059">match</a></li>
+              <li><a href="#M000062">match</a></li>
+              <li><a href="#M000061">memoize!</a></li>
+              <li><a href="#M000060">memoized?</a></li>
+              <li><a href="#M000063">reset</a></li>
             </ol>
           </div>
           <div id='section'>
@@ -70,8 +73,8 @@
                     <td class='context-item-value'>[R]</td>
                     <td class='context-item-desc'>
                       
-                      A two-level hash of rule id&#8217;s and offsets to their respective
-                      matches. Only present if memoing is enabled.
+                      A nested hash of rule id&#8217;s to offsets and their respective matches.
+                      Only present if memoing is enabled.
                     </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
@@ -87,15 +90,7 @@
                     <td class='context-item-value'>[R]</td>
                     <td class='context-item-desc'>
                       
-                      The maximum offset that has been achieved.
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>string</td>
-                    <td class='context-item-value'>[R]</td>
-                    <td class='context-item-desc'>
-                      
-                      The input string.
+                      The maximum offset that has been achieved during a parse.
                     </td>
                   </tr>
                 </table>
@@ -103,47 +98,22 @@
             </div>
             <div id='methods'>
               <h2>Public class methods</h2>
-              <div class='method public-class' id='method-M000055'>
-                <a name='M000055'></a>
+              <div class='method public-class' id='method-M000057'>
+                <a name='M000057'></a>
                 <div class='synopsis'>
                   <span class='name'>new</span>
-                  <span class='arguments'>(string, memoize=false)</span>
-                </div>
-                <div class='description'>
-                  <p>
-                  Takes the input <tt>string</tt> that is to be parsed. If <tt>memoize</tt>
-                  is <tt>true</tt> a cache is created that holds references to already
-                  generated matches.
-                  </p>
+                  <span class='arguments'>(string)</span>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000055-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000057-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000055-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 314</span>&#x000A;314:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">string</span>, <span class="ruby-identifier">memoize</span>=<span class="ruby-keyword kw">false</span>)&#x000A;315:       <span class="ruby-ivar">@string</span> = <span class="ruby-identifier">string</span>&#x000A;316:       <span class="ruby-ivar">@max_offset</span> = <span class="ruby-value">0</span>&#x000A;317:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">memoize</span>&#x000A;318:         <span class="ruby-ivar">@cache</span> = {}&#x000A;319:         <span class="ruby-ivar">@cache_hits</span> = <span class="ruby-value">0</span>&#x000A;320:       <span class="ruby-keyword kw">end</span>&#x000A;321:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000057-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 367</span>&#x000A;367:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">string</span>)&#x000A;368:       <span class="ruby-keyword kw">super</span>(<span class="ruby-identifier">string</span>)&#x000A;369:       <span class="ruby-ivar">@max_offset</span> = <span class="ruby-value">0</span>&#x000A;370:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <h2>Public instance methods</h2>
-              <div class='method public-instance' id='method-M000056'>
-                <a name='M000056'></a>
-                <div class='synopsis'>
-                  <span class='name'>[]</span>
-                  <span class='arguments'>(*args)</span>
-                </div>
-                <div class='description'>
-                  <p>
-                  Sends all arguments to this input&#8217;s <tt>string</tt>.
-                  </p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000056-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='M000056-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 337</span>&#x000A;337:     <span class="ruby-keyword kw">def</span> <span class="ruby-operator">[]</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;338:       <span class="ruby-ivar">@string</span>.<span class="ruby-identifier">__send__</span>(<span class="ruby-identifier">:[]</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;339:     <span class="ruby-keyword kw">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-M000057'>
-                <a name='M000057'></a>
+              <div class='method public-instance' id='method-M000058'>
+                <a name='M000058'></a>
                 <div class='synopsis'>
                   <span class='name'>length</span>
                   <span class='arguments'>()</span>
@@ -154,34 +124,97 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000057-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='M000057-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 342</span>&#x000A;342:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">length</span>&#x000A;343:       <span class="ruby-ivar">@string</span>.<span class="ruby-identifier">length</span>&#x000A;344:     <span class="ruby-keyword kw">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-M000058'>
-                <a name='M000058'></a>
-                <div class='synopsis'>
-                  <span class='name'>match</span>
-                  <span class='arguments'>(rule, offset=0)</span>
-                </div>
-                <div class='description'>
-                  <p>
-                  Returns the match for a given <tt>rule</tt> at <tt>offset</tt>. If memoing
-                  is enabled and a match does not already exist for the given rule/offset
-                  pair then the rule is executed and the result is cached before returning.
-                  See <a
-                  href="http://pdos.csail.mit.edu/~baford/packrat/icfp02/">pdos.csail.mit.edu/~baford/packrat/icfp02/</a>
-                  for more information on memoing match results (also known as packrat
-                  parsing).
-                  </p>
-                </div>
-                <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('M000058-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000058-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 351</span>&#x000A;351:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">match</span>(<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">offset</span>=<span class="ruby-value">0</span>)&#x000A;352:       <span class="ruby-ivar">@max_offset</span> = <span class="ruby-identifier">offset</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">offset</span> <span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@max_offset</span>&#x000A;353: &#x000A;354:       <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@cache</span>&#x000A;355:         <span class="ruby-identifier">c</span> = <span class="ruby-ivar">@cache</span>[<span class="ruby-identifier">rule</span>.<span class="ruby-identifier">id</span>] <span class="ruby-operator">||=</span> {}&#x000A;356: &#x000A;357:         <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">offset</span>)&#x000A;358:           <span class="ruby-ivar">@cache_hits</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>&#x000A;359:           <span class="ruby-identifier">c</span>[<span class="ruby-identifier">offset</span>]&#x000A;360:         <span class="ruby-keyword kw">else</span>&#x000A;361:           <span class="ruby-identifier">c</span>[<span class="ruby-identifier">offset</span>] = <span class="ruby-identifier">rule</span>.<span class="ruby-identifier">match</span>(<span class="ruby-keyword kw">self</span>, <span class="ruby-identifier">offset</span>)&#x000A;362:         <span class="ruby-keyword kw">end</span>&#x000A;363:       <span class="ruby-keyword kw">else</span>&#x000A;364:         <span class="ruby-identifier">rule</span>.<span class="ruby-identifier">match</span>(<span class="ruby-keyword kw">self</span>, <span class="ruby-identifier">offset</span>)&#x000A;365:       <span class="ruby-keyword kw">end</span>&#x000A;366:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000058-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 383</span>&#x000A;383:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">length</span>&#x000A;384:       <span class="ruby-identifier">string</span>.<span class="ruby-identifier">length</span>&#x000A;385:     <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-M000059'>
+                <a name='M000059'></a>
+                <div class='synopsis'>
+                  <span class='name'>match</span>
+                  <span class='arguments'>(rule)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Returns the match for a given <tt>rule</tt> at the current position in the
+                  input.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000059-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000059-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 388</span>&#x000A;388:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">match</span>(<span class="ruby-identifier">rule</span>)&#x000A;389:       <span class="ruby-identifier">offset</span> = <span class="ruby-identifier">pos</span>&#x000A;390:       <span class="ruby-identifier">match</span> = <span class="ruby-identifier">rule</span>.<span class="ruby-identifier">match</span>(<span class="ruby-keyword kw">self</span>)&#x000A;391: &#x000A;392:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">match</span>&#x000A;393:         <span class="ruby-ivar">@max_offset</span> = <span class="ruby-identifier">pos</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">pos</span> <span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@max_offset</span>&#x000A;394:       <span class="ruby-keyword kw">else</span>&#x000A;395:         <span class="ruby-comment cmt"># Reset the position for the next attempt at a match.</span>&#x000A;396:         <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">pos</span> = <span class="ruby-identifier">offset</span>&#x000A;397:       <span class="ruby-keyword kw">end</span>&#x000A;398: &#x000A;399:       <span class="ruby-identifier">match</span>&#x000A;400:     <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-M000062'>
+                <a name='M000062'></a>
+                <div class='synopsis'>
+                  <span class='name'>match</span>
+                  <span class='arguments'>(rule)</span>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000062-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000062-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 419</span>&#x000A;419:         <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">match</span>(<span class="ruby-identifier">rule</span>)&#x000A;420:           <span class="ruby-identifier">c</span> = <span class="ruby-ivar">@cache</span>[<span class="ruby-identifier">rule</span>.<span class="ruby-identifier">id</span>] <span class="ruby-operator">||=</span> {}&#x000A;421: &#x000A;422:           <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">pos</span>)&#x000A;423:             <span class="ruby-ivar">@cache_hits</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>&#x000A;424:             <span class="ruby-identifier">c</span>[<span class="ruby-identifier">pos</span>]&#x000A;425:           <span class="ruby-keyword kw">else</span>&#x000A;426:             <span class="ruby-identifier">c</span>[<span class="ruby-identifier">pos</span>] = <span class="ruby-keyword kw">super</span>&#x000A;427:           <span class="ruby-keyword kw">end</span>&#x000A;428:         <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-M000061'>
+                <a name='M000061'></a>
+                <div class='synopsis'>
+                  <span class='name'>memoize!</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Modifies this object to cache match results during a parse. This technique
+                  (also known as &#8220;Packrat&#8221; parsing) guarantees parsers will
+                  operate in linear time but costs significantly more in terms of time and
+                  memory required to perform a parse. For more information, please read the
+                  paper on Packrat parsing at <a
+                  href="http://pdos.csail.mit.edu/~baford/packrat/icfp02/.">pdos.csail.mit.edu/~baford/packrat/icfp02/.</a>
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000061-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000061-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 413</span>&#x000A;413:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">memoize!</span>&#x000A;414:       <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">memoized?</span>&#x000A;415: &#x000A;416:       <span class="ruby-comment cmt"># Using +instance_eval+ here preserves access to +super+ within the</span>&#x000A;417:       <span class="ruby-comment cmt"># methods we define inside the block.</span>&#x000A;418:       <span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword kw">do</span>&#x000A;419:         <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">match</span>(<span class="ruby-identifier">rule</span>)&#x000A;420:           <span class="ruby-identifier">c</span> = <span class="ruby-ivar">@cache</span>[<span class="ruby-identifier">rule</span>.<span class="ruby-identifier">id</span>] <span class="ruby-operator">||=</span> {}&#x000A;421: &#x000A;422:           <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">pos</span>)&#x000A;423:             <span class="ruby-ivar">@cache_hits</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>&#x000A;424:             <span class="ruby-identifier">c</span>[<span class="ruby-identifier">pos</span>]&#x000A;425:           <span class="ruby-keyword kw">else</span>&#x000A;426:             <span class="ruby-identifier">c</span>[<span class="ruby-identifier">pos</span>] = <span class="ruby-keyword kw">super</span>&#x000A;427:           <span class="ruby-keyword kw">end</span>&#x000A;428:         <span class="ruby-keyword kw">end</span>&#x000A;429: &#x000A;430:         <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">reset</span>&#x000A;431:           <span class="ruby-keyword kw">super</span>&#x000A;432:           <span class="ruby-ivar">@max_offset</span> = <span class="ruby-value">0</span>&#x000A;433:           <span class="ruby-ivar">@cache</span> = {}&#x000A;434:           <span class="ruby-ivar">@cache_hits</span> = <span class="ruby-value">0</span>&#x000A;435:         <span class="ruby-keyword kw">end</span>&#x000A;436:       <span class="ruby-keyword kw">end</span>&#x000A;437: &#x000A;438:       <span class="ruby-ivar">@cache</span> = {}&#x000A;439:       <span class="ruby-ivar">@cache_hits</span> = <span class="ruby-value">0</span>&#x000A;440:     <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-M000060'>
+                <a name='M000060'></a>
+                <div class='synopsis'>
+                  <span class='name'>memoized?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Returns true if this input uses memoization to cache match results. See <a
+                  href="Input.html#M000061">memoize!</a>.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000060-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000060-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 404</span>&#x000A;404:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">memoized?</span>&#x000A;405:       <span class="ruby-operator">!</span><span class="ruby-operator">!</span> <span class="ruby-ivar">@cache</span>&#x000A;406:     <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-M000063'>
+                <a name='M000063'></a>
+                <div class='synopsis'>
+                  <span class='name'>reset</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000063-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000063-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 430</span>&#x000A;430:         <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">reset</span>&#x000A;431:           <span class="ruby-keyword kw">super</span>&#x000A;432:           <span class="ruby-ivar">@max_offset</span> = <span class="ruby-value">0</span>&#x000A;433:           <span class="ruby-ivar">@cache</span> = {}&#x000A;434:           <span class="ruby-ivar">@cache_hits</span> = <span class="ruby-value">0</span>&#x000A;435:         <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

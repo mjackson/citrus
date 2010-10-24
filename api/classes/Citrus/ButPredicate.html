@@ -55,8 +55,8 @@
             <h2>Methods</h2>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000069">match</a></li>
-              <li><a href="#M000070">to_s</a></li>
+              <li><a href="#M000073">match</a></li>
+              <li><a href="#M000074">to_s</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -82,27 +82,27 @@
             </div>
             <div id='methods'>
               <h2>Public instance methods</h2>
-              <div class='method public-instance' id='method-M000069'>
-                <a name='M000069'></a>
+              <div class='method public-instance' id='method-M000073'>
+                <a name='M000073'></a>
                 <div class='synopsis'>
                   <span class='name'>match</span>
-                  <span class='arguments'>(input, offset=0)</span>
+                  <span class='arguments'>(input)</span>
                 </div>
                 <div class='description'>
                   <p>
-                  Returns the <a href="Match.html">Match</a> for this rule on <tt>input</tt>
-                  at the given <tt>offset</tt>, <tt>nil</tt> if no match can be made.
+                  Returns the <a href="Match.html">Match</a> for this rule on <tt>input</tt>,
+                  <tt>nil</tt> if no match can be made.
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000069-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000073-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000069-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 718</span>&#x000A;718:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">match</span>(<span class="ruby-identifier">input</span>, <span class="ruby-identifier">offset</span>=<span class="ruby-value">0</span>)&#x000A;719:       <span class="ruby-identifier">matches</span> = []&#x000A;720:       <span class="ruby-identifier">os</span> = <span class="ruby-identifier">offset</span>&#x000A;721:       <span class="ruby-keyword kw">while</span> <span class="ruby-identifier">input</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">os</span>).<span class="ruby-identifier">nil?</span>&#x000A;722:         <span class="ruby-identifier">m</span> = <span class="ruby-identifier">input</span>.<span class="ruby-identifier">match</span>(<span class="ruby-constant">DOT_RULE</span>, <span class="ruby-identifier">os</span>)&#x000A;723:         <span class="ruby-keyword kw">break</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">m</span>&#x000A;724:         <span class="ruby-identifier">matches</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">m</span>&#x000A;725:         <span class="ruby-identifier">os</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">length</span>&#x000A;726:       <span class="ruby-keyword kw">end</span>&#x000A;727:       <span class="ruby-comment cmt"># Create a single match from the aggregate text value of all submatches.</span>&#x000A;728:       <span class="ruby-identifier">create_match</span>(<span class="ruby-identifier">matches</span>.<span class="ruby-identifier">join</span>, <span class="ruby-identifier">offset</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">matches</span>.<span class="ruby-identifier">any?</span>&#x000A;729:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000073-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 767</span>&#x000A;767:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">match</span>(<span class="ruby-identifier">input</span>)&#x000A;768:       <span class="ruby-identifier">matches</span> = []&#x000A;769:       <span class="ruby-keyword kw">while</span> <span class="ruby-identifier">input</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">rule</span>).<span class="ruby-identifier">nil?</span>&#x000A;770:         <span class="ruby-identifier">m</span> = <span class="ruby-identifier">input</span>.<span class="ruby-identifier">match</span>(<span class="ruby-constant">DOT_RULE</span>)&#x000A;771:         <span class="ruby-keyword kw">break</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">m</span>&#x000A;772:         <span class="ruby-identifier">matches</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">m</span>&#x000A;773:       <span class="ruby-keyword kw">end</span>&#x000A;774:       <span class="ruby-comment cmt"># Create a single match from the aggregate text value of all submatches.</span>&#x000A;775:       <span class="ruby-identifier">create_match</span>(<span class="ruby-identifier">matches</span>.<span class="ruby-identifier">join</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">matches</span>.<span class="ruby-identifier">any?</span>&#x000A;776:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='method public-instance' id='method-M000070'>
-                <a name='M000070'></a>
+              <div class='method public-instance' id='method-M000074'>
+                <a name='M000074'></a>
                 <div class='synopsis'>
                   <span class='name'>to_s</span>
                   <span class='arguments'>()</span>
@@ -114,10 +114,10 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000070-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000074-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000070-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 732</span>&#x000A;732:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">to_s</span>&#x000A;733:       <span class="ruby-value str">'~'</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">rule</span>.<span class="ruby-identifier">embed</span>&#x000A;734:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000074-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 779</span>&#x000A;779:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">to_s</span>&#x000A;780:       <span class="ruby-value str">'~'</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">rule</span>.<span class="ruby-identifier">embed</span>&#x000A;781:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>
