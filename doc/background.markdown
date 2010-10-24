@@ -50,23 +50,23 @@ thereof.
 A Citrus grammar is really just a souped-up Ruby
 [module](http://ruby-doc.org/core/classes/Module.html). These modules may be
 included in other grammar modules in the same way that Ruby modules are normally
-used. This property allows you to divide a complex grammar into more manageable, 
-reusable pieces that may be combined at runtime. Any grammar rule with the same 
-name as a rule in an included grammar may access that rule with a mechanism 
+used. This property allows you to divide a complex grammar into more manageable,
+reusable pieces that may be combined at runtime. Any grammar rule with the same
+name as a rule in an included grammar may access that rule with a mechanism
 similar to Ruby's super keyword.
 
 ## Matches
 
-Matches are created by rule objects when they match on the input. A 
-[Match](api/classes/Citrus/Match.html) is actually a 
-[String](http://ruby-doc.org/core/classes/String.html) object with some extra 
+Matches are created by rule objects when they match on the input. A
+[Match](api/classes/Citrus/Match.html) is actually a
+[String](http://ruby-doc.org/core/classes/String.html) object with some extra
 information attached such as the name(s) of the rule(s) from which it was
 generated and any submatches it may contain.
 
 During a parse, matches are arranged in a tree structure where any match may
 contain any number of other matches. This structure is determined by the way in
-which the rule that generated each match is used in the grammar. For example, a 
-match that is created from a non-terminal rule that contains several other 
+which the rule that generated each match is used in the grammar. For example, a
+match that is created from a non-terminal rule that contains several other
 terminals will likewise contain several matches, one for each terminal.
 
 Match objects may be extended with semantic information in the form of methods.

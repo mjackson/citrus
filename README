@@ -5,8 +5,8 @@
                           Parsing Expressions for Ruby
 
 
-Citrus is a compact and powerful parsing library for 
-[Ruby](http://ruby-lang.org/) that combines the elegance and expressiveness of 
+Citrus is a compact and powerful parsing library for
+[Ruby](http://ruby-lang.org/) that combines the elegance and expressiveness of
 the language with the simplicity and power of
 [parsing expressions](http://en.wikipedia.org/wiki/Parsing_expression_grammar).
 
@@ -16,13 +16,13 @@ the language with the simplicity and power of
 
 Via [RubyGems](http://rubygems.org/):
 
-    $ sudo gem install citrus
+    $ gem install citrus
 
 From a local copy:
 
     $ git clone git://github.com/mjijackson/citrus.git
     $ cd citrus
-    $ rake package && sudo rake install
+    $ rake package install
 
 
 # Background
@@ -77,23 +77,23 @@ thereof.
 A Citrus grammar is really just a souped-up Ruby
 [module](http://ruby-doc.org/core/classes/Module.html). These modules may be
 included in other grammar modules in the same way that Ruby modules are normally
-used. This property allows you to divide a complex grammar into more manageable, 
-reusable pieces that may be combined at runtime. Any grammar rule with the same 
-name as a rule in an included grammar may access that rule with a mechanism 
+used. This property allows you to divide a complex grammar into more manageable,
+reusable pieces that may be combined at runtime. Any grammar rule with the same
+name as a rule in an included grammar may access that rule with a mechanism
 similar to Ruby's super keyword.
 
 ## Matches
 
-Matches are created by rule objects when they match on the input. A 
-[Match](api/classes/Citrus/Match.html) is actually a 
-[String](http://ruby-doc.org/core/classes/String.html) object with some extra 
+Matches are created by rule objects when they match on the input. A
+[Match](api/classes/Citrus/Match.html) is actually a
+[String](http://ruby-doc.org/core/classes/String.html) object with some extra
 information attached such as the name(s) of the rule(s) from which it was
 generated and any submatches it may contain.
 
 During a parse, matches are arranged in a tree structure where any match may
 contain any number of other matches. This structure is determined by the way in
-which the rule that generated each match is used in the grammar. For example, a 
-match that is created from a non-terminal rule that contains several other 
+which the rule that generated each match is used in the grammar. For example, a
+match that is created from a non-terminal rule that contains several other
 terminals will likewise contain several matches, one for each terminal.
 
 Match objects may be extended with semantic information in the form of methods.
@@ -207,28 +207,28 @@ See [Label](api/classes/Citrus/Label.html) for more information.
 
 ## Precedence
 
-The following table contains a list of all Citrus operators and their 
-precedence. A higher precedence indicates tighter binding.
+The following table contains a list of all Citrus symbols and operators and
+their precedence. A higher precedence indicates tighter binding.
 
-Operator    | Name                      | Precedence
------------ | ------------------------- | ----------
-''          | String (single quoted)    | 6
-""          | String (double quoted)    | 6
-[]          | Character class           | 6
-.           | Dot (any character)       | 6
-//          | Regular expression        | 6
-()          | Grouping                  | 6
-*           | Repetition (arbitrary)    | 5
-+           | Repetition (one or more)  | 5
-?           | Repetition (zero or one)  | 5
-&           | And predicate             | 4
-!           | Not predicate             | 4
-~           | But predicate             | 4
-:           | Label                     | 4
-<>          | Extension (module name)   | 3
-{}          | Extension (literal)       | 3
-e1 e2       | Sequence                  | 2
-e1 | e2     | Ordered choice            | 1
+Operator  | Name                      | Precedence
+--------- | ------------------------- | ----------
+''        | String (single quoted)    | 6
+""        | String (double quoted)    | 6
+[]        | Character class           | 6
+.         | Dot (any character)       | 6
+//        | Regular expression        | 6
+()        | Grouping                  | 6
+*         | Repetition (arbitrary)    | 5
++         | Repetition (one or more)  | 5
+?         | Repetition (zero or one)  | 5
+&         | And predicate             | 4
+!         | Not predicate             | 4
+~         | But predicate             | 4
+:         | Label                     | 4
+<>        | Extension (module name)   | 3
+{}        | Extension (literal)       | 3
+e1 e2     | Sequence                  | 2
+e1 | e2   | Ordered choice            | 1
 
 
 # Example
@@ -272,13 +272,12 @@ and "1 + 2+3", but it does not have enough semantic information to be able to
 actually interpret these expressions.
 
 At this point, when the grammar parses a string it generates a tree of
-[Match](api/classes/Citrus/Match.html) objects. Each match is created by a rule.
-A match knows what text it contains, its offset in the original input, and what
-submatches it contains.
+[Match](api/classes/Citrus/Match.html) objects. Each match is created by a rule
+and may itself be comprised of any number of submatches.
 
 Submatches are created whenever a rule contains another rule. For example, in
-the grammar above the number rule matches a string of digits followed by white
-space. Thus, a match generated by the number rule will contain two submatches.
+the grammar above `number` matches a string of digits followed by white space.
+Thus, a match generated by this rule will contain two submatches.
 
 We can define methods inside a set of curly braces that will be used to extend
 matches when they are created. This works in similar fashion to using Ruby's
@@ -352,14 +351,14 @@ Congratulations! You just ran your first piece of Citrus code.
 
 One interesting thing to notice about the above sequence of commands is the
 return value of [Citrus#load](api/classes/Citrus.html#M000003). When you use
-`Citrus.load` to
-load a grammar file (and likewise [Citrus#eval](api/classes/Citrus.html#M000004) to evaluate
-a raw string of grammar code), the return value is an array of all the grammars
-present in that file.
+`Citrus.load` to load a grammar file (and likewise
+[Citrus#eval](api/classes/Citrus.html#M000004) to evaluate a raw string of
+grammar code), the return value is an array of all the grammars present in that
+file.
 
-Take a look at 
+Take a look at
 [examples/calc.citrus](http://github.com/mjijackson/citrus/blob/master/examples/calc.citrus)
-for an example of a calculator that is able to parse and evaluate more complex 
+for an example of a calculator that is able to parse and evaluate more complex
 mathematical expressions.
 
 ## Implicit Value
@@ -383,23 +382,86 @@ as:
       }
     end
 
-Since no method name is explicitly specified in the semantic blocks, they may be 
+Since no method name is explicitly specified in the semantic blocks, they may be
 called using the `value` method.
+
+
+# Testing
+
+
+Citrus was designed to facilitate simple and powerful testing of grammars. To
+demonstrate how this is to be done, we'll use the `Addition` grammar from our
+previous [example](example.html). The following code demonstrates a simple test
+case that could be used to test that our grammar works properly.
+
+    class AdditionTest < Test::Unit::TestCase
+      def test_additive
+        match = Addition.parse('23 + 12', :root => :additive)
+        assert(match)
+        assert_equal('23 + 12', match)
+        assert_equal(35, match.value)
+      end
+
+      def test_number
+        match = Addition.parse('23', :root => :number)
+        assert(match)
+        assert_equal('23', match)
+        assert_equal(23, match.value)
+      end
+    end
+
+The key here is using the `root`
+[option](api/classes/Citrus/GrammarMethods.html#M000031) when performing the
+parse to specify the name of the rule at which the parse should start. In
+`test_number`, since `:number` was given the parse will start at that rule as if
+it were the root rule of the entire grammar. The ability to change the root rule
+on the fly like this enables easy unit testing of the entire grammar.
+
+Also note that because match objects are themselves strings, assertions may be
+made to test equality of match objects with string values.
+
+## Debugging
+
+When a parse fails, a [ParseError](api/classes/Citrus/ParseError.html) object is
+generated which provides a wealth of information about exactly where the parse
+failed. Using this object, you could possibly provide some useful feedback to
+the user about why the input was bad. The following code demonstrates one way
+to do this.
+
+    def parse_some_stuff(stuff)
+      match = StuffGrammar.parse(stuff)
+    rescue Citrus::ParseError => e
+      raise ArgumentError, "Invalid stuff on line %d, offset %d!" %
+        [e.line_number, e.line_offset]
+    end
+
+In addition to useful error objects, Citrus also includes a special file that
+should help grammar authors when debugging grammars. To get this extra
+functionality, simply `require 'citrus/debug'` instead of `require 'citrus'`
+when running your code.
+
+When debugging is enabled, you can visualize parse trees in the console as XML
+documents. This can help when determining which rules are generating which
+matches and how they are organized in the output. Also when debugging, each
+match object automatically records its offset in the original input, which can
+also be very helpful in keeping track of which offsets in the input generated
+which matches.
 
 
 # Links
 
 
 The primary resource for all things to do with parsing expressions can be found
-on the original [Packrat and Parsing Expression Grammars page](http://pdos.csail.mit.edu/~baford/packrat) at MIT.
+on the original [Packrat and Parsing Expression Grammars page](http://pdos.csail.mit.edu/~baford/packrat)
+at MIT.
 
-Also, a useful summary of parsing expression grammars can be found on 
+Also, a useful summary of parsing expression grammars can be found on
 [Wikipedia](http://en.wikipedia.org/wiki/Parsing_expression_grammar).
 
 Citrus draws inspiration from another Ruby library for writing parsing
 expression grammars, Treetop. While Citrus' syntax is similar to that of
-[Treetop](http://treetop.rubyforge.org), it's not identical. The link is 
-included here for those who may wish toexplore an alternative implementation.
+[Treetop](http://treetop.rubyforge.org), it's not identical. The link is
+included here for those who may wish to explore an alternative implementation.
 
 
 # License

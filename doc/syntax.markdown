@@ -104,8 +104,8 @@ See [Label](api/classes/Citrus/Label.html) for more information.
 
 ## Precedence
 
-The following table contains a list of all Citrus operators and their 
-precedence. A higher precedence indicates tighter binding.
+The following table contains a list of all Citrus symbols and operators and
+their precedence. A higher precedence indicates tighter binding.
 
 Operator                  | Name                      | Precedence
 ------------------------- | ------------------------- | ----------
