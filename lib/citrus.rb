@@ -41,7 +41,7 @@ module Citrus
   class ParseError < Exception
     def initialize(input)
       @input = input
-      msg = "Failed to parse input at offset %d" % offset
+      msg = "Failed to parse input at offset %d\n" % offset
       msg << detail
       super(msg)
     end
