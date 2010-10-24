@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Citrus ~ Parsing Expressions for Ruby</title>
+    <link rel="stylesheet" type="text/css" media="all" href="css/style.css">
+    <meta name="description" content="Parsing Expressions for Ruby">
+    <meta name="keywords" content="Ruby, PEG, parsing expression grammar">
+    <meta name="viewport" content="width=800">
+</head>
+
+<body>
+    <div id="wrapper">
+        <ul id="nav">
+            <li class="title"><a href="index.html">citrus</a></li>
+            <li class="separator">~<span class="splat">✻</span>~</li>
+            <li><a href="background.html">background</a></li>
+            <li><a href="syntax.html">syntax</a></li>
+            <li><a href="example.html">example</a></li>
+            <li><a href="testing.html">testing</a></li>
+            <li><a href="links.html">links</a></li>
+            <li><a href="http://github.com/mjijackson/citrus">code</a></li>
+            <li><a href="http://github.com/mjijackson/citrus/issues">issues</a></li>
+            <li><a href="api/index.html">api</a></li>
+        </ul>
+        <div id="body">
+            <h1>Testing</h1>
+
+<p>Citrus was designed to facilitate simple and powerful testing of grammars. To
+demonstrate how this is to be done, we&rsquo;ll use the <code>Addition</code> grammar from our
+previous <a href="example.html">example</a>. The following code demonstrates a simple test
+case that could be used to test that our grammar works properly.</p>
+
+<pre><code>class AdditionTest &lt; Test::Unit::TestCase
+  def test_additive
+    match = Addition.parse('23 + 12', :root =&gt; :additive)
+    assert(match)
+    assert_equal('23 + 12', match)
+    assert_equal(35, match.value)
+  end
+
+  def test_number
+    match = Addition.parse('23', :root =&gt; :number)
+    assert(match)
+    assert_equal('23', match)
+    assert_equal(23, match.value)
+  end
+end
+</code></pre>
+
+<p>The key here is using the <code>root</code>
+<a href="api/classes/Citrus/GrammarMethods.html#M000031">option</a> when performing the
+parse to specify the name of the rule at which the parse should start. In
+<code>test_number</code>, since <code>:number</code> was given the parse will start at that rule as if
+it were the root rule of the entire grammar. The ability to change the root rule
+on the fly like this enables easy unit testing of the entire grammar.</p>
+
+<p>Also note that because match objects are themselves strings, assertions may be
+made to test equality of match objects with string values.</p>
+
+<h2>Debugging</h2>
+
+<p>When a parse fails, a <a href="api/classes/Citrus/ParseError.html">ParseError</a> object is
+generated which provides a wealth of information about exactly where the parse
+failed. Using this object, you could possibly provide some useful feedback to
+the user about why the input was bad. The following code demonstrates one way
+to do this.</p>
+
+<pre><code>def parse_some_stuff(stuff)
+  match = StuffGrammar.parse(stuff)
+rescue Citrus::ParseError =&gt; e
+  raise ArgumentError, "Invalid stuff on line %d, offset %d!" %
+    [e.line_number, e.line_offset]
+end
+</code></pre>
+
+<p>In addition to useful error objects, Citrus also includes a special file that
+should help grammar authors when debugging grammars. To get this extra
+functionality, simply <code>require 'citrus/debug'</code> instead of <code>require 'citrus'</code>
+when running your code.</p>
+
+<p>When debugging is enabled, you can visualize parse trees in the console as XML
+documents. This can help when determining which rules are generating which
+matches and how they are organized in the output. Also when debugging, each
+match object automatically records its offset in the original input, which can
+also be very helpful in keeping track of which offsets in the input generated
+which matches.</p>
+
+            <p class="copyright"><a href="license.html">Copyright</a> &copy; 2010 <a href="http://mjijackson.com/">Michael Jackson</a></p>
+        </div>
+    </div>
+</body>
+
+</html>
