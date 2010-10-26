@@ -32,7 +32,7 @@ class AliasTest < Test::Unit::TestCase
     assert(match)
     assert('ab', match.value)
 
-    assert_raise RuntimeError do
+    assert_raise NoMatchError do
       match.b
     end
   end

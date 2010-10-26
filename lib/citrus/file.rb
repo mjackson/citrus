@@ -4,36 +4,62 @@ module Citrus
   # A grammar for Citrus grammar files. This grammar is used in Citrus#eval to
   # parse and evaluate Citrus grammars and serves as a prime example of how to
   # create a complex grammar complete with semantic interpretation in pure Ruby.
-  File = Grammar.new do
+  File = Grammar.new do #:nodoc:
+
+    # Some helper methods for rules that alias +module_name+ and don't want to
+    # use +Kernel#eval+ to retrieve Module objects.
+    module ModuleHelpers #:nodoc:
+      def module_segments
+        @module_segments ||= module_name.value.split('::')
+      end
+
+      def module_namespace
+        module_segments[0..-2].inject(Object) do |namespace, constant|
+          constant.empty? ? namespace : namespace.const_get(constant)
+        end
+      end
+
+      def module_basename
+        module_segments.last
+      end
+    end
 
     ## Hierarchical syntax
 
     rule :file do
       all(:space, zero_or_more(any(:require, :grammar))) {
-        find(:require).each { |r| require r.value }
-        find(:grammar).map { |g| g.value }
+        find(:require).each {|r| require r.value }
+        find(:grammar).map {|g| g.value }
       }
     end
 
     rule :grammar do
       all(:grammar_keyword, :module_name, :grammar_body, :end_keyword) {
-        code = '%s = Citrus::Grammar.new' % module_name.value
-        grammar = eval(code, TOPLEVEL_BINDING)
+        include ModuleHelpers
 
-        modules = find(:include).map { |inc| eval(inc.value, TOPLEVEL_BINDING) }
-        modules.each { |mod| grammar.include(mod) }
-
-        root = find(:root).last
-        grammar.root(root.value) if root
-
-        find(:rule).each { |r| grammar.rule(r.rule_name.value, r.value) }
-
-        grammar
+        def value
+          module_namespace.const_set(module_basename, grammar_body.value)
+        end
       }
     end
 
     rule :grammar_body do
-      zero_or_more(any(:include, :root, :rule))
+      zero_or_more(any(:include, :root, :rule)) {
+        grammar = Grammar.new
+
+        find(:include).map do |inc|
+          grammar.include(inc.value)
+        end
+
+        root = find(:root).last
+        grammar.root(root.value) if root
+
+        find(:rule).each do |r|
+          grammar.rule(r.rule_name.value, r.value)
+        end
+
+        grammar
+      }
     end
 
     rule :rule do
@@ -43,27 +69,37 @@ module Citrus
     end
 
     rule :rule_body do
-      all(:sequence, :choice) {
-        @choices ||= [ sequence ] + choice.value
-        values = @choices.map { |c| c.value }
-        values.length > 1 ? Choice.new(values) : values[0]
+      zero_or_one(:choice) {
+        # An empty rule definition matches the empty string.
+        matches.length > 0 ? choice.value : Rule.new('')
       }
     end
 
     rule :choice do
-      zero_or_more([ :bar, :sequence ]) {
-        matches.map { |m| m.matches[1] }
+      all(:sequence, zero_or_more([ :bar, :sequence ])) {
+        def rules
+          @rules ||= [ sequence.value ] + matches[1].matches.map {|m| m.matches[1].value }
+        end
+
+        def value
+          rules.length > 1 ? Choice.new(rules) : rules.first
+        end
       }
     end
 
     rule :sequence do
-      zero_or_more(:appendix) {
-        values = matches.map { |m| m.value }
-        values.length > 1 ? Sequence.new(values) : values[0]
+      one_or_more(:expression) {
+        def rules
+          @rules ||= matches.map {|m| m.value }
+        end
+
+        def value
+          rules.length > 1 ? Sequence.new(rules) : rules.first
+        end
       }
     end
 
-    rule :appendix do
+    rule :expression do
       all(:prefix, zero_or_one(:extension)) {
         rule = prefix.value
         extension = matches[1].first
@@ -105,7 +141,13 @@ module Citrus
     end
 
     rule :include do
-      all(:include_keyword, :module_name) { module_name.value }
+      all(:include_keyword, :module_name) {
+        include ModuleHelpers
+
+        def value
+          module_namespace.const_get(module_basename)
+        end
+      }
     end
 
     rule :root do
@@ -142,13 +184,13 @@ module Citrus
 
     rule :quoted_string do
       all(/(["'])(?:\\?.)*?\1/, :space) {
-        eval(first.to_s)
+        eval(first)
       }
     end
 
     rule :character_class do
       all(/\[(?:\\?.)*?\]/, :space) {
-        Regexp.new('\A' + first.to_s, nil, 'n')
+        Regexp.new('\A' + first, nil, 'n')
       }
     end
 
@@ -160,7 +202,7 @@ module Citrus
 
     rule :regular_expression do
       all(/\/(?:\\?.)*?\/[imxouesn]*/, :space) {
-        eval(first.to_s)
+        eval(first)
       }
     end
 
@@ -198,7 +240,11 @@ module Citrus
 
     rule :tag do
       all(:lt, :module_name, :gt) {
-        eval(module_name.value, TOPLEVEL_BINDING)
+        include ModuleHelpers
+
+        def value
+          module_namespace.const_get(module_basename)
+        end
       }
     end
 

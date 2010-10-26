@@ -27,18 +27,45 @@ module Citrus
     file << '.citrus' unless F.file?(file)
     raise "Cannot find file #{file}" unless F.file?(file)
     raise "Cannot read file #{file}" unless F.readable?(file)
-    self.eval(F.read(file))
+    eval(F.read(file))
   end
 
   # Evaluates the given Citrus parsing expression grammar +code+ in the global
-  # scope. The +code+ may contain the definition of any number of modules.
-  # Returns an array of any grammar modules that are created.
+  # scope. Returns an array of any grammar modules that are created. Implicitly
+  # raises +SyntaxError+ on a failed parse.
   def self.eval(code)
-    File.parse(code).value
+    parse(code, :consume => true).value
   end
 
-  # This error is raised whenever a parse fails.
-  class ParseError < Exception
+  # Parses the given Citrus +code+ using the given +options+. Returns the
+  # generated match tree. Raises a +SyntaxError+ if the parse fails.
+  def self.parse(code, options={})
+    begin
+      File.parse(code, options)
+    rescue ParseError => e
+      raise SyntaxError.new(e)
+    end
+  end
+
+  # A standard error class that all Citrus errors extend.
+  class Error < RuntimeError; end
+
+  # Raised when there is an error parsing Citrus code.
+  class SyntaxError < Error
+    # The +error+ given here should be a +ParseError+ object.
+    def initialize(error)
+      msg = "Syntax error on line %d at offset %d\n%s" %
+        [error.line_number, error.line_offset, error.detail]
+      super(msg)
+    end
+  end
+
+  # Raised when a match cannot be found.
+  class NoMatchError < Error; end
+
+  # Raised when a parse fails.
+  class ParseError < Error
+    # The +input+ given here is an instance of Citrus::Input.
     def initialize(input)
       @input = input
       msg = "Failed to parse input at offset %d\n" % offset
@@ -68,11 +95,6 @@ module Citrus
       0
     end
 
-    # Returns the text of the line on which the error occurred.
-    def line
-      input.lines[line_index]
-    end
-
     # Returns the 0-based number of the line in the input where the error
     # occurred.
     def line_index
@@ -84,6 +106,11 @@ module Citrus
         idx += 1
       end
       0
+    end
+
+    # Returns the text of the line on which the error occurred.
+    def line
+      input.lines[line_index]
     end
 
     # Returns the 1-based number of the line in the input where the error
@@ -444,7 +471,7 @@ module Citrus
     #     Citrus::Rule.eval('"a" | "b"')
     #
     def self.eval(expr)
-      File.parse(expr, :root => :rule_body).value
+      Citrus.parse(expr, :root => :rule_body, :consume => true).value
     end
 
     # Returns a new Rule object depending on the type of object given.
@@ -664,7 +691,7 @@ module Citrus
 
     # Returns the Match for this rule on +input+, +nil+ if no match can be made.
     def match(input)
-      m = input.scan(@rule)
+      m = input.scan(rule)
       create_match(m) if m
     end
 
@@ -1012,7 +1039,8 @@ module Citrus
     def method_missing(sym, *args)
       m = first(sym)
       return m if m
-      raise 'No match named "%s" in %s (%s)' % [sym, self, name]
+      raise NoMatchError, 'No match named "%s" in %s (%s)' %
+        [sym, self, name || '<anonymous>']
     end
 
     def to_ary
@@ -1033,8 +1061,8 @@ class Object
   #     end
   #
   def grammar(name, &block)
-    obj = respond_to?(:const_set) ? self : Object
-    obj.const_set(name, Citrus::Grammar.new(&block))
+    namespace = respond_to?(:const_set) ? self : Object
+    namespace.const_set(name, Citrus::Grammar.new(&block))
   rescue NameError
     raise ArgumentError, 'Invalid grammar name: %s' % name
   end

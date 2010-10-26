@@ -210,18 +210,58 @@ class CitrusFileTest < Test::Unit::TestCase
     assert_instance_of(AndPredicate, match.value)
   end
 
+  def test_empty
+    grammar = file(:rule_body)
+
+    match = grammar.parse('')
+    assert(match)
+  end
+
+  def test_choice
+    grammar = file(:choice)
+
+    match = grammar.parse('"a" | "b"')
+    assert(match)
+    assert_equal(2, match.rules.length)
+    assert_instance_of(Choice, match.value)
+
+    match = grammar.parse('"a" | ("b" "c")')
+    assert(match)
+    assert_equal(2, match.rules.length)
+    assert_instance_of(Choice, match.value)
+  end
+
   def test_sequence
     grammar = file(:sequence)
 
     match = grammar.parse('"" ""')
     assert(match)
-    assert_kind_of(Rule, match.value)
+    assert_equal(2, match.rules.length)
     assert_instance_of(Sequence, match.value)
 
     match = grammar.parse('"a" "b" "c"')
     assert(match)
-    assert_kind_of(Rule, match.value)
+    assert_equal(3, match.rules.length)
     assert_instance_of(Sequence, match.value)
+  end
+
+  def test_expression
+    grammar = file(:expression)
+
+    match = grammar.parse('"" <Module>')
+    assert(match)
+    assert_kind_of(Rule, match.value)
+    assert_kind_of(Module, match.value.extension)
+
+    match = grammar.parse('"" {}')
+    assert(match)
+    assert_kind_of(Rule, match.value)
+    assert_kind_of(Module, match.value.extension)
+
+    match = grammar.parse('"" {} ')
+    assert(match)
+    assert_kind_of(Rule, match.value)
+    assert_kind_of(Module, match.value.extension)
   end
 
   def test_prefix
@@ -246,25 +286,6 @@ class CitrusFileTest < Test::Unit::TestCase
     assert(match)
     assert_kind_of(Rule, match.value)
     assert_instance_of(Label, match.value)
-  end
-
-  def test_appendix
-    grammar = file(:appendix)
-
-    match = grammar.parse('"" <Module>')
-    assert(match)
-    assert_kind_of(Rule, match.value)
-    assert_kind_of(Module, match.value.extension)
-
-    match = grammar.parse('"" {}')
-    assert(match)
-    assert_kind_of(Rule, match.value)
-    assert_kind_of(Module, match.value.extension)
-
-    match = grammar.parse('"" {} ')
-    assert(match)
-    assert_kind_of(Rule, match.value)
-    assert_kind_of(Module, match.value.extension)
   end
 
   def test_suffix
@@ -325,11 +346,11 @@ class CitrusFileTest < Test::Unit::TestCase
 
     match = grammar.parse('include Module')
     assert(match)
-    assert_equal('Module', match.value)
+    assert_equal(Module, match.value)
 
     match = grammar.parse('include ::Module')
     assert(match)
-    assert_equal('::Module', match.value)
+    assert_equal(Module, match.value)
   end
 
   def test_root
