@@ -50,8 +50,8 @@
             <h2>Methods</h2>
             <h3>public class</h3>
             <ol>
-              <li><a href="#M000006">included</a></li>
-              <li><a href="#M000005">new</a></li>
+              <li><a href="#M000007">included</a></li>
+              <li><a href="#M000006">new</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -65,8 +65,8 @@
           <div id='section'>
             <div id='methods'>
               <h2>Public class methods</h2>
-              <div class='method public-class' id='method-M000006'>
-                <a name='M000006'></a>
+              <div class='method public-class' id='method-M000007'>
+                <a name='M000007'></a>
                 <div class='synopsis'>
                   <span class='name'>included</span>
                   <span class='arguments'>(mod)</span>
@@ -78,14 +78,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000006-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000007-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000006-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 125</span>&#x000A;125:     <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">included</span>(<span class="ruby-identifier">mod</span>)&#x000A;126:       <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">GrammarMethods</span>)&#x000A;127:       <span class="ruby-comment cmt"># Expose #include so it can be called publicly.</span>&#x000A;128:       <span class="ruby-keyword kw">class</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">mod</span>; <span class="ruby-identifier">public</span> <span class="ruby-identifier">:include</span> <span class="ruby-keyword kw">end</span>&#x000A;129:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000007-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 251</span>&#x000A;251:     <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">included</span>(<span class="ruby-identifier">mod</span>)&#x000A;252:       <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">GrammarMethods</span>)&#x000A;253:       <span class="ruby-comment cmt"># Expose #include so it can be called publicly.</span>&#x000A;254:       <span class="ruby-keyword kw">class</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">mod</span>; <span class="ruby-identifier">public</span> <span class="ruby-identifier">:include</span> <span class="ruby-keyword kw">end</span>&#x000A;255:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='method public-class' id='method-M000005'>
-                <a name='M000005'></a>
+              <div class='method public-class' id='method-M000006'>
+                <a name='M000006'></a>
                 <div class='synopsis'>
                   <span class='name'>new</span>
                   <span class='arguments'>(&amp;block)</span>
@@ -101,10 +101,10 @@
                   <pre>Calc = Citrus::Grammar.new {}</pre>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000005-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000006-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000005-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 117</span>&#x000A;117:     <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">new</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;118:       <span class="ruby-identifier">mod</span> = <span class="ruby-constant">Module</span>.<span class="ruby-identifier">new</span> { <span class="ruby-identifier">include</span> <span class="ruby-constant">Grammar</span> }&#x000A;119:       <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">module_eval</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">block</span>&#x000A;120:       <span class="ruby-identifier">mod</span>&#x000A;121:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000006-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 243</span>&#x000A;243:     <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">new</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;244:       <span class="ruby-identifier">mod</span> = <span class="ruby-constant">Module</span>.<span class="ruby-identifier">new</span> { <span class="ruby-identifier">include</span> <span class="ruby-constant">Grammar</span> }&#x000A;245:       <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">module_eval</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">block</span>&#x000A;246:       <span class="ruby-identifier">mod</span>&#x000A;247:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

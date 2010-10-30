@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
   <head>
-    <title>: Citrus::List [Citrus API Documentation]</title>
+    <title>: Citrus::SyntaxError [Citrus API Documentation]</title>
     <meta content='text/html; charset=utf8' http-equiv='Content-Type'>
     <link href='../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
@@ -26,58 +26,53 @@
     <div class='class' id='wrapper'>
       <div class='header'>
         <h1 class='name'>
-          <span class='type'>Module</span>
-          Citrus::List
+          <span class='type'>Class</span>
+          Citrus::SyntaxError
         </h1>
         <ol class='paths'>
           <li>
             <a href="../../files/lib/citrus_rb.html">lib/citrus.rb</a>
           </li>
         </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a href="Error.html">Citrus::Error</a></strong>
+        </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
             <p>
-            A <a href="List.html">List</a> is a <a
-            href="Nonterminal.html">Nonterminal</a> that contains any number of other
-            rules and tests them for matches in sequential order.
+            Raised when there is an error parsing <a href="../Citrus.html">Citrus</a>
+            code.
             </p>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
-            <h3>public instance</h3>
+            <h3>public class</h3>
             <ol>
-              <li><a href="#M000050">paren?</a></li>
+              <li><a href="#M000051">new</a></li>
             </ol>
-          </div>
-          <div id='context'>
-            <div id='includes'>
-              <h2>Included modules</h2>
-              <ol>
-                <li><a href="Nonterminal.html">Nonterminal</a></li>
-              </ol>
-            </div>
           </div>
           <div id='section'>
             <div id='methods'>
-              <h2>Public instance methods</h2>
-              <div class='method public-instance' id='method-M000050'>
-                <a name='M000050'></a>
+              <h2>Public class methods</h2>
+              <div class='method public-class' id='method-M000051'>
+                <a name='M000051'></a>
                 <div class='synopsis'>
-                  <span class='name'>paren?</span>
-                  <span class='arguments'>()</span>
+                  <span class='name'>new</span>
+                  <span class='arguments'>(error)</span>
                 </div>
                 <div class='description'>
                   <p>
-                  See <a href="Rule.html#M000040">Rule#paren?</a>.
+                  The <tt>error</tt> given here should be a <tt>ParseError</tt> object.
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000050-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000051-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000050-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 927</span>&#x000A;927:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">paren?</span>&#x000A;928:       <span class="ruby-identifier">rules</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>&#x000A;929:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000051-source'>    <span class="ruby-comment cmt"># File lib/citrus.rb, line 56</span>&#x000A;56:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">error</span>)&#x000A;57:       <span class="ruby-identifier">msg</span> = <span class="ruby-value str">&quot;Syntax error on line %d at offset %d\n%s&quot;</span> <span class="ruby-operator">%</span>&#x000A;58:         [<span class="ruby-identifier">error</span>.<span class="ruby-identifier">line_number</span>, <span class="ruby-identifier">error</span>.<span class="ruby-identifier">line_offset</span>, <span class="ruby-identifier">error</span>.<span class="ruby-identifier">detail</span>]&#x000A;59:       <span class="ruby-keyword kw">super</span>(<span class="ruby-identifier">msg</span>)&#x000A;60:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>
