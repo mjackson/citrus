@@ -1,28 +1,28 @@
 require 'citrus'
 
 module Citrus
+  # Some helper methods for rules that alias +module_name+ and don't want to
+  # use +Kernel#eval+ to retrieve Module objects.
+  module ModuleHelpers #:nodoc:
+    def module_segments
+      @module_segments ||= module_name.value.split('::')
+    end
+
+    def module_namespace
+      module_segments[0..-2].inject(Object) do |namespace, constant|
+        constant.empty? ? namespace : namespace.const_get(constant)
+      end
+    end
+
+    def module_basename
+      module_segments.last
+    end
+  end
+
   # A grammar for Citrus grammar files. This grammar is used in Citrus#eval to
   # parse and evaluate Citrus grammars and serves as a prime example of how to
   # create a complex grammar complete with semantic interpretation in pure Ruby.
   File = Grammar.new do #:nodoc:
-
-    # Some helper methods for rules that alias +module_name+ and don't want to
-    # use +Kernel#eval+ to retrieve Module objects.
-    module ModuleHelpers #:nodoc:
-      def module_segments
-        @module_segments ||= module_name.value.split('::')
-      end
-
-      def module_namespace
-        module_segments[0..-2].inject(Object) do |namespace, constant|
-          constant.empty? ? namespace : namespace.const_get(constant)
-        end
-      end
-
-      def module_basename
-        module_segments.last
-      end
-    end
 
     ## Hierarchical syntax
 

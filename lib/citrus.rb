@@ -67,64 +67,163 @@ module Citrus
   class ParseError < Error
     # The +input+ given here is an instance of Citrus::Input.
     def initialize(input)
-      @input = input
+      @offset = input.max_offset
+      @line_offset = input.line_offset(offset)
+      @line_number = input.line_number(offset)
+      @line = input.line(offset)
       msg = "Failed to parse input at offset %d\n" % offset
       msg << detail
       super(msg)
     end
 
-    # The Input object that was used for the parse.
-    attr_reader :input
-
-    # Returns the 0-based offset at which the error occurred in the input, i.e.
-    # the maximum offset in the input that was successfully parsed before the
-    # error occurred.
-    def offset
-      input.max_offset
-    end
-
-    # Returns the 0-based offset at which the error occurred on the line on
-    # which it occurred.
-    def line_offset
-      pos = 0
-      input.each_line do |line|
-        len = line.length
-        return (offset - pos) if pos + len >= offset
-        pos += len
-      end
-      0
-    end
-
-    # Returns the 0-based number of the line in the input where the error
+    # The 0-based offset at which the error occurred in the input, i.e. the
+    # maximum offset in the input that was successfully parsed before the error
     # occurred.
-    def line_index
-      pos = 0
-      idx = 0
-      input.each_line do |line|
-        pos += line.length
-        return idx if pos >= offset
-        idx += 1
-      end
-      0
-    end
+    attr_reader :offset
 
-    # Returns the text of the line on which the error occurred.
-    def line
-      input.lines[line_index]
-    end
+    # The 0-based offset at which the error occurred on the line on which it
+    # occurred in the input.
+    attr_reader :line_offset
 
-    # Returns the 1-based number of the line in the input where the error
-    # occurred.
-    def line_number
-      line_index + 1
-    end
+    # The 1-based number of the line in the input where the error occurred.
+    attr_reader :line_number
 
-    alias lineno line_number
+    # The text of the line in the input where the error occurred.
+    attr_reader :line
 
     # Returns a string that, when printed, gives a visual representation of
     # exactly where the error occurred on its line in the input.
     def detail
       "%s\n%s^" % [line, ' ' * line_offset]
+    end
+  end
+
+  # This class represents the core of the parsing algorithm. It wraps the input
+  # string and serves matches to all nonterminals.
+  class Input < StringScanner
+    def initialize(string)
+      super(string)
+      @max_offset = 0
+    end
+
+    # The maximum offset that has been achieved during a parse.
+    attr_reader :max_offset
+
+    # A nested hash of rule id's to offsets and their respective matches. Only
+    # present if memoing is enabled.
+    attr_reader :cache
+
+    # The number of times the cache was hit. Only present if memoing is enabled.
+    attr_reader :cache_hits
+
+    # Returns the length of this input.
+    def length
+      string.length
+    end
+
+    # Returns an array containing the lines of text in the input.
+    def lines
+      string.send(string.respond_to?(:lines) ? :lines : :to_s).to_a
+    end
+
+    # Iterates over the lines of text in the input using the given +block+.
+    def each_line(&block)
+      string.each_line(&block)
+    end
+
+    # Returns the 0-based offset of the given +pos+ in the input on the line
+    # on which it is found. +pos+ defaults to the current pointer position.
+    def line_offset(pos=pos)
+      p = 0
+      each_line do |line|
+        len = line.length
+        return (pos - p) if p + len >= pos
+        p += len
+      end
+      0
+    end
+
+    # Returns the 0-based number of the line that contains the character at the
+    # given +pos+. +pos+ defaults to the current pointer position.
+    def line_index(pos=pos)
+      p, n = 0, 0
+      each_line do |line|
+        p += line.length
+        return n if p >= pos
+        n += 1
+      end
+      0
+    end
+
+    # Returns the 1-based number of the line that contains the character at the
+    # given +pos+. +pos+ defaults to the current pointer position.
+    def line_number(pos=pos)
+      line_index(pos) + 1
+    end
+
+    alias lineno line_number
+
+    # Returns the text of the line that contains the character at the given
+    # +pos+. +pos+ defaults to the current pointer position.
+    def line(pos=pos)
+      lines[line_index(pos)]
+    end
+
+    # Returns the match for the given +rule+ at the current pointer position,
+    # which is +nil+ if no match can be made.
+    def match(rule)
+      offset = pos
+      match = rule.match(self)
+
+      if match
+        @max_offset = pos if pos > @max_offset
+      else
+        # Reset the position for the next attempt at a match.
+        self.pos = offset unless match
+      end
+
+      match
+    end
+
+    # Returns +true+ when using memoization to cache match results.
+    def memoized?
+      !! @cache
+    end
+
+    # Modifies this object to cache match results during a parse. This technique
+    # (also known as "Packrat" parsing) guarantees parsers will operate in
+    # linear time but costs significantly more in terms of time and memory
+    # required to perform a parse. For more information, please read the paper
+    # on Packrat parsing at http://pdos.csail.mit.edu/~baford/packrat/icfp02/.
+    def memoize!
+      return if memoized?
+
+      # Using +instance_eval+ here preserves access to +super+ within the
+      # methods we define inside the block.
+      instance_eval do
+        def match(rule) # :nodoc:
+          c = @cache[rule.id] ||= {}
+
+          if c.key?(pos)
+            @cache_hits += 1
+            c[pos]
+          else
+            c[pos] = super
+          end
+        end
+
+        # Resets all internal variables so that this object may be used in
+        # another parse.
+        def reset
+          super
+          @max_offset = 0
+          @cache = {}
+          @cache_hits = 0
+        end
+      end
+
+      @cache = {}
+      @cache_hits = 0
     end
   end
 
@@ -371,95 +470,6 @@ module Citrus
         :memoize  => false,
         :consume  => false
       }
-    end
-  end
-
-  # This class represents the core of the parsing algorithm. It wraps the input
-  # string and serves matches to all nonterminals.
-  class Input < StringScanner
-    def initialize(string)
-      super(string)
-      @max_offset = 0
-    end
-
-    # The maximum offset that has been achieved during a parse.
-    attr_reader :max_offset
-
-    # A nested hash of rule id's to offsets and their respective matches. Only
-    # present if memoing is enabled.
-    attr_reader :cache
-
-    # The number of times the cache was hit. Only present if memoing is enabled.
-    attr_reader :cache_hits
-
-    # Returns the length of this input.
-    def length
-      string.length
-    end
-
-    # Returns an array containing the lines of text in this input.
-    def lines
-      string.send(string.respond_to?(:lines) ? :lines : :to_s).to_a
-    end
-
-    # Returns an iterator for the lines of text in this input.
-    def each_line(&block)
-      string.each_line(&block)
-    end
-
-    # Returns the match for a given +rule+ at the current position in the input.
-    def match(rule)
-      offset = pos
-      match = rule.match(self)
-
-      if match
-        @max_offset = pos if pos > @max_offset
-      else
-        # Reset the position for the next attempt at a match.
-        self.pos = offset
-      end
-
-      match
-    end
-
-    # Returns true if this input uses memoization to cache match results. See
-    # #memoize!.
-    def memoized?
-      !! @cache
-    end
-
-    # Modifies this object to cache match results during a parse. This technique
-    # (also known as "Packrat" parsing) guarantees parsers will operate in
-    # linear time but costs significantly more in terms of time and memory
-    # required to perform a parse. For more information, please read the paper
-    # on Packrat parsing at http://pdos.csail.mit.edu/~baford/packrat/icfp02/.
-    def memoize!
-      return if memoized?
-
-      # Using +instance_eval+ here preserves access to +super+ within the
-      # methods we define inside the block.
-      instance_eval do
-        def match(rule)
-          c = @cache[rule.id] ||= {}
-
-          if c.key?(pos)
-            @cache_hits += 1
-            c[pos]
-          else
-            c[pos] = super
-          end
-        end
-
-        def reset
-          super
-          @max_offset = 0
-          @cache = {}
-          @cache_hits = 0
-        end
-      end
-
-      @cache = {}
-      @cache_hits = 0
     end
   end
 
