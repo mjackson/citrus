@@ -598,6 +598,15 @@ class CitrusFileTest < Test::Unit::TestCase
     match = grammar.parse("{\n  def value\n    'a'\n  end\n} ")
     assert(match)
     assert(match.value)
+
+  end
+
+  def test_block_with_interpolation
+    grammar = file(:block)
+
+    match = grammar.parse('{ "#{number}" }')
+    assert(match)
+    assert(match.value)
   end
 
   def test_repeat

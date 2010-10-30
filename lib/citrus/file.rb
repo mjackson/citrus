@@ -249,7 +249,7 @@ module Citrus
     end
 
     rule :block do
-      all(:lcurly, zero_or_more(any(:block, /[^}]+/)), :rcurly) {
+      all(:lcurly, zero_or_more(any(:block, /[^{}]+/)), :rcurly) {
         eval('Proc.new ' + to_s)
       }
     end
