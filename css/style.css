@@ -11,50 +11,54 @@ del{text-decoration:line-through;}
 table{border-collapse:collapse;border-spacing:0;}
 
 body{
-  background:url(bg.gif) repeat;
+  background: #efefef;
   font-family:Helvetica,Arial,sans-serif;
   font-size:11pt;
   line-height:1.5;
   padding:18px 0;
 }
 h1,h2,h3,p,ul,ol,pre{margin-bottom:18px;}
-h1,h2,h3{font-weight:normal}
+h1,h2,h3{font-weight:normal;}
 h1{font-size:22pt;}
 h2{font-size:18pt;}
 h3{font-size:12pt;}
-pre,code{font-family:Menlo,monospace;font-size:8pt;}
+a{padding:0 2px;}
 a:link,a:visited{color:#cc6600;}
+a:link,a:visited{color:#c81130;}
+a:hover{background:#c81130;color:white;text-decoration:none;}
+pre,code{font-family:Monaco,Menlo,'Lucida Console',monospace;font-size:10pt;}
+pre{background:#f3f3f3;padding:4px 0 4px 6px;border:1px solid #ddd;}
+code{color:#c81130;}
 th{text-align:left;}
 th,td{padding:2px 4px;}
 th{background-color:#efefef;}
 
-#wrapper{position:relative;width:700px;margin:0 auto;}
+#wrapper{position:relative;width:800px;margin:0 auto;}
 
 #nav{
   position:fixed;
   width:200px;
   text-align:center;
-  color:white;
-  text-shadow:#cc6600 2px 2px 0;
+  color:#c81130;
   top:56px;
 }
 #nav,h1,h2,h3{font-family:Baskerville,'Times New Roman',serif;}
 #nav li{font-size:22pt;line-height:1.2;}
 #nav li.title{font-size:42pt;}
-#nav li.separator{font-size:22pt;letter-spacing:2pt;padding:12px 0;}
-#nav li.separator .splat{font-size:18pt;}
-#nav a{color:white;text-decoration:none;}
-#nav a:hover{border-bottom:1px dotted white;}
+#nav li.separator{height:40px;margin:19px 0;background:url(s.gif) no-repeat 50% 0;}
+#nav a{color:#c81130;text-decoration:none;}
+#nav a:hover{color:white;}
+#nav a.selected{border-bottom:1px dotted #c81130;}
 
+#body-wrapper{padding-left:200px;}
 #body{
-  margin-left:200px;
   padding:48px 18px;
   background:white;
-  -webkit-box-shadow:0px 0px 10px #cc6600;
-  -moz-box-shadow:0px 0px 10px #cc6600;
+  -webkit-box-shadow:0px 0px 10px #ccc;
+  -moz-box-shadow:0px 0px 10px #ccc;
 }
 #body ul{list-style-type:disc;margin-left:36px;}
-#body table{width:464px;border-top:1px solid #ddd;border-left:1px solid #ddd;}
+#body table{width:564px;border-top:1px solid #ddd;border-left:1px solid #ddd;}
 #body table td, #body table th{border-right:1px solid #ddd;border-bottom:1px solid #ddd;}
 
 .copyright{padding-top:36px;text-align:right;font-size:8pt;}

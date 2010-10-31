@@ -4,7 +4,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Citrus ~ Parsing Expressions for Ruby</title>
+    <title>Citrus ~ Syntax</title>
     <link rel="stylesheet" type="text/css" media="all" href="css/style.css">
     <meta name="description" content="Parsing Expressions for Ruby">
     <meta name="keywords" content="Ruby, PEG, parsing expression grammar">
@@ -15,9 +15,9 @@
     <div id="wrapper">
         <ul id="nav">
             <li class="title"><a href="index.html">citrus</a></li>
-            <li class="separator">~<span class="splat">✻</span>~</li>
+            <li class="separator"></li>
             <li><a href="background.html">background</a></li>
-            <li><a href="syntax.html">syntax</a></li>
+            <li><a href="syntax.html" class="selected">syntax</a></li>
             <li><a href="example.html">example</a></li>
             <li><a href="testing.html">testing</a></li>
             <li><a href="extras.html">extras</a></li>
@@ -26,8 +26,9 @@
             <li><a href="http://github.com/mjijackson/citrus/issues">issues</a></li>
             <li><a href="api/index.html">api</a></li>
         </ul>
-        <div id="body">
-            <h1>Syntax</h1>
+        <div id="body-wrapper">
+          <div id="body">
+              <h1>Syntax</h1>
 
 <p>The most straightforward way to compose a Citrus grammar is to use Citrus' own
 custom grammar syntax. This syntax borrows heavily from Ruby, so it should
@@ -38,9 +39,9 @@ already be familiar to Ruby programmers.</p>
 <p>Terminals may be represented by a string or a regular expression. Both follow
 the same rules as Ruby string and regular expression literals.</p>
 
-<pre><code>'abc'
-"abc\n"
-/\xFF/
+<pre><code>'abc'         # match "abc"
+"abc\n"       # match "abc\n"
+/\xFF/        # match "\xFF"
 </code></pre>
 
 <p>Character classes and the dot (match anything) symbol are supported as well for
@@ -48,7 +49,7 @@ compatibility with other parsing expression implementations.</p>
 
 <pre><code>[a-z0-9]      # match any lowercase letter or digit
 [\x00-\xFF]   # match any octet
-.             # match anything, even new lines
+.             # match any single character, including new lines
 </code></pre>
 
 <p>See <a href="api/classes/Citrus/Terminal.html">Terminal</a> for more information.</p>
@@ -56,17 +57,22 @@ compatibility with other parsing expression implementations.</p>
 <h2>Repetition</h2>
 
 <p>Quantifiers may be used after any expression to specify a number of times it
-must match. The universal form of a quantifier is N*M where N is the minimum and
-M is the maximum number of times the expression may match.</p>
+must match. The universal form of a quantifier is <code>N*M</code> where <code>N</code> is the minimum
+and <code>M</code> is the maximum number of times the expression may match.</p>
 
-<pre><code>'abc'1*2      # match "abc" a minimum of one, maximum
-              # of two times
+<pre><code>'abc'1*2      # match "abc" a minimum of one, maximum of two times
 'abc'1*       # match "abc" at least once
 'abc'*2       # match "abc" a maximum of twice
 </code></pre>
 
-<p>The + and ? operators are supported as well for the common cases of 1<em> and </em>1
-respectively.</p>
+<p>Additionally, the minimum and maximum may be omitted entirely to specify that an
+expression may match zero or more times.</p>
+
+<pre><code>'abc'*        # match "abc" any number of times, including zero
+</code></pre>
+
+<p>The <code>+</code> and <code>?</code> operators are supported as well for the common cases of <code>1*</code> and
+<code>*1</code> respectively.</p>
 
 <pre><code>'abc'+        # match "abc" at least once
 'abc'?        # match "abc" a maximum of once
@@ -76,12 +82,12 @@ respectively.</p>
 
 <h2>Lookahead</h2>
 
-<p>Both positive and negative lookahead are supported in Citrus. Use the &amp; and !
-operators to indicate that an expression either should or should not match. In
-neither case is any input consumed.</p>
+<p>Both positive and negative lookahead are supported in Citrus. Use the <code>&amp;</code> and
+<code>!</code> operators to indicate that an expression either should or should not match.
+In neither case is any input consumed.</p>
 
 <pre><code>&amp;'a' 'b'      # match a "b" preceded by an "a"
-!'a' 'b'      # match a "b" that is not preceded by an "a"
+'a' !'b'      # match an "a" that is not followed by a "b"
 !'a' .        # match any character except for "a"
 </code></pre>
 
@@ -118,26 +124,51 @@ Note that any operator binds more tightly than the bar.</p>
 
 <p>See <a href="api/classes/Citrus/Choice.html">Choice</a> for more information.</p>
 
-<h2>Super</h2>
-
-<p>When including a grammar inside another, all rules in the child that have the
-same name as a rule in the parent also have access to the &ldquo;super&rdquo; keyword to
-invoke the parent rule.</p>
-
-<p>See <a href="api/classes/Citrus/Super.html">Super</a> for more information.</p>
-
 <h2>Labels</h2>
 
 <p>Match objects may be referred to by a different name than the rule that
 originally generated them. Labels are created by placing the label and a colon
 immediately preceding any expression.</p>
 
-<pre><code>chars:/[a-z]+/  # the characters matched by the regular
-                # expression may be referred to as "chars"
-                # in a block method
+<pre><code>chars:/[a-z]+/  # the characters matched by the regular expression
+                # may be referred to as "chars" in an extension
+                # method
 </code></pre>
 
 <p>See <a href="api/classes/Citrus/Label.html">Label</a> for more information.</p>
+
+<h2>Grouping</h2>
+
+<p>As is common in many programming languages, parentheses may be used to override
+the normal binding order of operators.</p>
+
+<pre><code>'a' ('b' | 'c')   # match "a", then "b" or "c"
+</code></pre>
+
+<h2>Extensions</h2>
+
+<p>Extensions may be specified using either &ldquo;module&rdquo; or &ldquo;block&rdquo; syntax. When using
+module syntax, specify the name of a module that is used to extend match objects
+in between less than and greater than symbols.</p>
+
+<pre><code>[a-z0-9]5*9 &lt;CouponCode&gt;  # match a string that consists of any lower
+                          # cased letter or digit between 5 and 9
+                          # times and extend the match with the
+                          # CouponCode module
+</code></pre>
+
+<p>Additionally, extensions may be specified inline using curly braces. Inside the
+curly braces you may embed method definitions that will be used to extend match
+objects.</p>
+
+<pre><code># match any digit and return its integer value when calling the
+# #value method on the match object
+[0-9] {
+  def value
+    to_i
+  end
+}
+</code></pre>
 
 <h2>Precedence</h2>
 
@@ -242,7 +273,8 @@ their precedence. A higher precedence indicates tighter binding.</p>
 </table>
 
 
-            <p class="copyright"><a href="license.html">Copyright</a> &copy; 2010 <a href="http://mjijackson.com/">Michael Jackson</a></p>
+              <p class="copyright"><a href="license.html">Copyright</a> &copy; 2010 <a href="http://mjijackson.com/">Michael Jackson</a></p>
+          </div>
         </div>
     </div>
 </body>

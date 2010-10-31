@@ -35,6 +35,7 @@ def generate_docs(docs)
   require 'rdiscount'
   layout = ERB.new(File.read('etc/layout.html.erb'), 0, '%<>')
   docs.each do |file, source|
+    title = source.match(/^.*?#\s*(\w+)/) && $1.downcase
     content = RDiscount.new(source, :smart).to_html
     output = layout.result(binding)
     File.open(File.basename(file, '.markdown') + '.html', 'w') do |f|
