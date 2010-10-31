@@ -65,43 +65,44 @@ grammar :Calc do
   end
 
   rule :float do
-    all(:digits, '.', :digits, :space) { strip.to_f }
+    all(:digits, '.', :digits, zero_or_more(:space)) { strip.to_f }
   end
 
   rule :integer do
-    all(:digits, :space) { strip.to_i }
+    all(:digits, zero_or_more(:space)) { strip.to_i }
   end
 
   rule :digits do
+    # Numbers may contain underscores in Ruby.
     /[0-9]+(?:_[0-9]+)*/
   end
 
   rule :additive_operator do
-    all(any('+', '-'), :space) { |a, b|
+    all(any('+', '-'), zero_or_more(:space)) { |a, b|
       a.send(strip, b)
     }
   end
 
   rule :multiplicative_operator do
-    all(any('*', '/', '%'), :space) { |a, b|
+    all(any('*', '/', '%'), zero_or_more(:space)) { |a, b|
       a.send(strip, b)
     }
   end
 
   rule :exponential_operator do
-    all('**', :space) { |a, b|
+    all('**', zero_or_more(:space)) { |a, b|
       a ** b
     }
   end
 
   rule :unary_operator do
-    all(any('~', '+', '-'), :space) { |n|
+    all(any('~', '+', '-'), zero_or_more(:space)) { |n|
       # Unary + and - require an @.
       n.send(strip == '~' ? strip : '%s@' % strip)
     }
   end
 
-  rule :lparen, ['(', :space]
-  rule :rparen, [')', :space]
-  rule :space,  /[ \t\n\r]*/
+  rule :lparen, ['(', zero_or_more(:space)]
+  rule :rparen, [')', zero_or_more(:space)]
+  rule :space,  /[ \t\n\r]/
 end

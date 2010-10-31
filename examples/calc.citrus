@@ -62,43 +62,44 @@ grammar Calc
   end
 
   rule float
-    (digits '.' digits space) { strip.to_f }
+    (digits '.' digits space*) { strip.to_f }
   end
 
   rule integer
-    (digits space) { strip.to_i }
+    (digits space*) { strip.to_i }
   end
 
   rule digits
+    # Numbers may contain underscores in Ruby.
     [0-9]+ ('_' [0-9]+)*
   end
 
   rule additive_operator
-    (('+' | '-') space) { |a, b|
+    (('+' | '-') space*) { |a, b|
       a.send(strip, b)
     }
   end
 
   rule multiplicative_operator
-    (('*' | '/' | '%') space) { |a, b|
+    (('*' | '/' | '%') space*) { |a, b|
       a.send(strip, b)
     }
   end
 
   rule exponential_operator
-    ('**' space) { |a, b|
+    ('**' space*) { |a, b|
       a ** b
     }
   end
 
   rule unary_operator
-    (('~' | '+' | '-') space) { |n|
+    (('~' | '+' | '-') space*) { |n|
       # Unary + and - require an @.
       n.send(strip == '~' ? strip : '%s@' % strip)
     }
   end
 
-  rule lparen '(' space  end
-  rule rparen ')' space  end
-  rule space  [ \t\n\r]* end
+  rule lparen '(' space* end
+  rule rparen ')' space* end
+  rule space  [ \t\n\r]  end
 end
