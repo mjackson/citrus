@@ -116,8 +116,8 @@ module Citrus
     # The number of times the cache was hit. Only present if memoing is enabled.
     attr_reader :cache_hits
 
-    # Resets all internal variables so that this object may be used in
-    # another parse.
+    # Resets all internal variables so that this object may be used in another
+    # parse.
     def reset
       super
       @max_offset = 0

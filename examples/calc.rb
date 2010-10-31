@@ -8,7 +8,7 @@ require 'citrus'
 # found in calc.citrus.
 grammar :Calc do
 
-  ## Hierarchy
+  ## Hierarchical syntax
 
   rule :term do
     any(:additive, :factor)
@@ -58,7 +58,7 @@ grammar :Calc do
     all(:lparen, :term, :rparen) { term.value }
   end
 
-  ## Syntax
+  ## Lexical syntax
 
   rule :number do
     any(:float, :integer)

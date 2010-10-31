@@ -5,7 +5,7 @@
 # An identical grammar that is written using pure Ruby can be found in calc.rb.
 grammar Calc
 
-  ## Hierarchy
+  ## Hierarchical syntax
 
   rule term
     additive | factor
@@ -55,7 +55,7 @@ grammar Calc
     (lparen term rparen) { term.value }
   end
 
-  ## Syntax
+  ## Lexical syntax
 
   rule number
     float | integer
