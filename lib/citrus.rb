@@ -116,6 +116,13 @@ module Citrus
     # The number of times the cache was hit. Only present if memoing is enabled.
     attr_reader :cache_hits
 
+    # Resets all internal variables so that this object may be used in
+    # another parse.
+    def reset
+      super
+      @max_offset = 0
+    end
+
     # Returns the length of this input.
     def length
       string.length
@@ -212,11 +219,8 @@ module Citrus
           end
         end
 
-        # Resets all internal variables so that this object may be used in
-        # another parse.
-        def reset
+        def reset # :nodoc:
           super
-          @max_offset = 0
           @cache = {}
           @cache_hits = 0
         end
