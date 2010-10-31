@@ -100,7 +100,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('M000078-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000078-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 827</span>&#x000A;827:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">rule</span>=<span class="ruby-value str">''</span>, <span class="ruby-identifier">label</span>=<span class="ruby-value str">'&lt;label&gt;'</span>)&#x000A;828:       <span class="ruby-keyword kw">super</span>(<span class="ruby-identifier">rule</span>)&#x000A;829:       <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">label</span> = <span class="ruby-identifier">label</span>&#x000A;830:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000078-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 831</span>&#x000A;831:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">rule</span>=<span class="ruby-value str">''</span>, <span class="ruby-identifier">label</span>=<span class="ruby-value str">'&lt;label&gt;'</span>)&#x000A;832:       <span class="ruby-keyword kw">super</span>(<span class="ruby-identifier">rule</span>)&#x000A;833:       <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">label</span> = <span class="ruby-identifier">label</span>&#x000A;834:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <h2>Public instance methods</h2>
@@ -119,7 +119,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('M000079-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000079-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 833</span>&#x000A;833:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">label=</span>(<span class="ruby-identifier">label</span>)&#x000A;834:       <span class="ruby-ivar">@label</span> = <span class="ruby-identifier">label</span>.<span class="ruby-identifier">to_sym</span>&#x000A;835:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000079-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 837</span>&#x000A;837:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">label=</span>(<span class="ruby-identifier">label</span>)&#x000A;838:       <span class="ruby-ivar">@label</span> = <span class="ruby-identifier">label</span>.<span class="ruby-identifier">to_sym</span>&#x000A;839:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-M000080'>
@@ -139,7 +139,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('M000080-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000080-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 843</span>&#x000A;843:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">match</span>(<span class="ruby-identifier">input</span>)&#x000A;844:       <span class="ruby-identifier">m</span> = <span class="ruby-identifier">input</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">rule</span>)&#x000A;845:       <span class="ruby-identifier">extend_match</span>(<span class="ruby-identifier">m</span>, <span class="ruby-identifier">label</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">m</span>&#x000A;846:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000080-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 847</span>&#x000A;847:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">match</span>(<span class="ruby-identifier">input</span>)&#x000A;848:       <span class="ruby-identifier">m</span> = <span class="ruby-identifier">input</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">rule</span>)&#x000A;849:       <span class="ruby-identifier">extend_match</span>(<span class="ruby-identifier">m</span>, <span class="ruby-identifier">label</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">m</span>&#x000A;850:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-M000081'>
@@ -158,7 +158,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('M000081-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000081-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 849</span>&#x000A;849:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">to_s</span>&#x000A;850:       <span class="ruby-identifier">label</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">+</span> <span class="ruby-value str">':'</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">rule</span>.<span class="ruby-identifier">embed</span>&#x000A;851:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000081-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 853</span>&#x000A;853:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">to_s</span>&#x000A;854:       <span class="ruby-identifier">label</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">+</span> <span class="ruby-value str">':'</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">rule</span>.<span class="ruby-identifier">embed</span>&#x000A;855:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>
