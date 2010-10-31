@@ -5,7 +5,7 @@ require 'citrus'
 Gem::Specification.new do |s|
   s.name = 'citrus'
   s.version = Citrus.version
-  s.date = '2010-08-17'
+  s.date = Time.now.strftime('%Y-%m-%d')
 
   s.summary = 'Parsing Expressions for Ruby'
   s.description = 'Parsing Expressions for Ruby'
