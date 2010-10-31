@@ -225,10 +225,34 @@
 		</dict>
 		<key>operator</key>
 		<dict>
-			<key>match</key>
-			<string>(?:\d*\*\d*)|\+|\?</string>
-			<key>name</key>
-			<string>keyword.operator.other.citrus</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>constant.numeric.citrus</string>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>constant.numeric.citrus</string>
+						</dict>
+					</dict>
+					<key>match</key>
+					<string>(\d*)\*(\d*)</string>
+					<key>name</key>
+					<string>keyword.operator.other.citrus</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>\+|\?</string>
+					<key>name</key>
+					<string>keyword.operator.other.citrus</string>
+				</dict>
+			</array>
 		</dict>
 		<key>regexp</key>
 		<dict>
