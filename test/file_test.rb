@@ -33,38 +33,17 @@ class CitrusFileTest < Test::Unit::TestCase
 
   ## Hierarchical syntax
 
-  def test_rule_body
+  def test_rule_body_alias
     grammar = file(:rule_body)
-
-    match = grammar.parse('"a" | "b"')
-    assert(match)
-    assert_kind_of(Rule, match.value)
-    assert_instance_of(Choice, match.value)
 
     match = grammar.parse('rule_name')
     assert(match)
     assert_kind_of(Rule, match.value)
     assert_instance_of(Alias, match.value)
+  end
 
-    match = grammar.parse('""')
-    assert(match)
-    assert_kind_of(Rule, match.value)
-    assert_instance_of(Terminal, match.value)
-
-    match = grammar.parse('"a"')
-    assert(match)
-    assert_kind_of(Rule, match.value)
-    assert_instance_of(Terminal, match.value)
-
-    match = grammar.parse('"a" "b"')
-    assert(match)
-    assert_kind_of(Rule, match.value)
-    assert_instance_of(Sequence, match.value)
-
-    match = grammar.parse('"a" | "b"')
-    assert(match)
-    assert_kind_of(Rule, match.value)
-    assert_instance_of(Choice, match.value)
+  def test_rule_body_terminal
+    grammar = file(:rule_body)
 
     match = grammar.parse('.')
     assert(match)
@@ -81,29 +60,33 @@ class CitrusFileTest < Test::Unit::TestCase
     assert_kind_of(Rule, match.value)
     assert_instance_of(Terminal, match.value)
 
-    match = grammar.parse('/./ /./')
+    match = grammar.parse("[0-9] {\n  def value\n    text.to_i\n  end\n}\n")
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_instance_of(Sequence, match.value)
-    assert_equal(2, match.find(:regular_expression).length)
+    assert_instance_of(Terminal, match.value)
+  end
 
-    match = grammar.parse('/./ | /./')
+  def test_rule_body_string_terminal
+    grammar = file(:rule_body)
+
+    match = grammar.parse('""')
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_instance_of(Choice, match.value)
-    assert_equal(1, match.find(:bar).length)
-    assert_equal(2, match.find(:regular_expression).length)
-    assert_equal(0, match.find(:dot).length)
+    assert_instance_of(StringTerminal, match.value)
+
+    match = grammar.parse('"a"')
+    assert(match)
+    assert_kind_of(Rule, match.value)
+    assert_instance_of(StringTerminal, match.value)
 
     match = grammar.parse('"" {}')
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_instance_of(Terminal, match.value)
+    assert_instance_of(StringTerminal, match.value)
+  end
 
-    match = grammar.parse('""* {}')
-    assert(match)
-    assert_kind_of(Rule, match.value)
-    assert_instance_of(Repeat, match.value)
+  def test_rule_body_repeat
+    grammar = file(:rule_body)
 
     match = grammar.parse('"a"*')
     assert(match)
@@ -112,15 +95,15 @@ class CitrusFileTest < Test::Unit::TestCase
     assert_equal(0, match.value.min)
     assert_equal(Infinity, match.value.max)
 
-    match = grammar.parse('("a" "b")*')
+    match = grammar.parse('""* {}')
     assert(match)
     assert_kind_of(Rule, match.value)
     assert_instance_of(Repeat, match.value)
 
-    match = grammar.parse('"a" | "b"')
+    match = grammar.parse('("a" "b")*')
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_instance_of(Choice, match.value)
+    assert_instance_of(Repeat, match.value)
 
     match = grammar.parse('("a" | "b")*')
     assert(match)
@@ -137,16 +120,6 @@ class CitrusFileTest < Test::Unit::TestCase
     assert_kind_of(Rule, match.value)
     assert_instance_of(Repeat, match.value)
 
-    match = grammar.parse('("a" | /./)')
-    assert(match)
-    assert_kind_of(Rule, match.value)
-    assert_instance_of(Choice, match.value)
-
-    match = grammar.parse('"a" ("b" | /./)* {}')
-    assert(match)
-    assert_kind_of(Rule, match.value)
-    assert_instance_of(Sequence, match.value)
-
     match = grammar.parse('("a" "b")* <Module>')
     assert(match)
     assert_kind_of(Rule, match.value)
@@ -157,35 +130,72 @@ class CitrusFileTest < Test::Unit::TestCase
     assert_kind_of(Rule, match.value)
     assert_instance_of(Repeat, match.value)
 
-    match = grammar.parse('( "a" "b" ) <Module>')
-    assert(match)
-    assert_kind_of(Rule, match.value)
-    assert_instance_of(Sequence, match.value)
-
     match = grammar.parse('("a" | "b")* <Module>')
     assert(match)
     assert_kind_of(Rule, match.value)
     assert_instance_of(Repeat, match.value)
 
+    match = grammar.parse("[0-9]+ {\n  def value\n    text.to_i\n  end\n}\n")
+    assert(match)
+    assert_kind_of(Rule, match.value)
+    assert_instance_of(Repeat, match.value)
+  end
+
+  def test_rule_body_choice
+    grammar = file(:rule_body)
+
+    match = grammar.parse('"a" | "b"')
+    assert(match)
+    assert_kind_of(Rule, match.value)
+    assert_instance_of(Choice, match.value)
+
+    match = grammar.parse('/./ | /./')
+    assert(match)
+    assert_kind_of(Rule, match.value)
+    assert_instance_of(Choice, match.value)
+    assert_equal(1, match.find(:bar).length)
+    assert_equal(2, match.find(:regular_expression).length)
+    assert_equal(0, match.find(:dot).length)
+
+    match = grammar.parse('("a" | /./)')
+    assert(match)
+    assert_kind_of(Rule, match.value)
+    assert_instance_of(Choice, match.value)
+
     match = grammar.parse('("a" | "b") <Module>')
     assert(match)
     assert_kind_of(Rule, match.value)
     assert_instance_of(Choice, match.value)
+  end
+
+  def test_rule_body_sequence
+    grammar = file(:rule_body)
+
+    match = grammar.parse('"a" "b"')
+    assert(match)
+    assert_kind_of(Rule, match.value)
+    assert_instance_of(Sequence, match.value)
+
+    match = grammar.parse('/./ /./')
+    assert(match)
+    assert_kind_of(Rule, match.value)
+    assert_instance_of(Sequence, match.value)
+    assert_equal(2, match.find(:regular_expression).length)
+
+    match = grammar.parse('( "a" "b" ) <Module>')
+    assert(match)
+    assert_kind_of(Rule, match.value)
+    assert_instance_of(Sequence, match.value)
 
     match = grammar.parse('"a" ("b" | /./)* <Module>')
     assert(match)
     assert_kind_of(Rule, match.value)
     assert_instance_of(Sequence, match.value)
 
-    match = grammar.parse("[0-9] {\n  def value\n    text.to_i\n  end\n}\n")
+    match = grammar.parse('"a" ("b" | /./)* {}')
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_instance_of(Terminal, match.value)
-
-    match = grammar.parse("[0-9]+ {\n  def value\n    text.to_i\n  end\n}\n")
-    assert(match)
-    assert_kind_of(Rule, match.value)
-    assert_instance_of(Repeat, match.value)
+    assert_instance_of(Sequence, match.value)
   end
 
   def test_precedence
@@ -318,7 +328,7 @@ class CitrusFileTest < Test::Unit::TestCase
     match = grammar.parse('"a"')
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_instance_of(Terminal, match.value)
+    assert_instance_of(StringTerminal, match.value)
   end
 
 
@@ -380,29 +390,39 @@ class CitrusFileTest < Test::Unit::TestCase
   def test_terminal
     grammar = file(:terminal)
 
-    match = grammar.parse('"a"')
-    assert(match)
-    assert_kind_of(Rule, match.value)
-    assert_instance_of(Terminal, match.value)
-    assert(match.value.terminal?)
-
     match = grammar.parse('[a-z]')
     assert(match)
     assert_kind_of(Rule, match.value)
     assert_instance_of(Terminal, match.value)
-    assert(match.value.terminal?)
 
     match = grammar.parse('.')
     assert(match)
     assert_kind_of(Rule, match.value)
     assert_instance_of(Terminal, match.value)
-    assert(match.value.terminal?)
 
     match = grammar.parse('/./')
     assert(match)
     assert_kind_of(Rule, match.value)
     assert_instance_of(Terminal, match.value)
-    assert(match.value.terminal?)
+  end
+
+  def test_string_terminal
+    grammar = file(:string_terminal)
+
+    match = grammar.parse("'a'")
+    assert(match)
+    assert_kind_of(Rule, match.value)
+    assert_instance_of(StringTerminal, match.value)
+
+    match = grammar.parse('"a"')
+    assert(match)
+    assert_kind_of(Rule, match.value)
+    assert_instance_of(StringTerminal, match.value)
+
+    match = grammar.parse('`a`')
+    assert(match)
+    assert_kind_of(Rule, match.value)
+    assert_instance_of(StringTerminal, match.value)
   end
 
   def test_single_quoted_string
@@ -437,6 +457,26 @@ class CitrusFileTest < Test::Unit::TestCase
     assert_equal("te'st", match.value)
 
     match = grammar.parse('"\\x26"')
+    assert(match)
+    assert_equal('&', match.value)
+  end
+
+  def test_case_insensitive_string
+    grammar = file(:case_insensitive_string)
+
+    match = grammar.parse('`test`')
+    assert(match)
+    assert_equal('test', match.value)
+
+    match = grammar.parse('`te\\"st`')
+    assert(match)
+    assert_equal('te"st', match.value)
+
+    match = grammar.parse('`te\`st`')
+    assert(match)
+    assert_equal("te`st", match.value)
+
+    match = grammar.parse('`\\x26`')
     assert(match)
     assert_equal('&', match.value)
   end

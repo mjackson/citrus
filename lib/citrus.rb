@@ -491,12 +491,13 @@ module Citrus
     # Returns a new Rule object depending on the type of object given.
     def self.new(obj)
       case obj
-      when Rule           then obj
-      when Symbol         then Alias.new(obj)
-      when String, Regexp then Terminal.new(obj)
-      when Array          then Sequence.new(obj)
-      when Range          then Choice.new(obj.to_a)
-      when Numeric        then Terminal.new(obj.to_s)
+      when Rule     then obj
+      when Symbol   then Alias.new(obj)
+      when String   then StringTerminal.new(obj)
+      when Regexp   then Terminal.new(obj)
+      when Array    then Sequence.new(obj)
+      when Range    then Choice.new(obj.to_a)
+      when Numeric  then StringTerminal.new(obj.to_s)
       else
         raise ArgumentError, "Invalid rule object: %s" % obj.inspect
       end
@@ -666,15 +667,9 @@ module Citrus
   end
 
   # A Terminal is a Rule that matches directly on the input stream and may not
-  # contain any other rule. Terminals may be created from either a String or a
-  # Regexp object. When created from strings, the Citrus notation is any
-  # sequence of characters enclosed in either single or double quotes, e.g.:
-  #
-  #     'expr'
-  #     "expr"
-  #
-  # When created from a regular expression, the Citrus notation is identical to
-  # Ruby's regular expression notation, e.g.:
+  # contain any other rule. Terminals are essentially wrappers for regular
+  # expressions. As such, the Citrus notation is identical to Ruby's regular
+  # expression notation, e.g.:
   #
   #     /expr/
   #
@@ -687,17 +682,8 @@ module Citrus
   class Terminal
     include Rule
 
-    def initialize(rule='')
-      case rule
-      when String
-        @string = rule
-        @rule = Regexp.new(Regexp.escape(rule))
-      when Regexp
-        @rule = rule
-      else
-        raise ArgumentError, "Cannot create terminal from object: %s" % 
-          rule.inspect
-      end
+    def initialize(rule=/^/)
+      @rule = rule
     end
 
     # The actual Regexp object this rule uses to match.
@@ -709,9 +695,46 @@ module Citrus
       create_match(m) if m
     end
 
+    # Returns +true+ if this rule is case sensitive.
+    def case_sensitive?
+      !rule.casefold?
+    end
+
     # Returns the Citrus notation of this rule as a string.
     def to_s
-      (@string || @rule).inspect
+      rule.inspect
+    end
+  end
+
+  # A StringTerminal is a Terminal that may be instantiated from a String
+  # object. The Citrus notation is any sequence of characters enclosed in either
+  # single or double quotes, e.g.:
+  #
+  #     'expr'
+  #     "expr"
+  #
+  # This notation works the same as it does in Ruby; i.e. strings in double
+  # quotes may contain escape sequences while strings in single quotes may not.
+  # In order to specify that a string should ignore case when matching, enclose
+  # it in backticks instead of single or double quotes, e.g.:
+  #
+  #     `expr`
+  #
+  # Besides case sensitivity, case-insensitive strings have the same semantics
+  # as double-quoted strings.
+  class StringTerminal < Terminal
+    # The +flags+ will be passed directly to Regexp#new.
+    def initialize(rule='', flags=0)
+      super(Regexp.new(Regexp.escape(rule), flags))
+    end
+
+    # Returns the Citrus notation of this rule as a string.
+    def to_s
+      if case_sensitive?
+        rule.source.inspect
+      else
+        rule.source.inspect.gsub(/^"|"$/, '`')
+      end
     end
   end
 
@@ -1013,15 +1036,14 @@ module Citrus
 
     # Returns +true+ if this match has the given +name+.
     def has_name?(name)
-      names.include?(name)
+      names.include?(name.to_sym)
     end
 
     # Returns an array of all sub-matches with the given +name+. If +deep+ is
     # +false+, returns only sub-matches that are immediate descendants of this
     # match.
     def find(name, deep=true)
-      sym = name.to_sym
-      ms = matches.select {|m| m.has_name?(sym) }
+      ms = matches.select {|m| m.has_name?(name) }
       matches.each {|m| ms.concat(m.find(name, deep)) } if deep
       ms
     end
@@ -1036,9 +1058,7 @@ module Citrus
     # Allows sub-matches of this match to be retrieved by name as instance
     # methods.
     def method_missing(sym, *args)
-      m = first(sym)
-      return m if m
-      raise NoMatchError, 'No match named "%s" in %s (%s)' %
+      first(sym) or raise NoMatchError, 'No match named "%s" in %s (%s)' %
         [sym, self, name || '<anonymous>']
     end
 
