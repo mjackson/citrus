@@ -986,16 +986,17 @@ module Citrus
   # convenient tree traversal methods that help when examining parse results.
   class Match < String
     def initialize(data)
-      case data
-      when String
-        super(data)
-      when Array
+      if Array === data
         super(data.join)
         @matches = data
       else
-        raise ArgumentError, "Cannot create match from object: %s" % 
-          data.inspect
+        super
       end
+    end
+
+    # An array of all submatches of this match.
+    def matches
+      @matches ||= []
     end
 
     # An array of all names of this match. A name is added to a match object
@@ -1015,11 +1016,6 @@ module Citrus
       names.include?(name)
     end
 
-    # An array of all sub-matches of this match.
-    def matches
-      @matches ||= []
-    end
-
     # Returns an array of all sub-matches with the given +name+. If +deep+ is
     # +false+, returns only sub-matches that are immediate descendants of this
     # match.
@@ -1034,18 +1030,7 @@ module Citrus
     # +name+ is given, attempts to retrieve the first immediate sub-match named
     # +name+.
     def first(name=nil)
-      name.nil? ? matches.first : find(name, false).first
-    end
-
-    # Returns +true+ if this match has no descendants (was created from a
-    # Terminal).
-    def terminal?
-      matches.length == 0
-    end
-
-    # Creates a new String object from the contents of this match.
-    def to_s
-      String.new(self)
+      name ? find(name, false).first : matches.first
     end
 
     # Allows sub-matches of this match to be retrieved by name as instance
