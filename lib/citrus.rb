@@ -522,7 +522,7 @@ module Citrus
           tmp = Module.new(&mod)
           raise ArgumentError if tmp.instance_methods.empty?
           mod = tmp
-        rescue ArgumentError, NameError, NoMethodError
+        rescue NoMethodError, ArgumentError, NameError
           mod = Module.new { define_method(:value, &mod) }
         end
       end
@@ -619,10 +619,8 @@ module Citrus
     # Searches this proxy's grammar and any included grammars for a rule with
     # this proxy's #rule_name. Raises an error if one cannot be found.
     def resolve!
-      rule = grammar.rule(rule_name)
-      raise RuntimeError, 'No rule named "%s" in grammar %s' %
-        [rule_name, grammar.name] unless rule
-      rule
+      grammar.rule(rule_name) or raise RuntimeError,
+        'No rule named "%s" in grammar %s' % [rule_name, grammar.name]
     end
   end
 
@@ -646,10 +644,8 @@ module Citrus
     # Searches this proxy's included grammars for a rule with this proxy's
     # #rule_name. Raises an error if one cannot be found.
     def resolve!
-      rule = grammar.super_rule(rule_name)
-      raise RuntimeError, 'No rule named "%s" in hierarchy of grammar %s' %
-        [rule_name, grammar.name] unless rule
-      rule
+      grammar.super_rule(rule_name) or raise RuntimeError,
+        'No rule named "%s" in hierarchy of grammar %s' % [rule_name, grammar.name]
     end
   end
 
