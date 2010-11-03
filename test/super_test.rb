@@ -1,5 +1,7 @@
 require File.expand_path('../helper', __FILE__)
-Citrus.load(File.dirname(__FILE__) + '/_files/super')
+
+Citrus.load(File.expand_path('../_files/super', __FILE__))
+Citrus.load(File.expand_path('../_files/super2', __FILE__))
 
 class SuperTest < Test::Unit::TestCase
 
@@ -30,10 +32,10 @@ class SuperTest < Test::Unit::TestCase
   end
 
   def test_peg
-    match = SuperTwo.parse('2')
+    match = SuperOneSub.parse('2')
     assert(match)
 
-    match = SuperTwo.parse('1')
+    match = SuperOneSub.parse('1')
     assert(match)
   end
 
@@ -56,6 +58,28 @@ class SuperTest < Test::Unit::TestCase
     match = grammar2.parse('b')
     assert(match)
     assert_equal(:b, match.name)
+  end
+
+  def test_super_two
+    m = SuperTwo.parse('1', :root => :one)
+    assert(m)
+    assert_equal('1', m)
+    assert_equal(1, m.value)
+
+    m = SuperTwo.parse('2', :root => :two)
+    assert(m)
+    assert_equal('2', m)
+    assert_equal(2, m.value)
+
+    m = SuperTwo.parse('1')
+    assert(m)
+    assert_equal('1', m)
+    assert_equal(1000, m.value)
+
+    m = SuperTwo.parse('2')
+    assert(m)
+    assert_equal('2', m)
+    assert_equal(2000, m.value)
   end
 
   def test_to_s

@@ -1,0 +1,13 @@
+grammar SuperTwo
+  rule root
+    (one | two) { super() * 1000 }
+  end
+
+  rule one
+    "1" { 1 }
+  end
+
+  rule two
+    "2" { 2 }
+  end
+end

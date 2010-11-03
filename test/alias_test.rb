@@ -1,5 +1,6 @@
 require File.expand_path('../helper', __FILE__)
-Citrus.load(File.dirname(__FILE__) + '/_files/alias')
+
+Citrus.load(File.expand_path('../_files/alias', __FILE__))
 
 class AliasTest < Test::Unit::TestCase
 

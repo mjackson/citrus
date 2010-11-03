@@ -230,6 +230,26 @@ module Citrus
       }
     end
 
+    rule :extension do
+      any(:tag, :block)
+    end
+
+    rule :tag do
+      all(:lt, :module_name, :gt) {
+        include ModuleHelpers
+
+        def value
+          module_namespace.const_get(module_basename)
+        end
+      }
+    end
+
+    rule :block do
+      all(:lcurly, zero_or_more(any(:block, /[^{}]+/)), :rcurly) {
+        eval('Proc.new ' + to_s, TOPLEVEL_BINDING)
+      }
+    end
+
     rule :predicate do
       any(:and, :not, :but, :label)
     end
@@ -255,26 +275,6 @@ module Citrus
     rule :label do
       all(/[a-zA-Z0-9_]+/, :space, ':', :space) { |rule|
         Label.new(rule, first.to_s)
-      }
-    end
-
-    rule :extension do
-      any(:tag, :block)
-    end
-
-    rule :tag do
-      all(:lt, :module_name, :gt) {
-        include ModuleHelpers
-
-        def value
-          module_namespace.const_get(module_basename)
-        end
-      }
-    end
-
-    rule :block do
-      all(:lcurly, zero_or_more(any(:block, /[^{}]+/)), :rcurly) {
-        eval('Proc.new ' + to_s)
       }
     end
 
