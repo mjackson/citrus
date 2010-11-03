@@ -40,25 +40,11 @@ module Citrus
   # Parses the given Citrus +code+ using the given +options+. Returns the
   # generated match tree. Raises a +SyntaxError+ if the parse fails.
   def self.parse(code, options={})
-    begin
-      File.parse(code, options)
-    rescue ParseError => e
-      raise SyntaxError.new(e)
-    end
+    File.parse(code, options)
   end
 
   # A standard error class that all Citrus errors extend.
   class Error < RuntimeError; end
-
-  # Raised when there is an error parsing Citrus code.
-  class SyntaxError < Error
-    # The +error+ given here should be a +ParseError+ object.
-    def initialize(error)
-      msg = "Syntax error on line %d at offset %d\n%s" %
-        [error.line_number, error.line_offset, error.detail]
-      super(msg)
-    end
-  end
 
   # Raised when a match cannot be found.
   class NoMatchError < Error; end
@@ -71,7 +57,8 @@ module Citrus
       @line_offset = input.line_offset(offset)
       @line_number = input.line_number(offset)
       @line = input.line(offset)
-      msg = "Failed to parse input at offset %d\n" % offset
+      msg = "Failed to parse input on line %d at offset %d\n%s" %
+        [line_number, line_offset, detail]
       msg << detail
       super(msg)
     end
