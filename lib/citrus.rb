@@ -533,7 +533,7 @@ module Citrus
       if Proc === mod
         begin
           tmp = Module.new(&mod)
-          raise ArgumentError unless tmp.instance_methods.any?
+          raise ArgumentError if tmp.instance_methods.empty?
           mod = tmp
         rescue ArgumentError, NameError, NoMethodError
           mod = Module.new { define_method(:value, &mod) }
