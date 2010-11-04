@@ -59,7 +59,6 @@ module Citrus
       @line = input.line(offset)
       msg = "Failed to parse input on line %d at offset %d\n%s" %
         [line_number, line_offset, detail]
-      msg << detail
       super(msg)
     end
 
