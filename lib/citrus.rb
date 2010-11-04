@@ -490,19 +490,27 @@ module Citrus
     end
 
     @unique_id = 0
+    @rules = {}
 
-    # Generates a new rule id.
-    def self.new_id
-      @unique_id += 1
+    def self.<<(rule) # :nodoc:
+      rule.id = @unique_id += 1
+      @rules[rule.id] = rule
     end
+
+    # Returns the Rule object with the given +id+.
+    def self.[](id)
+      @rules[id]
+    end
+
+    def initialize(*args) # :nodoc:
+      Rule << self
+    end
+
+    # An integer id that is unique to this rule.
+    attr_accessor :id
 
     # The grammar this rule belongs to.
     attr_accessor :grammar
-
-    # An integer id that is unique to this rule.
-    def id
-      @id ||= Rule.new_id
-    end
 
     # Sets the name of this rule.
     def name=(name)
@@ -576,6 +584,7 @@ module Citrus
     include Rule
 
     def initialize(rule_name='<proxy>')
+      super
       self.rule_name = rule_name
     end
 
@@ -665,6 +674,7 @@ module Citrus
     include Rule
 
     def initialize(rule=/^/)
+      super
       @rule = rule
     end
 
@@ -728,6 +738,7 @@ module Citrus
     include Rule
 
     def initialize(rules=[])
+      super
       @rules = rules.map {|r| Rule.new(r) }
     end
 
