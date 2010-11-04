@@ -173,7 +173,7 @@ module Citrus
         @max_offset = pos if pos > @max_offset
       else
         # Reset the position for the next attempt at a match.
-        self.pos = offset unless match
+        self.pos = offset
       end
 
       match
