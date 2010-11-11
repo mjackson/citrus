@@ -1,41 +1,30 @@
 require File.expand_path('../helper', __FILE__)
 
 class SequenceTest < Test::Unit::TestCase
-
   def test_terminal?
     rule = Sequence.new
     assert_equal(false, rule.terminal?)
   end
 
-  def test_match
-    rule = Sequence.new(%w<a b>)
+  def test_exec
+    a = Rule.new('a')
+    b = Rule.new('b')
+    c = Rule.new('c')
+    rule = Sequence.new([ a, b, c ])
 
-    match = rule.match(input(''))
-    assert_equal(nil, match)
+    events = rule.exec(Input.new(''))
+    assert_equal([], events)
 
-    match = rule.match(input('a'))
-    assert_equal(nil, match)
+    expected_events = [
+      rule.id,
+        a.id, CLOSE, 1,
+        b.id, CLOSE, 1,
+        c.id, CLOSE, 1,
+      CLOSE, 3
+    ]
 
-    match = rule.match(input('ab'))
-    assert(match)
-    assert_equal('ab', match)
-    assert_equal(2, match.length)
-  end
-
-  def test_match_mixed
-    rule = Sequence.new([/\d+/, '+', /\d+/])
-    match = rule.match(input('1+2'))
-    assert(match)
-    assert_equal('1+2', match)
-    assert_equal(3, match.length)
-  end
-
-  def test_match_embed
-    rule = Sequence.new([/[0-9]+/, Choice.new(%w<+ ->), /\d+/])
-    match = rule.match(input('1+2'))
-    assert(match)
-    assert_equal('1+2', match)
-    assert_equal(3, match.length)
+    events = rule.exec(Input.new('abc'))
+    assert_equal(expected_events, events)
   end
 
   def test_to_s
@@ -49,5 +38,4 @@ class SequenceTest < Test::Unit::TestCase
     rule = Sequence.new([rule1, rule2])
     assert_equal('("a" "b") ("c" "d")', rule.to_s)
   end
-
 end

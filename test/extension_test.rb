@@ -1,7 +1,6 @@
 require File.expand_path('../helper', __FILE__)
 
-class RuleTest < Test::Unit::TestCase
-
+class ExtensionTest < Test::Unit::TestCase
   module MatchModule
     def a_test
       :test
@@ -16,37 +15,39 @@ class RuleTest < Test::Unit::TestCase
 
   NumericModule = Module.new(&NumericProc)
 
-  def test_create
-    rule = Rule.eval('"a"')
-    assert(rule)
-    match = rule.match(input('a'))
-    assert(match)
-  end
+  NumericProcBare = Proc.new {
+    to_i + 1
+  }
 
   def test_match_module
-    rule = EqualRule.new('a')
+    rule = StringTerminal.new('abc')
     rule.extension = MatchModule
-    match = rule.match(input('a'))
+    match = rule.parse('abc')
     assert(match)
     assert_equal(:test, match.a_test)
   end
 
   def test_numeric_proc
-    rule = EqualRule.new(1)
+    rule = StringTerminal.new('1')
     rule.extension = NumericProc
-    match = rule.match(input('1'))
+    match = rule.parse('1')
     assert(match)
     assert_equal(2, match.add_one)
-    assert_instance_of(Float, match.to_f)
   end
 
   def test_numeric_module
-    rule = EqualRule.new(1)
+    rule = StringTerminal.new('1')
     rule.extension = NumericModule
-    match = rule.match(input('1'))
+    match = rule.parse('1')
     assert(match)
     assert_equal(2, match.add_one)
-    assert_instance_of(Float, match.to_f)
   end
 
+  def test_numeric_proc_bare
+    rule = StringTerminal.new('1')
+    rule.extension = NumericProcBare
+    match = rule.parse('1')
+    assert(match)
+    assert_equal(2, match.value)
+  end
 end

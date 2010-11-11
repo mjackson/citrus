@@ -1,90 +1,66 @@
 require File.expand_path('../helper', __FILE__)
 
-Citrus.load(File.expand_path('../_files/super', __FILE__))
-Citrus.load(File.expand_path('../_files/super2', __FILE__))
-
 class SuperTest < Test::Unit::TestCase
-
   def test_terminal?
     rule = Super.new
     assert_equal(false, rule.terminal?)
   end
 
-  def test_match
+  def test_exec
+    ghi = Rule.new('ghi')
     grammar1 = Grammar.new {
-      rule :a, 'a'
+      rule :a, 'abc'
     }
-
     grammar2 = Grammar.new {
       include grammar1
-      rule :a, any('b', sup)
+      rule :a, any(ghi, sup)
     }
+    rule_2a = grammar2.rule(:a)
+    rule_1a = grammar1.rule(:a)
 
-    match = grammar2.parse('b')
-    assert(match)
-    assert_equal('b', match)
-    assert_equal(1, match.length)
+    events = rule_2a.exec(Input.new('abc'))
+    assert_equal([rule_2a.id, rule_1a.id, CLOSE, 3, CLOSE, 3], events)
 
-    match = grammar2.parse('a')
-    assert(match)
-    assert_equal('a', match)
-    assert_equal(1, match.length)
+    events = rule_2a.exec(Input.new('ghi'))
+    assert_equal([rule_2a.id, ghi.id, CLOSE, 3, CLOSE, 3], events)
   end
 
-  def test_peg
-    match = SuperOneSub.parse('2')
-    assert(match)
-
-    match = SuperOneSub.parse('1')
-    assert(match)
-  end
-
-  def test_nested
+  def test_exec_miss
     grammar1 = Grammar.new {
-      rule :a, 'a'
-      rule :b, 'b'
+      rule :a, 'abc'
     }
+    grammar2 = Grammar.new {
+      include grammar1
+      rule :a, any('def', sup)
+    }
+    rule_2a = grammar2.rule(:a)
+    events = rule_2a.exec(Input.new('ghi'))
+    assert_equal([], events)
+  end
 
+  def test_exec_aliased
+    grammar1 = Grammar.new {
+      rule :a, 'abc'
+      rule :b, 'def'
+    }
     grammar2 = Grammar.new {
       include grammar1
       rule :a, any(sup, :b)
       rule :b, sup
     }
+    rule_2a = grammar2.rule(:a)
+    rule_1a = grammar1.rule(:a)
+    rule_1b = grammar1.rule(:b)
 
-    match = grammar2.parse('a')
-    assert(match)
-    assert_equal(:a, match.name)
+    events = rule_2a.exec(Input.new('abc'))
+    assert_equal([rule_2a.id, rule_1a.id, CLOSE, 3, CLOSE, 3], events)
 
-    match = grammar2.parse('b')
-    assert(match)
-    assert_equal(:b, match.name)
-  end
-
-  def test_super_two
-    m = SuperTwo.parse('1', :root => :one)
-    assert(m)
-    assert_equal('1', m)
-    assert_equal(1, m.value)
-
-    m = SuperTwo.parse('2', :root => :two)
-    assert(m)
-    assert_equal('2', m)
-    assert_equal(2, m.value)
-
-    m = SuperTwo.parse('1')
-    assert(m)
-    assert_equal('1', m)
-    assert_equal(1000, m.value)
-
-    m = SuperTwo.parse('2')
-    assert(m)
-    assert_equal('2', m)
-    assert_equal(2000, m.value)
+    events = rule_2a.exec(Input.new('def'))
+    assert_equal([rule_2a.id, rule_1b.id, CLOSE, 3, CLOSE, 3], events)
   end
 
   def test_to_s
     rule = Super.new
     assert_equal('super', rule.to_s)
   end
-
 end

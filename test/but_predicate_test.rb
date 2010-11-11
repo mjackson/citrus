@@ -1,36 +1,41 @@
 require File.expand_path('../helper', __FILE__)
 
 class ButPredicateTest < Test::Unit::TestCase
-
   def test_terminal?
     rule = ButPredicate.new
     assert_equal(false, rule.terminal?)
   end
 
-  def test_match
-    rule = ButPredicate.new('a')
+  def test_exec
+    rule = ButPredicate.new('abc')
 
-    match = rule.match(input('b'))
-    assert(match)
-    assert_equal('b', match)
-    assert_equal(1, match.length)
+    events = rule.exec(Input.new('def'))
+    assert_equal([rule.id, CLOSE, 3], events)
 
-    match = rule.match(input('bbba'))
-    assert(match)
-    assert_equal('bbb', match)
-    assert_equal(3, match.length)
+    events = rule.exec(Input.new('defabc'))
+    assert_equal([rule.id, CLOSE, 3], events)
+  end
 
-    match = rule.match(input('a'))
-    assert_equal(nil, match)
+  def test_exec_miss
+    rule = ButPredicate.new('abc')
+    events = rule.exec(Input.new('abc'))
+    assert_equal([], events)
+  end
 
-    # ButPredicate must match at least one character.
-    match = rule.match(input(''))
-    assert_equal(nil, match)
+  def test_consumption
+    rule = ButPredicate.new('abc')
+
+    input = Input.new('def')
+    events = rule.exec(input)
+    assert_equal(3, input.pos)
+
+    input = Input.new('defabc')
+    events = rule.exec(input)
+    assert_equal(3, input.pos)
   end
 
   def test_to_s
     rule = ButPredicate.new('a')
     assert_equal('~"a"', rule.to_s)
   end
-
 end

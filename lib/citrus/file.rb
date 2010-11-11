@@ -3,7 +3,7 @@ require 'citrus'
 module Citrus
   # Some helper methods for rules that alias +module_name+ and don't want to
   # use +Kernel#eval+ to retrieve Module objects.
-  module ModuleHelpers #:nodoc:
+  module ModuleNameHelpers #:nodoc:
     def module_segments
       @module_segments ||= module_name.value.split('::')
     end
@@ -35,7 +35,7 @@ module Citrus
 
     rule :grammar do
       all(:grammar_keyword, :module_name, :grammar_body, :end_keyword) {
-        include ModuleHelpers
+        include ModuleNameHelpers
 
         def value
           module_namespace.const_set(module_basename, grammar_body.value)
@@ -78,7 +78,11 @@ module Citrus
     rule :choice do
       all(:sequence, zero_or_more([ :bar, :sequence ])) {
         def rules
-          @rules ||= [ sequence.value ] + matches[1].matches.map {|m| m.matches[1].value }
+          @rules ||= begin
+            [ sequence.value ] + matches[1].matches.map do |m|
+              m.matches[1].value
+            end
+          end
         end
 
         def value
@@ -142,7 +146,7 @@ module Citrus
 
     rule :include do
       all(:include_keyword, :module_name) {
-        include ModuleHelpers
+        include ModuleNameHelpers
 
         def value
           module_namespace.const_get(module_basename)
@@ -236,7 +240,7 @@ module Citrus
 
     rule :tag do
       all(:lt, :module_name, :gt) {
-        include ModuleHelpers
+        include ModuleNameHelpers
 
         def value
           module_namespace.const_get(module_basename)
@@ -300,8 +304,13 @@ module Citrus
 
     rule :star do
       all(/[0-9]*/, '*', /[0-9]*/, :space) {
-        def min; matches[0] == '' ? 0 : matches[0].to_i end
-        def max; matches[2] == '' ? Infinity : matches[2].to_i end
+        def min
+          matches[0] == '' ? 0 : matches[0].to_i
+        end
+
+        def max
+          matches[2] == '' ? Infinity : matches[2].to_i
+        end
       }
     end
 

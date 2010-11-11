@@ -1,53 +1,81 @@
 require File.expand_path('../helper', __FILE__)
 
 class RepeatTest < Test::Unit::TestCase
-
   def test_terminal?
     rule = Repeat.new
     assert_equal(false, rule.terminal?)
   end
 
-  def test_match_zero_or_one
-    rule = Repeat.new('a', 0, 1)
+  def test_exec_zero_or_one
+    abc = Rule.new('abc')
+    rule = Repeat.new(abc, 0, 1)
 
-    match = rule.match(input(''))
-    assert(match)
-    assert_equal('', match)
-    assert_equal(0, match.length)
+    events = rule.exec(Input.new(''))
+    assert_equal([rule.id, CLOSE, 0], events)
 
-    match = rule.match(input('a'))
-    assert(match)
-    assert_equal('a', match)
-    assert_equal(1, match.length)
+    events = rule.exec(Input.new('abc'))
+    assert_equal([rule.id, abc.id, CLOSE, 3, CLOSE, 3], events)
+
+    events = rule.exec(Input.new('abc' * 3))
+    assert_equal([rule.id, abc.id, CLOSE, 3, CLOSE, 3], events)
   end
 
-  def test_match_one_or_more
-    rule = Repeat.new('a', 1, Infinity)
+  def test_exec_zero_or_more
+    abc = Rule.new('abc')
+    rule = Repeat.new(abc, 0, Infinity)
 
-    match = rule.match(input(''))
-    assert_equal(nil, match)
+    events = rule.exec(Input.new(''))
+    assert_equal([rule.id, CLOSE, 0], events)
 
-    match = rule.match(input('a'))
-    assert(match)
-    assert_equal('a', match)
-    assert_equal(1, match.length)
+    events = rule.exec(Input.new('abc'))
+    assert_equal([rule.id, abc.id, CLOSE, 3, CLOSE, 3], events)
 
-    match = rule.match(input('a' * 200))
-    assert(match)
-    assert_equal('a' * 200, match)
-    assert_equal(200, match.length)
+    expected_events = [
+      rule.id,
+        abc.id, CLOSE, 3,
+        abc.id, CLOSE, 3,
+        abc.id, CLOSE, 3,
+      CLOSE, 9
+    ]
+
+    events = rule.exec(Input.new('abc' * 3))
+    assert_equal(expected_events, events)
   end
 
-  def test_match_one
-    rule = Repeat.new('a', 1, 1)
+  def test_exec_one_or_more
+    abc = Rule.new('abc')
+    rule = Repeat.new(abc, 1, Infinity)
 
-    match = rule.match(input(''))
-    assert_equal(nil, match)
+    events = rule.exec(Input.new(''))
+    assert_equal([], events)
 
-    match = rule.match(input('a'))
-    assert(match)
-    assert_equal('a', match)
-    assert_equal(1, match.length)
+    events = rule.exec(Input.new('abc'))
+    assert_equal([rule.id, abc.id, CLOSE, 3, CLOSE, 3], events)
+
+    expected_events = [
+      rule.id,
+        abc.id, CLOSE, 3,
+        abc.id, CLOSE, 3,
+        abc.id, CLOSE, 3,
+      CLOSE, 9
+    ]
+
+    events = rule.exec(Input.new('abc' * 3))
+    assert_equal(expected_events, events)
+  end
+
+  def test_exec_one
+    abc = Rule.new('abc')
+    rule = Repeat.new(abc, 1, 1)
+
+    events = rule.exec(Input.new(''))
+    assert_equal([], events)
+
+    events = rule.exec(Input.new('abc'))
+    assert_equal([rule.id, abc.id, CLOSE, 3, CLOSE, 3], events)
+
+    events = rule.exec(Input.new('abc' * 3))
+    assert_equal([rule.id, abc.id, CLOSE, 3, CLOSE, 3], events)
   end
 
   def test_operator
@@ -94,5 +122,4 @@ class RepeatTest < Test::Unit::TestCase
     rule = Repeat.new('a', 1, Infinity)
     assert_equal('"a"+', rule.to_s)
   end
-
 end

@@ -1,56 +1,112 @@
 require File.expand_path('../helper', __FILE__)
 
 class MatchTest < Test::Unit::TestCase
-
-  def test_string
+  def test_string_equality
     match = Match.new('hello')
     assert_equal('hello', match)
-    assert_equal(5, match.length)
   end
 
-  def test_array_string
-    match1 = Match.new('a')
-    match2 = Match.new('b')
-    match = Match.new([match1, match2])
-    assert_equal('ab', match)
-    assert_equal(2, match.length)
-    assert_equal(2, match.matches.length)
-  end
-
-  def test_equality
+  def test_match_equality
     match1 = Match.new('a')
     match2 = Match.new('a')
-    assert(match1 == 'a')
     assert(match1 == match2)
     assert(match2 == match1)
+  end
 
-    match3 = Match.new('b')
-    assert_equal(false, match1 == match3)
-    assert_equal(false, match3 == match1)
+  def test_match_inequality
+    match1 = Match.new('a')
+    match2 = Match.new('b')
+    assert_equal(false, match1 == match2)
+    assert_equal(false, match2 == match1)
+  end
+
+  def test_names
+    a = Rule.new('a')
+    a.name = 'a'
+    b = Rule.new('b')
+    b.name = 'b'
+    c = Rule.new('c')
+    c.name = 'c'
+    s = Rule.new([ a, b, c ])
+    s.name = 's'
+    r = Repeat.new(s, 0, Infinity)
+    r.name = 'r'
+
+    events = [
+      r.id,
+        s.id,
+          a.id, CLOSE, 1,
+          b.id, CLOSE, 1,
+          c.id, CLOSE, 1,
+        CLOSE, 3,
+        s.id,
+          a.id, CLOSE, 1,
+          b.id, CLOSE, 1,
+          c.id, CLOSE, 1,
+        CLOSE, 3,
+        s.id,
+          a.id, CLOSE, 1,
+          b.id, CLOSE, 1,
+          c.id, CLOSE, 1,
+        CLOSE, 3,
+      CLOSE, 9
+    ]
+
+    match = Match.new("abcabcabc", events)
+    assert(match.names)
+    assert_equal([:r], match.names)
+
+    match.matches.each do |m|
+      assert_equal([:s], m.names)
+    end
   end
 
   def test_matches
-    match = Double.parse('123')
-    assert(match)
+    a = Rule.new('a')
+    b = Rule.new('b')
+    c = Rule.new('c')
+    s = Rule.new([ a, b, c ])
+    s.name = 's'
+    r = Repeat.new(s, 0, Infinity)
+
+    events = [
+      r.id,
+        s.id,
+          a.id, CLOSE, 1,
+          b.id, CLOSE, 1,
+          c.id, CLOSE, 1,
+        CLOSE, 3,
+        s.id,
+          a.id, CLOSE, 1,
+          b.id, CLOSE, 1,
+          c.id, CLOSE, 1,
+        CLOSE, 3,
+        s.id,
+          a.id, CLOSE, 1,
+          b.id, CLOSE, 1,
+          c.id, CLOSE, 1,
+        CLOSE, 3,
+      CLOSE, 9
+    ]
+
+    match = Match.new("abcabcabc", events)
+    assert(match.matches)
     assert_equal(3, match.matches.length)
-    assert_equal(3, match.find(:num).length)
+
+    sub_events = [
+      s.id,
+        a.id, CLOSE, 1,
+        b.id, CLOSE, 1,
+        c.id, CLOSE, 1,
+      CLOSE, 3
+    ]
+
+    match.matches.each do |m|
+      assert_equal(sub_events, m.events)
+      assert_equal(:s, m.name)
+      assert_equal("abc", m)
+      assert(m.matches)
+      assert_equal(3, m.matches.length)
+    end
   end
-
-  def test_match
-    match = Double.parse('456')
-    assert(match)
-    assert_equal(3, match.matches.length)
-
-    num = match.first(:num)
-    assert(num)
-    assert_equal('4', num)
-    assert_equal(4, num.value)
-  end
-
-  def test_matches_deep
-    match = Words.parse('one two three four')
-    assert(match)
-    assert_equal(15, match.find(:alpha).length)
-  end
-
 end

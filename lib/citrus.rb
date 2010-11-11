@@ -22,6 +22,8 @@ module Citrus
 
   F = ::File
 
+  CLOSE = -1
+
   # Loads the grammar from the given +file+ into the global scope using #eval.
   def self.load(file)
     file << '.citrus' unless F.file?(file)
@@ -92,7 +94,7 @@ module Citrus
       @max_offset = 0
     end
 
-    # The maximum offset that has been achieved during a parse.
+    # The maximum offset in the input that was successfully parsed.
     attr_reader :max_offset
 
     # A nested hash of rule id's to offsets and their respective matches. Only
@@ -104,9 +106,9 @@ module Citrus
 
     # Resets all internal variables so that this object may be used in another
     # parse.
-    def reset
-      super
+    def reset # :nodoc:
       @max_offset = 0
+      super
     end
 
     # Returns the length of this input.
@@ -139,7 +141,7 @@ module Citrus
     # Returns the 0-based number of the line that contains the character at the
     # given +pos+. +pos+ defaults to the current pointer position.
     def line_index(pos=pos)
-      p, n = 0, 0
+      p = n = 0
       each_line do |line|
         p += line.length
         return n if p >= pos
@@ -162,20 +164,29 @@ module Citrus
       lines[line_index(pos)]
     end
 
-    # Returns the match for the given +rule+ at the current pointer position,
-    # which is +nil+ if no match can be made.
-    def match(rule)
-      offset = pos
-      match = rule.match(self)
+    # Returns an array of events for the given +rule+ at the current pointer
+    # position. Objects in this array may be one of three types: a rule id,
+    # Citrus::CLOSE, or a length.
+    def exec(rule, events=[])
+      start = pos
+      index = events.size
 
-      if match
+      rule.exec(self, events)
+
+      if index < events.size
+        self.pos = start + events[-1]
         @max_offset = pos if pos > @max_offset
       else
-        # Reset the position for the next attempt at a match.
-        self.pos = offset
+        self.pos = start
       end
 
-      match
+      events
+    end
+
+    # Returns the length of a match for the given +rule+ at the current pointer
+    # position, +nil+ if none can be made.
+    def test(rule)
+      rule.exec(self)[-1]
     end
 
     # Returns +true+ when using memoization to cache match results.
@@ -191,29 +202,31 @@ module Citrus
     def memoize!
       return if memoized?
 
+      @cache = {}
+      @cache_hits = 0
+
       # Using +instance_eval+ here preserves access to +super+ within the
       # methods we define inside the block.
       instance_eval do
-        def match(rule) # :nodoc:
+        def exec(rule, events=[]) # :nodoc:
           c = @cache[rule.id] ||= {}
 
-          if c.key?(pos)
+          e = if c[pos]
             @cache_hits += 1
             c[pos]
           else
-            c[pos] = super
+            c[pos] = super(rule)
           end
+
+          events.concat(e)
         end
 
         def reset # :nodoc:
-          super
-          @cache = {}
+          @cache.clear
           @cache_hits = 0
+          super
         end
       end
-
-      @cache = {}
-      @cache_hits = 0
     end
   end
 
@@ -250,6 +263,16 @@ module Citrus
     def self.extend_object(obj)
       raise ArgumentError, "Grammars must be Modules" unless Module === obj
       super
+    end
+
+    # Parses the given +string+ using this grammar's root rule. Optionally, the
+    # name of a different rule may be given here as the value of the +:root+
+    # option. Otherwise, all options are the same as in Rule#parse.
+    def parse(string, options={})
+      rule_name = options.delete(:root) || root
+      rule = rule(rule_name)
+      raise 'No rule named "%s"' % rule_name unless rule
+      rule.parse(string, options)
     end
 
     # Returns the name of this grammar as a string.
@@ -296,9 +319,9 @@ module Citrus
     # and returns it on success. Returns +nil+ on failure.
     def super_rule(name)
       sym = name.to_sym
-      included_grammars.each do |g|
-        r = g.rule(sym)
-        return r if r
+      included_grammars.each do |grammar|
+        rule = grammar.rule(sym)
+        return rule if rule
       end
       nil
     end
@@ -419,48 +442,6 @@ module Citrus
       rule.extension = mod if mod
       rule
     end
-
-    # Parses the given input +string+ using the given +options+. If no match can
-    # be made, a ParseError is raised. See #default_parse_options for a detailed
-    # description of available parse options.
-    def parse(string, options={})
-      opts = default_parse_options.merge(options)
-      raise 'No root rule specified' unless opts[:root]
-
-      root_rule = rule(opts[:root])
-      raise 'No rule named "%s"' % root unless root_rule
-
-      input = Input.new(string)
-      input.memoize! if opts[:memoize]
-      input.pos = opts[:offset] if opts[:offset] > 0
-
-      match = input.match(root_rule)
-      if match.nil? || (opts[:consume] && input.length != match.length)
-        raise ParseError.new(input)
-      end
-
-      match
-    end
-
-    # The default set of options that is used in #parse. The options hash may
-    # have any of the following keys:
-    #
-    # offset::    The offset at which the parse should start. Defaults to 0.
-    # root::      The name of the root rule to use for the parse. Defaults
-    #             to the name supplied by calling #root.
-    # memoize::   If this is +true+ the matches generated during a parse are
-    #             memoized. See Input#memoize! for more information. Defaults to
-    #             +false+.
-    # consume::   If this is +true+ a ParseError will be raised during a parse
-    #             unless the entire input string is consumed. Defaults to
-    #             +false+.
-    def default_parse_options
-      { :offset   => 0,
-        :root     => root,
-        :memoize  => false,
-        :consume  => false
-      }
-    end
   end
 
   # A Rule is an object that is used by a grammar to create matches on the
@@ -490,10 +471,13 @@ module Citrus
     end
 
     @unique_id = 0
+
+    # A global registry for Rule objects. Keyed by rule id.
     @rules = {}
 
+    # Adds the given +rule+ to the global registry and gives it an id.
     def self.<<(rule) # :nodoc:
-      rule.id = @unique_id += 1
+      rule.id = (@unique_id += 1)
       @rules[rule.id] = rule
     end
 
@@ -517,8 +501,15 @@ module Citrus
       @name = name.to_sym
     end
 
-    # The name of this rule.
-    attr_reader :name
+    # Returns the name of this rule.
+    def name
+      @name || '<anonymous>'
+    end
+
+    # Returns +true+ if this rule has a name, +false+ otherwise.
+    def named?
+      !! @name
+    end
 
     # Specifies a module that will be used to extend all Match objects that
     # result from this rule. If +mod+ is a Proc, it is used to create an
@@ -542,9 +533,68 @@ module Citrus
     # The module this rule uses to extend new matches.
     attr_reader :extension
 
+    # Attempts to parse the given +string+ and return a Match if any can be
+    # made. The +options+ may contain any of the following keys:
+    #
+    # offset::    The offset in +string+ at which to start the parse. Defaults
+    #             to 0.
+    # memoize::   If this is +true+ the matches generated during a parse are
+    #             memoized. See Input#memoize! for more information. Defaults to
+    #             +false+.
+    # consume::   If this is +true+ a ParseError will be raised during a parse
+    #             unless the entire input string is consumed. Defaults to
+    #             +false+.
+    def parse(string, options={})
+      opts = default_parse_options.merge(options)
+
+      input = Input.new(string)
+      input.memoize! if opts[:memoize]
+      input.pos = opts[:offset] if opts[:offset] > 0
+
+      start = input.pos
+      events = input.exec(self)
+      length = events[-1]
+
+      if !length || (opts[:consume] && length < (input.length - opts[:offset]))
+        raise ParseError.new(input)
+      end
+
+      Match.new(string.slice(start, length), events)
+    end
+
+    # The default set of options to use when parsing.
+    def default_parse_options # :nodoc:
+      { :offset   => 0,
+        :memoize  => false,
+        :consume  => false
+      }
+    end
+
+    # Tests whether or not this rule matches on the given +string+. Returns the
+    # length of the match if any can be made, +nil+ otherwise.
+    def test(string)
+      input = Input.new(string)
+      input.test(self)
+    end
+
     # Returns +true+ if this rule is a Terminal.
     def terminal?
       is_a?(Terminal)
+    end
+
+    # Returns +true+ if this rule is able to propagate extensions from child
+    # rules to the scope of the parent, +false+ otherwise. In general, this will
+    # return +false+ for any rule whose match value is derived from an arbitrary
+    # number of child rules, such as a Repeat or a Sequence. Note that this is
+    # not true for Choice objects because they rely on exactly 1 rule to match,
+    # as do Proxy objects.
+    def propagates_extensions?
+      case self
+      when AndPredicate, NotPredicate, ButPredicate, Repeat, Sequence
+        false
+      else
+        true
+      end
     end
 
     # Returns +true+ if this rule needs to be surrounded by parentheses when
@@ -556,23 +606,90 @@ module Citrus
     # Returns a string version of this rule that is suitable to be used in the
     # string representation of another rule.
     def embed
-      name ? name.to_s : (paren? ? '(%s)' % to_s : to_s)
+      named? ? name.to_s : (paren? ? '(%s)' % to_s : to_s)
     end
 
     def inspect # :nodoc:
       to_s
     end
+  end
 
-  private
+  # A Terminal is a Rule that matches directly on the input stream and may not
+  # contain any other rule. Terminals are essentially wrappers for regular
+  # expressions. As such, the Citrus notation is identical to Ruby's regular
+  # expression notation, e.g.:
+  #
+  #     /expr/
+  #
+  # Character classes and the dot symbol may also be used in Citrus notation for
+  # compatibility with other parsing expression implementations, e.g.:
+  #
+  #     [a-zA-Z]
+  #     .
+  #
+  class Terminal
+    include Rule
 
-    def extend_match(match, name)
-      match.extend(extension) if extension
-      match.names << name if name
-      match
+    def initialize(rule=/^/)
+      super
+      @rule = rule
     end
 
-    def create_match(data)
-      extend_match(Match.new(data), name)
+    # The actual Regexp object this rule uses to match.
+    attr_reader :rule
+
+    # Returns an array of events for this rule on the given +input+.
+    def exec(input, events=[])
+      length = input.scan_full(rule, false, false)
+      if length
+        events << id
+        events << CLOSE
+        events << length
+      end
+      events
+    end
+
+    # Returns +true+ if this rule is case sensitive.
+    def case_sensitive?
+      !rule.casefold?
+    end
+
+    # Returns the Citrus notation of this rule as a string.
+    def to_s
+      rule.inspect
+    end
+  end
+
+  # A StringTerminal is a Terminal that may be instantiated from a String
+  # object. The Citrus notation is any sequence of characters enclosed in either
+  # single or double quotes, e.g.:
+  #
+  #     'expr'
+  #     "expr"
+  #
+  # This notation works the same as it does in Ruby; i.e. strings in double
+  # quotes may contain escape sequences while strings in single quotes may not.
+  # In order to specify that a string should ignore case when matching, enclose
+  # it in backticks instead of single or double quotes, e.g.:
+  #
+  #     `expr`
+  #
+  # Besides case sensitivity, case-insensitive strings have the same semantics
+  # as double-quoted strings.
+  class StringTerminal < Terminal
+    # The +flags+ will be passed directly to Regexp#new.
+    def initialize(rule='', flags=0)
+      super(Regexp.new(Regexp.escape(rule), flags))
+      @string = rule
+    end
+
+    # Returns the Citrus notation of this rule as a string.
+    def to_s
+      if case_sensitive?
+        @string.inspect
+      else
+        @string.inspect.gsub(/^"|"$/, '`')
+      end
     end
   end
 
@@ -601,10 +718,9 @@ module Citrus
       @rule ||= resolve!
     end
 
-    # Returns the Match for this rule on +input+, +nil+ if no match can be made.
-    def match(input)
-      m = input.match(rule)
-      extend_match(m, name) if m
+    # Returns an array of events for this rule on the given +input+.
+    def exec(input, events=[])
+      input.exec(rule, events)
     end
   end
 
@@ -657,79 +773,6 @@ module Citrus
     end
   end
 
-  # A Terminal is a Rule that matches directly on the input stream and may not
-  # contain any other rule. Terminals are essentially wrappers for regular
-  # expressions. As such, the Citrus notation is identical to Ruby's regular
-  # expression notation, e.g.:
-  #
-  #     /expr/
-  #
-  # Character classes and the dot symbol may also be used in Citrus notation for
-  # compatibility with other parsing expression implementations, e.g.:
-  #
-  #     [a-zA-Z]
-  #     .
-  #
-  class Terminal
-    include Rule
-
-    def initialize(rule=/^/)
-      super
-      @rule = rule
-    end
-
-    # The actual Regexp object this rule uses to match.
-    attr_reader :rule
-
-    # Returns the Match for this rule on +input+, +nil+ if no match can be made.
-    def match(input)
-      m = input.scan(rule)
-      create_match(m) if m
-    end
-
-    # Returns +true+ if this rule is case sensitive.
-    def case_sensitive?
-      !rule.casefold?
-    end
-
-    # Returns the Citrus notation of this rule as a string.
-    def to_s
-      rule.inspect
-    end
-  end
-
-  # A StringTerminal is a Terminal that may be instantiated from a String
-  # object. The Citrus notation is any sequence of characters enclosed in either
-  # single or double quotes, e.g.:
-  #
-  #     'expr'
-  #     "expr"
-  #
-  # This notation works the same as it does in Ruby; i.e. strings in double
-  # quotes may contain escape sequences while strings in single quotes may not.
-  # In order to specify that a string should ignore case when matching, enclose
-  # it in backticks instead of single or double quotes, e.g.:
-  #
-  #     `expr`
-  #
-  # Besides case sensitivity, case-insensitive strings have the same semantics
-  # as double-quoted strings.
-  class StringTerminal < Terminal
-    # The +flags+ will be passed directly to Regexp#new.
-    def initialize(rule='', flags=0)
-      super(Regexp.new(Regexp.escape(rule), flags))
-    end
-
-    # Returns the Citrus notation of this rule as a string.
-    def to_s
-      if case_sensitive?
-        rule.source.inspect
-      else
-        rule.source.inspect.gsub(/^"|"$/, '`')
-      end
-    end
-  end
-
   # A Nonterminal is a Rule that augments the matching behavior of one or more
   # other rules. Nonterminals may not match directly on the input, but instead
   # invoke the rule(s) they contain to determine if a match can be made from
@@ -745,9 +788,9 @@ module Citrus
     # An array of the actual Rule objects this rule uses to match.
     attr_reader :rules
 
-    def grammar=(grammar)
-      @rules.each {|r| r.grammar = grammar }
+    def grammar=(grammar) # :nodoc:
       super
+      @rules.each {|r| r.grammar = grammar }
     end
   end
 
@@ -774,9 +817,14 @@ module Citrus
   class AndPredicate
     include Predicate
 
-    # Returns the Match for this rule on +input+, +nil+ if no match can be made.
-    def match(input)
-      create_match('') if input.match(rule)
+    # Returns an array of events for this rule on the given +input+.
+    def exec(input, events=[])
+      if input.test(rule)
+        events << id
+        events << CLOSE
+        events << 0
+      end
+      events
     end
 
     # Returns the Citrus notation of this rule as a string.
@@ -794,9 +842,14 @@ module Citrus
   class NotPredicate
     include Predicate
 
-    # Returns the Match for this rule on +input+, +nil+ if no match can be made.
-    def match(input)
-      create_match('') unless input.match(rule)
+    # Returns an array of events for this rule on the given +input+.
+    def exec(input, events=[])
+      unless input.test(rule)
+        events << id
+        events << CLOSE
+        events << 0
+      end
+      events
     end
 
     # Returns the Citrus notation of this rule as a string.
@@ -816,16 +869,20 @@ module Citrus
 
     DOT_RULE = Rule.new(DOT)
 
-    # Returns the Match for this rule on +input+, +nil+ if no match can be made.
-    def match(input)
-      matches = []
-      while input.match(rule).nil?
-        m = input.match(DOT_RULE)
-        break unless m
-        matches << m
+    # Returns an array of events for this rule on the given +input+.
+    def exec(input, events=[])
+      length = 0
+      until input.test(rule)
+        len = input.exec(DOT_RULE)[-1]
+        break unless len
+        length += len
       end
-      # Create a single match from the aggregate text value of all submatches.
-      create_match(matches.join) if matches.any?
+      if length > 0
+        events << id
+        events << CLOSE
+        events << length
+      end
+      events
     end
 
     # Returns the Citrus notation of this rule as a string.
@@ -857,12 +914,9 @@ module Citrus
     # The label this rule adds to all its matches.
     attr_reader :label
 
-    # Returns the Match for this rule on +input+, +nil+ if no match can be made.
-    # When a Label makes a match, it re-names the match to the value of its
-    # #label.
-    def match(input)
-      m = input.match(rule)
-      extend_match(m, label) if m
+    # Returns an array of events for this rule on the given +input+.
+    def exec(input, events=[])
+      input.exec(rule, events)
     end
 
     # Returns the Citrus notation of this rule as a string.
@@ -894,20 +948,32 @@ module Citrus
     include Predicate
 
     def initialize(rule='', min=1, max=Infinity)
-      super(rule)
       raise ArgumentError, "Min cannot be greater than max" if min > max
+      super(rule)
       @range = Range.new(min, max)
     end
 
-    # Returns the Match for this rule on +input+, +nil+ if no match can be made.
-    def match(input)
-      matches = []
-      while matches.length < @range.end
-        m = input.match(rule)
-        break unless m
-        matches << m
+    # Returns an array of events for this rule on the given +input+.
+    def exec(input, events=[])
+      events << id
+
+      index = events.size
+      start = index - 1
+      length = n = 0
+      while n < max && input.exec(rule, events).size > index
+        index = events.size
+        length += events[-1]
+        n += 1
       end
-      create_match(matches) if @range.include?(matches.length)
+
+      if n >= min
+        events << CLOSE
+        events << length
+      else
+        events.slice!(start, events.size)
+      end
+
+      events
     end
 
     # The minimum number of times this rule must match.
@@ -957,13 +1023,25 @@ module Citrus
   class Choice
     include List
 
-    # Returns the Match for this rule on +input+, +nil+ if no match can be made.
-    def match(input)
-      rules.each do |rule|
-        m = input.match(rule)
-        return extend_match(m, name) if m
+    # Returns an array of events for this rule on the given +input+.
+    def exec(input, events=[])
+      events << id
+
+      index = events.size
+      start = index - 1
+      n = 0
+      while n < rules.length && input.exec(rules[n], events).size == index
+        n += 1
       end
-      nil
+
+      if index < events.size
+        events << CLOSE
+        events << events[-2]
+      else
+        events.slice!(start, events.size)
+      end
+
+      events
     end
 
     # Returns the Citrus notation of this rule as a string.
@@ -980,15 +1058,27 @@ module Citrus
   class Sequence
     include List
 
-    # Returns the Match for this rule on +input+, +nil+ if no match can be made.
-    def match(input)
-      matches = []
-      rules.each do |rule|
-        m = input.match(rule)
-        break unless m
-        matches << m
+    # Returns an array of events for this rule on the given +input+.
+    def exec(input, events=[])
+      events << id
+
+      index = events.size
+      start = index - 1
+      length = n = 0
+      while n < rules.length && input.exec(rules[n], events).size > index
+        index = events.size
+        length += events[-1]
+        n += 1
       end
-      create_match(matches) if matches.length == rules.length
+
+      if n == rules.length
+        events << CLOSE
+        events << length
+      else
+        events.slice!(start, events.size)
+      end
+
+      events
     end
 
     # Returns the Citrus notation of this rule as a string.
@@ -1001,19 +1091,18 @@ module Citrus
   # match may contain any number of other matches. This class provides several
   # convenient tree traversal methods that help when examining parse results.
   class Match < String
-    def initialize(data)
-      if Array === data
-        super(data.join)
-        @matches = data
-      else
-        super
-      end
+    def initialize(string, events=[])
+      raise ArgumentError, "Invalid events for match length %d" %
+        string.length if events[-1] && string.length != events[-1]
+
+      super(string)
+      @events = events
+
+      extend!
     end
 
-    # An array of all submatches of this match.
-    def matches
-      @matches ||= []
-    end
+    # The array of events that was passed to the constructor.
+    attr_reader :events
 
     # An array of all names of this match. A name is added to a match object
     # for each rule that returns that object when matching. These names can then
@@ -1030,6 +1119,56 @@ module Citrus
     # Returns +true+ if this match has the given +name+.
     def has_name?(name)
       names.include?(name.to_sym)
+    end
+
+    # Returns an array of all Rule objects that extend this match.
+    def extenders
+      @extenders ||= begin
+        extenders = []
+        @events.each do |event|
+          break if event == CLOSE
+          rule = Rule[event]
+          extenders.unshift(rule)
+          break unless rule.propagates_extensions?
+        end
+        extenders
+      end
+    end
+
+    # Returns a reference to the Rule object that first created this match.
+    def creator
+      extenders.first
+    end
+
+    # Returns an array of Match objects that are submatches of this match in the
+    # order they appeared in the input.
+    def matches
+      @matches ||= begin
+        matches = []
+        stack = []
+        offset = 0
+        close = false
+        index = 0
+
+        while index < @events.size
+          event = @events[index]
+          if close
+            start = stack.pop
+            if stack.size == extenders.size
+              matches << Match.new(slice(offset, event), @events[start..index])
+              offset += event
+            end
+            close = false
+          elsif event == CLOSE
+            close = true
+          else
+            stack << index
+          end
+          index += 1
+        end
+
+        matches
+      end
     end
 
     # Returns an array of all sub-matches with the given +name+. If +deep+ is
@@ -1051,12 +1190,38 @@ module Citrus
     # Allows sub-matches of this match to be retrieved by name as instance
     # methods.
     def method_missing(sym, *args)
-      first(sym) or raise NoMatchError, 'No match named "%s" in %s (%s)' %
-        [sym, self, name || '<anonymous>']
+      if sym == :to_ary
+        # This is a workaround for a bug in Ruby 1.9 with classes that
+        # extend String.
+        super
+      else
+        first(sym) or raise NoMatchError, 'No match named "%s" in %s (%s)' %
+          [sym, self, name]
+      end
     end
 
-    def to_ary
-      # This method intentionally left blank to work around a bug in Ruby 1.9.
+    # Returns a string representation of this match that displays the entire
+    # match tree for easy viewing in the console.
+    def dump
+      dump_lines.join("\n")
+    end
+
+    def dump_lines(indent='  ') # :nodoc:
+      line = to_s.inspect
+      line << ' (%s)' % names.join(',') unless names.empty?
+      matches.inject([line]) do |lines, m|
+        lines.concat(m.dump_lines(indent).map {|line| indent + line })
+      end
+    end
+
+  private
+
+    # Extends this match with the extensions provided by its #rules.
+    def extend! # :nodoc:
+      extenders.each do |rule|
+        self.names << rule.name if rule.named?
+        extend(rule.extension) if rule.extension
+      end
     end
   end
 end

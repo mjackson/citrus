@@ -4,7 +4,7 @@ if defined?(Calc)
   Object.__send__(:remove_const, :Calc)
 end
 
-Citrus.load(File.dirname(__FILE__) + '/../examples/calc')
+Citrus.load File.expand_path('../../examples/calc', __FILE__)
 
 class CalcFileTest < Test::Unit::TestCase
   include CalcTestMethods

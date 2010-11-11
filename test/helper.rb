@@ -2,14 +2,10 @@ lib = File.expand_path('../../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 require 'test/unit'
-require 'citrus/debug'
+require 'citrus'
 
 class Test::Unit::TestCase
   include Citrus
-
-  def input(str='')
-    Input.new(str)
-  end
 
   TestGrammar = Grammar.new do
     rule :alpha do
@@ -46,18 +42,6 @@ class Test::Unit::TestCase
 
     rule :words do
       [ :word, zero_or_more([ ' ', :word ]) ]
-    end
-  end
-
-  class EqualRule
-    include Citrus::Rule
-
-    def initialize(value)
-      @value = value
-    end
-
-    def match(input)
-      create_match(@value.to_s.dup) if @value.to_s == input.string
     end
   end
 

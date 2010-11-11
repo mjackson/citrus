@@ -1,7 +1,6 @@
 require File.expand_path('../helper', __FILE__)
 
 class ParseErrorTest < Test::Unit::TestCase
-
   Sentence = Grammar.new do
     include Words
 
@@ -52,5 +51,4 @@ class ParseErrorTest < Test::Unit::TestCase
       assert_equal(3, e.line_offset)
     end
   end
-
 end

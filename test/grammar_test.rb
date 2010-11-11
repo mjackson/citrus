@@ -1,17 +1,10 @@
 require File.expand_path('../helper', __FILE__)
 
 class GrammarTest < Test::Unit::TestCase
-
   def test_new
-    g = Grammar.new
-    assert_kind_of(Module, g)
-    assert(g.include?(Grammar))
-  end
-
-  def test_non_module_fail
-    assert_raise ArgumentError do
-      ''.extend(GrammarMethods)
-    end
+    grammar = Grammar.new
+    assert_kind_of(Module, grammar)
+    assert(grammar.include?(Grammar))
   end
 
   def test_name
@@ -72,6 +65,8 @@ class GrammarTest < Test::Unit::TestCase
     }
     match = grammar.parse('1234')
     assert(match)
+    assert_equal('123', match)
+    assert_equal(3, match.length)
   end
 
   def test_parse_sequence_short
@@ -135,5 +130,4 @@ class GrammarTest < Test::Unit::TestCase
       grammar(:abc)
     end
   end
-
 end
