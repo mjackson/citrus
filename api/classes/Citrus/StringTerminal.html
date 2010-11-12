@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>: Citrus::StringTerminal [Citrus API Documentation]</title>
+    <meta content='text/html; charset=utf8' http-equiv='Content-Type'>
+    <link href='../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>Class</span>
+          Citrus::StringTerminal
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../files/lib/citrus_rb.html">lib/citrus.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a href="Terminal.html">Citrus::Terminal</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <p>
+            A <a href="StringTerminal.html">StringTerminal</a> is a <a
+            href="Terminal.html">Terminal</a> that may be instantiated from a String
+            object. The <a href="../Citrus.html">Citrus</a> notation is any sequence of
+            characters enclosed in either single or double quotes, e.g.:
+            </p>
+            <pre>'expr'&#x000A;&quot;expr&quot;</pre>
+            <p>
+            This notation works the same as it does in Ruby; i.e. strings in double
+            quotes may contain escape sequences while strings in single quotes may not.
+            In order to specify that a string should ignore case when matching, enclose
+            it in backticks instead of single or double quotes, e.g.:
+            </p>
+            <pre>`expr`</pre>
+            <p>
+            Besides case sensitivity, case-insensitive strings have the same semantics
+            as double-quoted strings.
+            </p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>public class</h3>
+            <ol>
+              <li><a href="#M000072">new</a></li>
+            </ol>
+            <h3>public instance</h3>
+            <ol>
+              <li><a href="#M000073">to_s</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public class methods</h2>
+              <div class='method public-class' id='method-M000072'>
+                <a name='M000072'></a>
+                <div class='synopsis'>
+                  <span class='name'>new</span>
+                  <span class='arguments'>(rule='', flags=0)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  The <tt>flags</tt> will be passed directly to Regexp#new.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000072-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000072-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 681</span>&#x000A;681:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">rule</span>=<span class="ruby-value str">''</span>, <span class="ruby-identifier">flags</span>=<span class="ruby-value">0</span>)&#x000A;682:       <span class="ruby-keyword kw">super</span>(<span class="ruby-constant">Regexp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Regexp</span>.<span class="ruby-identifier">escape</span>(<span class="ruby-identifier">rule</span>), <span class="ruby-identifier">flags</span>))&#x000A;683:       <span class="ruby-ivar">@string</span> = <span class="ruby-identifier">rule</span>&#x000A;684:     <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <h2>Public instance methods</h2>
+              <div class='method public-instance' id='method-M000073'>
+                <a name='M000073'></a>
+                <div class='synopsis'>
+                  <span class='name'>to_s</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Returns the <a href="../Citrus.html">Citrus</a> notation of this rule as a
+                  string.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000073-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000073-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 687</span>&#x000A;687:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">to_s</span>&#x000A;688:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">case_sensitive?</span>&#x000A;689:         <span class="ruby-ivar">@string</span>.<span class="ruby-identifier">inspect</span>&#x000A;690:       <span class="ruby-keyword kw">else</span>&#x000A;691:         <span class="ruby-ivar">@string</span>.<span class="ruby-identifier">inspect</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp re">/^&quot;|&quot;$/</span>, <span class="ruby-value str">'`'</span>)&#x000A;692:       <span class="ruby-keyword kw">end</span>&#x000A;693:     <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

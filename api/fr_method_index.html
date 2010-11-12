@@ -4331,32 +4331,44 @@
         
         Element.addMethods();
         var search_index = [
-          { method: 'all', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000028"><span class="method_name">all</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
-          { method: 'andp', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000019"><span class="method_name">andp</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
-          { method: 'any', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000029"><span class="method_name">any</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
-          { method: 'but', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000021"><span class="method_name">but</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
-          { method: 'butp', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000022"><span class="method_name">butp</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
-          { method: 'default_parse_options', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000032"><span class="method_name">default_parse_options</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
-          { method: 'detail', module: 'citrus::parseerror', html: '<a href="classes/Citrus/ParseError.html#M000053"><span class="method_name">detail</span> <span class="module_name">(Citrus::ParseError)</span></a>' },
-          { method: 'dot', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000017"><span class="method_name">dot</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
+          { method: '[]', module: 'citrus::rule', html: '<a href="classes/Citrus/Rule.html#M000034"><span class="method_name">[]</span> <span class="module_name">(Citrus::Rule)</span></a>' },
+          { method: 'all', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000029"><span class="method_name">all</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
+          { method: 'andp', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000020"><span class="method_name">andp</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
+          { method: 'any', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000030"><span class="method_name">any</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
+          { method: 'but', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000022"><span class="method_name">but</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
+          { method: 'butp', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000023"><span class="method_name">butp</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
+          { method: 'case_sensitive?', module: 'citrus::terminal', html: '<a href="classes/Citrus/Terminal.html#M000070"><span class="method_name">case_sensitive?</span> <span class="module_name">(Citrus::Terminal)</span></a>' },
+          { method: 'creator', module: 'citrus::match', html: '<a href="classes/Citrus/Match.html#M000101"><span class="method_name">creator</span> <span class="module_name">(Citrus::Match)</span></a>' },
+          { method: 'detail', module: 'citrus::parseerror', html: '<a href="classes/Citrus/ParseError.html#M000054"><span class="method_name">detail</span> <span class="module_name">(Citrus::ParseError)</span></a>' },
+          { method: 'dot', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000018"><span class="method_name">dot</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
+          { method: 'dump', module: 'citrus::match', html: '<a href="classes/Citrus/Match.html#M000106"><span class="method_name">dump</span> <span class="module_name">(Citrus::Match)</span></a>' },
           { method: 'each_line', module: 'citrus::input', html: '<a href="classes/Citrus/Input.html#M000058"><span class="method_name">each_line</span> <span class="module_name">(Citrus::Input)</span></a>' },
-          { method: 'embed', module: 'citrus::rule', html: '<a href="classes/Citrus/Rule.html#M000041"><span class="method_name">embed</span> <span class="module_name">(Citrus::Rule)</span></a>' },
+          { method: 'embed', module: 'citrus::rule', html: '<a href="classes/Citrus/Rule.html#M000044"><span class="method_name">embed</span> <span class="module_name">(Citrus::Rule)</span></a>' },
           { method: 'eval', module: 'citrus', html: '<a href="classes/Citrus.html#M000004"><span class="method_name">eval</span> <span class="module_name">(Citrus)</span></a>' },
-          { method: 'eval', module: 'citrus::rule', html: '<a href="classes/Citrus/Rule.html#M000033"><span class="method_name">eval</span> <span class="module_name">(Citrus::Rule)</span></a>' },
-          { method: 'ext', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000030"><span class="method_name">ext</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
+          { method: 'eval', module: 'citrus::rule', html: '<a href="classes/Citrus/Rule.html#M000032"><span class="method_name">eval</span> <span class="module_name">(Citrus::Rule)</span></a>' },
+          { method: 'exec', module: 'citrus::label', html: '<a href="classes/Citrus/Label.html#M000084"><span class="method_name">exec</span> <span class="module_name">(Citrus::Label)</span></a>' },
+          { method: 'exec', module: 'citrus::notpredicate', html: '<a href="classes/Citrus/NotPredicate.html#M000078"><span class="method_name">exec</span> <span class="module_name">(Citrus::NotPredicate)</span></a>' },
+          { method: 'exec', module: 'citrus::proxy', html: '<a href="classes/Citrus/Proxy.html#M000048"><span class="method_name">exec</span> <span class="module_name">(Citrus::Proxy)</span></a>' },
+          { method: 'exec', module: 'citrus::repeat', html: '<a href="classes/Citrus/Repeat.html#M000087"><span class="method_name">exec</span> <span class="module_name">(Citrus::Repeat)</span></a>' },
+          { method: 'exec', module: 'citrus::choice', html: '<a href="classes/Citrus/Choice.html#M000092"><span class="method_name">exec</span> <span class="module_name">(Citrus::Choice)</span></a>' },
+          { method: 'exec', module: 'citrus::terminal', html: '<a href="classes/Citrus/Terminal.html#M000069"><span class="method_name">exec</span> <span class="module_name">(Citrus::Terminal)</span></a>' },
+          { method: 'exec', module: 'citrus::andpredicate', html: '<a href="classes/Citrus/AndPredicate.html#M000076"><span class="method_name">exec</span> <span class="module_name">(Citrus::AndPredicate)</span></a>' },
+          { method: 'exec', module: 'citrus::sequence', html: '<a href="classes/Citrus/Sequence.html#M000094"><span class="method_name">exec</span> <span class="module_name">(Citrus::Sequence)</span></a>' },
+          { method: 'exec', module: 'citrus::input', html: '<a href="classes/Citrus/Input.html#M000064"><span class="method_name">exec</span> <span class="module_name">(Citrus::Input)</span></a>' },
+          { method: 'exec', module: 'citrus::butpredicate', html: '<a href="classes/Citrus/ButPredicate.html#M000080"><span class="method_name">exec</span> <span class="module_name">(Citrus::ButPredicate)</span></a>' },
+          { method: 'ext', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000031"><span class="method_name">ext</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
           { method: 'extend_object', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000008"><span class="method_name">extend_object</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
+          { method: 'extenders', module: 'citrus::match', html: '<a href="classes/Citrus/Match.html#M000100"><span class="method_name">extenders</span> <span class="module_name">(Citrus::Match)</span></a>' },
           { method: 'extension=', module: 'citrus::rule', html: '<a href="classes/Citrus/Rule.html#M000038"><span class="method_name">extension=</span> <span class="module_name">(Citrus::Rule)</span></a>' },
-          { method: 'find', module: 'citrus::match', html: '<a href="classes/Citrus/Match.html#M000097"><span class="method_name">find</span> <span class="module_name">(Citrus::Match)</span></a>' },
-          { method: 'first', module: 'citrus::match', html: '<a href="classes/Citrus/Match.html#M000098"><span class="method_name">first</span> <span class="module_name">(Citrus::Match)</span></a>' },
+          { method: 'find', module: 'citrus::match', html: '<a href="classes/Citrus/Match.html#M000103"><span class="method_name">find</span> <span class="module_name">(Citrus::Match)</span></a>' },
+          { method: 'first', module: 'citrus::match', html: '<a href="classes/Citrus/Match.html#M000104"><span class="method_name">first</span> <span class="module_name">(Citrus::Match)</span></a>' },
           { method: 'grammar', module: 'object', html: '<a href="classes/Object.html#M000001"><span class="method_name">grammar</span> <span class="module_name">(Object)</span></a>' },
-          { method: 'grammar=', module: 'citrus::nonterminal', html: '<a href="classes/Citrus/Nonterminal.html#M000047"><span class="method_name">grammar=</span> <span class="module_name">(Citrus::Nonterminal)</span></a>' },
-          { method: 'has_name?', module: 'citrus::match', html: '<a href="classes/Citrus/Match.html#M000095"><span class="method_name">has_name?</span> <span class="module_name">(Citrus::Match)</span></a>' },
-          { method: 'has_rule?', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000013"><span class="method_name">has_rule?</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
-          { method: 'id', module: 'citrus::rule', html: '<a href="classes/Citrus/Rule.html#M000036"><span class="method_name">id</span> <span class="module_name">(Citrus::Rule)</span></a>' },
+          { method: 'has_name?', module: 'citrus::match', html: '<a href="classes/Citrus/Match.html#M000099"><span class="method_name">has_name?</span> <span class="module_name">(Citrus::Match)</span></a>' },
+          { method: 'has_rule?', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000014"><span class="method_name">has_rule?</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
           { method: 'included', module: 'citrus::grammar', html: '<a href="classes/Citrus/Grammar.html#M000007"><span class="method_name">included</span> <span class="module_name">(Citrus::Grammar)</span></a>' },
-          { method: 'included_grammars', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000010"><span class="method_name">included_grammars</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
-          { method: 'label', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000023"><span class="method_name">label</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
-          { method: 'label=', module: 'citrus::label', html: '<a href="classes/Citrus/Label.html#M000079"><span class="method_name">label=</span> <span class="module_name">(Citrus::Label)</span></a>' },
+          { method: 'included_grammars', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000011"><span class="method_name">included_grammars</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
+          { method: 'label', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000024"><span class="method_name">label</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
+          { method: 'label=', module: 'citrus::label', html: '<a href="classes/Citrus/Label.html#M000083"><span class="method_name">label=</span> <span class="module_name">(Citrus::Label)</span></a>' },
           { method: 'length', module: 'citrus::input', html: '<a href="classes/Citrus/Input.html#M000056"><span class="method_name">length</span> <span class="module_name">(Citrus::Input)</span></a>' },
           { method: 'line', module: 'citrus::input', html: '<a href="classes/Citrus/Input.html#M000063"><span class="method_name">line</span> <span class="module_name">(Citrus::Input)</span></a>' },
           { method: 'line_index', module: 'citrus::input', html: '<a href="classes/Citrus/Input.html#M000060"><span class="method_name">line_index</span> <span class="module_name">(Citrus::Input)</span></a>' },
@@ -4365,74 +4377,66 @@
           { method: 'lineno', module: 'citrus::input', html: '<a href="classes/Citrus/Input.html#M000062"><span class="method_name">lineno</span> <span class="module_name">(Citrus::Input)</span></a>' },
           { method: 'lines', module: 'citrus::input', html: '<a href="classes/Citrus/Input.html#M000057"><span class="method_name">lines</span> <span class="module_name">(Citrus::Input)</span></a>' },
           { method: 'load', module: 'citrus', html: '<a href="classes/Citrus.html#M000003"><span class="method_name">load</span> <span class="module_name">(Citrus)</span></a>' },
-          { method: 'match', module: 'citrus::choice', html: '<a href="classes/Citrus/Choice.html#M000088"><span class="method_name">match</span> <span class="module_name">(Citrus::Choice)</span></a>' },
-          { method: 'match', module: 'citrus::proxy', html: '<a href="classes/Citrus/Proxy.html#M000045"><span class="method_name">match</span> <span class="module_name">(Citrus::Proxy)</span></a>' },
-          { method: 'match', module: 'citrus::butpredicate', html: '<a href="classes/Citrus/ButPredicate.html#M000076"><span class="method_name">match</span> <span class="module_name">(Citrus::ButPredicate)</span></a>' },
-          { method: 'match', module: 'citrus::label', html: '<a href="classes/Citrus/Label.html#M000080"><span class="method_name">match</span> <span class="module_name">(Citrus::Label)</span></a>' },
-          { method: 'match', module: 'citrus::notpredicate', html: '<a href="classes/Citrus/NotPredicate.html#M000074"><span class="method_name">match</span> <span class="module_name">(Citrus::NotPredicate)</span></a>' },
-          { method: 'match', module: 'citrus::input', html: '<a href="classes/Citrus/Input.html#M000064"><span class="method_name">match</span> <span class="module_name">(Citrus::Input)</span></a>' },
-          { method: 'match', module: 'citrus::terminal', html: '<a href="classes/Citrus/Terminal.html#M000070"><span class="method_name">match</span> <span class="module_name">(Citrus::Terminal)</span></a>' },
-          { method: 'match', module: 'citrus::repeat', html: '<a href="classes/Citrus/Repeat.html#M000083"><span class="method_name">match</span> <span class="module_name">(Citrus::Repeat)</span></a>' },
-          { method: 'match', module: 'citrus::andpredicate', html: '<a href="classes/Citrus/AndPredicate.html#M000072"><span class="method_name">match</span> <span class="module_name">(Citrus::AndPredicate)</span></a>' },
-          { method: 'match', module: 'citrus::sequence', html: '<a href="classes/Citrus/Sequence.html#M000090"><span class="method_name">match</span> <span class="module_name">(Citrus::Sequence)</span></a>' },
-          { method: 'matches', module: 'citrus::match', html: '<a href="classes/Citrus/Match.html#M000096"><span class="method_name">matches</span> <span class="module_name">(Citrus::Match)</span></a>' },
-          { method: 'max', module: 'citrus::repeat', html: '<a href="classes/Citrus/Repeat.html#M000085"><span class="method_name">max</span> <span class="module_name">(Citrus::Repeat)</span></a>' },
-          { method: 'memoize!', module: 'citrus::input', html: '<a href="classes/Citrus/Input.html#M000066"><span class="method_name">memoize!</span> <span class="module_name">(Citrus::Input)</span></a>' },
-          { method: 'memoized?', module: 'citrus::input', html: '<a href="classes/Citrus/Input.html#M000065"><span class="method_name">memoized?</span> <span class="module_name">(Citrus::Input)</span></a>' },
-          { method: 'method_missing', module: 'citrus::match', html: '<a href="classes/Citrus/Match.html#M000101"><span class="method_name">method_missing</span> <span class="module_name">(Citrus::Match)</span></a>' },
-          { method: 'min', module: 'citrus::repeat', html: '<a href="classes/Citrus/Repeat.html#M000084"><span class="method_name">min</span> <span class="module_name">(Citrus::Repeat)</span></a>' },
-          { method: 'name', module: 'citrus::match', html: '<a href="classes/Citrus/Match.html#M000094"><span class="method_name">name</span> <span class="module_name">(Citrus::Match)</span></a>' },
-          { method: 'name', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000009"><span class="method_name">name</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
-          { method: 'name=', module: 'citrus::rule', html: '<a href="classes/Citrus/Rule.html#M000037"><span class="method_name">name=</span> <span class="module_name">(Citrus::Rule)</span></a>' },
-          { method: 'names', module: 'citrus::match', html: '<a href="classes/Citrus/Match.html#M000093"><span class="method_name">names</span> <span class="module_name">(Citrus::Match)</span></a>' },
-          { method: 'new', module: 'citrus::syntaxerror', html: '<a href="classes/Citrus/SyntaxError.html#M000051"><span class="method_name">new</span> <span class="module_name">(Citrus::SyntaxError)</span></a>' },
-          { method: 'new', module: 'citrus::input', html: '<a href="classes/Citrus/Input.html#M000054"><span class="method_name">new</span> <span class="module_name">(Citrus::Input)</span></a>' },
-          { method: 'new', module: 'citrus::repeat', html: '<a href="classes/Citrus/Repeat.html#M000082"><span class="method_name">new</span> <span class="module_name">(Citrus::Repeat)</span></a>' },
-          { method: 'new', module: 'citrus::label', html: '<a href="classes/Citrus/Label.html#M000078"><span class="method_name">new</span> <span class="module_name">(Citrus::Label)</span></a>' },
-          { method: 'new', module: 'citrus::match', html: '<a href="classes/Citrus/Match.html#M000092"><span class="method_name">new</span> <span class="module_name">(Citrus::Match)</span></a>' },
-          { method: 'new', module: 'citrus::rule', html: '<a href="classes/Citrus/Rule.html#M000034"><span class="method_name">new</span> <span class="module_name">(Citrus::Rule)</span></a>' },
-          { method: 'new', module: 'citrus::proxy', html: '<a href="classes/Citrus/Proxy.html#M000042"><span class="method_name">new</span> <span class="module_name">(Citrus::Proxy)</span></a>' },
-          { method: 'new', module: 'citrus::predicate', html: '<a href="classes/Citrus/Predicate.html#M000048"><span class="method_name">new</span> <span class="module_name">(Citrus::Predicate)</span></a>' },
-          { method: 'new', module: 'citrus::terminal', html: '<a href="classes/Citrus/Terminal.html#M000069"><span class="method_name">new</span> <span class="module_name">(Citrus::Terminal)</span></a>' },
-          { method: 'new', module: 'citrus::parseerror', html: '<a href="classes/Citrus/ParseError.html#M000052"><span class="method_name">new</span> <span class="module_name">(Citrus::ParseError)</span></a>' },
+          { method: 'matches', module: 'citrus::match', html: '<a href="classes/Citrus/Match.html#M000102"><span class="method_name">matches</span> <span class="module_name">(Citrus::Match)</span></a>' },
+          { method: 'max', module: 'citrus::repeat', html: '<a href="classes/Citrus/Repeat.html#M000089"><span class="method_name">max</span> <span class="module_name">(Citrus::Repeat)</span></a>' },
+          { method: 'memoize!', module: 'citrus::input', html: '<a href="classes/Citrus/Input.html#M000067"><span class="method_name">memoize!</span> <span class="module_name">(Citrus::Input)</span></a>' },
+          { method: 'memoized?', module: 'citrus::input', html: '<a href="classes/Citrus/Input.html#M000066"><span class="method_name">memoized?</span> <span class="module_name">(Citrus::Input)</span></a>' },
+          { method: 'method_missing', module: 'citrus::match', html: '<a href="classes/Citrus/Match.html#M000105"><span class="method_name">method_missing</span> <span class="module_name">(Citrus::Match)</span></a>' },
+          { method: 'min', module: 'citrus::repeat', html: '<a href="classes/Citrus/Repeat.html#M000088"><span class="method_name">min</span> <span class="module_name">(Citrus::Repeat)</span></a>' },
+          { method: 'name', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000010"><span class="method_name">name</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
+          { method: 'name', module: 'citrus::rule', html: '<a href="classes/Citrus/Rule.html#M000036"><span class="method_name">name</span> <span class="module_name">(Citrus::Rule)</span></a>' },
+          { method: 'name', module: 'citrus::match', html: '<a href="classes/Citrus/Match.html#M000098"><span class="method_name">name</span> <span class="module_name">(Citrus::Match)</span></a>' },
+          { method: 'name=', module: 'citrus::rule', html: '<a href="classes/Citrus/Rule.html#M000035"><span class="method_name">name=</span> <span class="module_name">(Citrus::Rule)</span></a>' },
+          { method: 'named?', module: 'citrus::rule', html: '<a href="classes/Citrus/Rule.html#M000037"><span class="method_name">named?</span> <span class="module_name">(Citrus::Rule)</span></a>' },
+          { method: 'names', module: 'citrus::match', html: '<a href="classes/Citrus/Match.html#M000097"><span class="method_name">names</span> <span class="module_name">(Citrus::Match)</span></a>' },
+          { method: 'new', module: 'citrus::parseerror', html: '<a href="classes/Citrus/ParseError.html#M000053"><span class="method_name">new</span> <span class="module_name">(Citrus::ParseError)</span></a>' },
+          { method: 'new', module: 'citrus::label', html: '<a href="classes/Citrus/Label.html#M000082"><span class="method_name">new</span> <span class="module_name">(Citrus::Label)</span></a>' },
+          { method: 'new', module: 'citrus::input', html: '<a href="classes/Citrus/Input.html#M000055"><span class="method_name">new</span> <span class="module_name">(Citrus::Input)</span></a>' },
+          { method: 'new', module: 'citrus::predicate', html: '<a href="classes/Citrus/Predicate.html#M000050"><span class="method_name">new</span> <span class="module_name">(Citrus::Predicate)</span></a>' },
+          { method: 'new', module: 'citrus::nonterminal', html: '<a href="classes/Citrus/Nonterminal.html#M000049"><span class="method_name">new</span> <span class="module_name">(Citrus::Nonterminal)</span></a>' },
+          { method: 'new', module: 'citrus::rule', html: '<a href="classes/Citrus/Rule.html#M000033"><span class="method_name">new</span> <span class="module_name">(Citrus::Rule)</span></a>' },
           { method: 'new', module: 'citrus::grammar', html: '<a href="classes/Citrus/Grammar.html#M000006"><span class="method_name">new</span> <span class="module_name">(Citrus::Grammar)</span></a>' },
-          { method: 'new', module: 'citrus::nonterminal', html: '<a href="classes/Citrus/Nonterminal.html#M000046"><span class="method_name">new</span> <span class="module_name">(Citrus::Nonterminal)</span></a>' },
-          { method: 'new_id', module: 'citrus::rule', html: '<a href="classes/Citrus/Rule.html#M000035"><span class="method_name">new_id</span> <span class="module_name">(Citrus::Rule)</span></a>' },
-          { method: 'notp', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000020"><span class="method_name">notp</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
-          { method: 'one_or_more', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000025"><span class="method_name">one_or_more</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
-          { method: 'operator', module: 'citrus::repeat', html: '<a href="classes/Citrus/Repeat.html#M000086"><span class="method_name">operator</span> <span class="module_name">(Citrus::Repeat)</span></a>' },
-          { method: 'paren?', module: 'citrus::list', html: '<a href="classes/Citrus/List.html#M000050"><span class="method_name">paren?</span> <span class="module_name">(Citrus::List)</span></a>' },
-          { method: 'paren?', module: 'citrus::rule', html: '<a href="classes/Citrus/Rule.html#M000040"><span class="method_name">paren?</span> <span class="module_name">(Citrus::Rule)</span></a>' },
-          { method: 'parse', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000031"><span class="method_name">parse</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
+          { method: 'new', module: 'citrus::proxy', html: '<a href="classes/Citrus/Proxy.html#M000045"><span class="method_name">new</span> <span class="module_name">(Citrus::Proxy)</span></a>' },
+          { method: 'new', module: 'citrus::match', html: '<a href="classes/Citrus/Match.html#M000096"><span class="method_name">new</span> <span class="module_name">(Citrus::Match)</span></a>' },
+          { method: 'new', module: 'citrus::terminal', html: '<a href="classes/Citrus/Terminal.html#M000068"><span class="method_name">new</span> <span class="module_name">(Citrus::Terminal)</span></a>' },
+          { method: 'new', module: 'citrus::stringterminal', html: '<a href="classes/Citrus/StringTerminal.html#M000072"><span class="method_name">new</span> <span class="module_name">(Citrus::StringTerminal)</span></a>' },
+          { method: 'new', module: 'citrus::repeat', html: '<a href="classes/Citrus/Repeat.html#M000086"><span class="method_name">new</span> <span class="module_name">(Citrus::Repeat)</span></a>' },
+          { method: 'notp', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000021"><span class="method_name">notp</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
+          { method: 'one_or_more', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000026"><span class="method_name">one_or_more</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
+          { method: 'operator', module: 'citrus::repeat', html: '<a href="classes/Citrus/Repeat.html#M000090"><span class="method_name">operator</span> <span class="module_name">(Citrus::Repeat)</span></a>' },
+          { method: 'paren?', module: 'citrus::rule', html: '<a href="classes/Citrus/Rule.html#M000043"><span class="method_name">paren?</span> <span class="module_name">(Citrus::Rule)</span></a>' },
+          { method: 'paren?', module: 'citrus::list', html: '<a href="classes/Citrus/List.html#M000052"><span class="method_name">paren?</span> <span class="module_name">(Citrus::List)</span></a>' },
+          { method: 'parse', module: 'citrus::rule', html: '<a href="classes/Citrus/Rule.html#M000039"><span class="method_name">parse</span> <span class="module_name">(Citrus::Rule)</span></a>' },
           { method: 'parse', module: 'citrus', html: '<a href="classes/Citrus.html#M000005"><span class="method_name">parse</span> <span class="module_name">(Citrus)</span></a>' },
-          { method: 'rep', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000024"><span class="method_name">rep</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
-          { method: 'reset', module: 'citrus::input', html: '<a href="classes/Citrus/Input.html#M000055"><span class="method_name">reset</span> <span class="module_name">(Citrus::Input)</span></a>' },
-          { method: 'root', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000016"><span class="method_name">root</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
-          { method: 'rule', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000015"><span class="method_name">rule</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
-          { method: 'rule', module: 'citrus::predicate', html: '<a href="classes/Citrus/Predicate.html#M000049"><span class="method_name">rule</span> <span class="module_name">(Citrus::Predicate)</span></a>' },
-          { method: 'rule', module: 'citrus::proxy', html: '<a href="classes/Citrus/Proxy.html#M000044"><span class="method_name">rule</span> <span class="module_name">(Citrus::Proxy)</span></a>' },
-          { method: 'rule_name=', module: 'citrus::proxy', html: '<a href="classes/Citrus/Proxy.html#M000043"><span class="method_name">rule_name=</span> <span class="module_name">(Citrus::Proxy)</span></a>' },
-          { method: 'rule_names', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000011"><span class="method_name">rule_names</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
-          { method: 'rules', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000012"><span class="method_name">rules</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
-          { method: 'sup', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000018"><span class="method_name">sup</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
-          { method: 'super_rule', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000014"><span class="method_name">super_rule</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
-          { method: 'terminal?', module: 'citrus::rule', html: '<a href="classes/Citrus/Rule.html#M000039"><span class="method_name">terminal?</span> <span class="module_name">(Citrus::Rule)</span></a>' },
-          { method: 'terminal?', module: 'citrus::match', html: '<a href="classes/Citrus/Match.html#M000099"><span class="method_name">terminal?</span> <span class="module_name">(Citrus::Match)</span></a>' },
-          { method: 'to_ary', module: 'citrus::match', html: '<a href="classes/Citrus/Match.html#M000102"><span class="method_name">to_ary</span> <span class="module_name">(Citrus::Match)</span></a>' },
-          { method: 'to_s', module: 'citrus::choice', html: '<a href="classes/Citrus/Choice.html#M000089"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Choice)</span></a>' },
-          { method: 'to_s', module: 'citrus::repeat', html: '<a href="classes/Citrus/Repeat.html#M000087"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Repeat)</span></a>' },
-          { method: 'to_s', module: 'citrus::sequence', html: '<a href="classes/Citrus/Sequence.html#M000091"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Sequence)</span></a>' },
-          { method: 'to_s', module: 'citrus::label', html: '<a href="classes/Citrus/Label.html#M000081"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Label)</span></a>' },
-          { method: 'to_s', module: 'citrus::notpredicate', html: '<a href="classes/Citrus/NotPredicate.html#M000075"><span class="method_name">to_s</span> <span class="module_name">(Citrus::NotPredicate)</span></a>' },
-          { method: 'to_s', module: 'citrus::andpredicate', html: '<a href="classes/Citrus/AndPredicate.html#M000073"><span class="method_name">to_s</span> <span class="module_name">(Citrus::AndPredicate)</span></a>' },
+          { method: 'parse', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000009"><span class="method_name">parse</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
+          { method: 'propagates_extensions?', module: 'citrus::rule', html: '<a href="classes/Citrus/Rule.html#M000042"><span class="method_name">propagates_extensions?</span> <span class="module_name">(Citrus::Rule)</span></a>' },
+          { method: 'rep', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000025"><span class="method_name">rep</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
+          { method: 'root', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000017"><span class="method_name">root</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
+          { method: 'rule', module: 'citrus::proxy', html: '<a href="classes/Citrus/Proxy.html#M000047"><span class="method_name">rule</span> <span class="module_name">(Citrus::Proxy)</span></a>' },
+          { method: 'rule', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000016"><span class="method_name">rule</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
+          { method: 'rule', module: 'citrus::predicate', html: '<a href="classes/Citrus/Predicate.html#M000051"><span class="method_name">rule</span> <span class="module_name">(Citrus::Predicate)</span></a>' },
+          { method: 'rule_name=', module: 'citrus::proxy', html: '<a href="classes/Citrus/Proxy.html#M000046"><span class="method_name">rule_name=</span> <span class="module_name">(Citrus::Proxy)</span></a>' },
+          { method: 'rule_names', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000012"><span class="method_name">rule_names</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
+          { method: 'rules', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000013"><span class="method_name">rules</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
+          { method: 'sup', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000019"><span class="method_name">sup</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
+          { method: 'super_rule', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000015"><span class="method_name">super_rule</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
+          { method: 'terminal?', module: 'citrus::rule', html: '<a href="classes/Citrus/Rule.html#M000041"><span class="method_name">terminal?</span> <span class="module_name">(Citrus::Rule)</span></a>' },
+          { method: 'test', module: 'citrus::rule', html: '<a href="classes/Citrus/Rule.html#M000040"><span class="method_name">test</span> <span class="module_name">(Citrus::Rule)</span></a>' },
+          { method: 'test', module: 'citrus::input', html: '<a href="classes/Citrus/Input.html#M000065"><span class="method_name">test</span> <span class="module_name">(Citrus::Input)</span></a>' },
+          { method: 'to_s', module: 'citrus::choice', html: '<a href="classes/Citrus/Choice.html#M000093"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Choice)</span></a>' },
+          { method: 'to_s', module: 'citrus::andpredicate', html: '<a href="classes/Citrus/AndPredicate.html#M000077"><span class="method_name">to_s</span> <span class="module_name">(Citrus::AndPredicate)</span></a>' },
+          { method: 'to_s', module: 'citrus::sequence', html: '<a href="classes/Citrus/Sequence.html#M000095"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Sequence)</span></a>' },
+          { method: 'to_s', module: 'citrus::super', html: '<a href="classes/Citrus/Super.html#M000075"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Super)</span></a>' },
+          { method: 'to_s', module: 'citrus::repeat', html: '<a href="classes/Citrus/Repeat.html#M000091"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Repeat)</span></a>' },
+          { method: 'to_s', module: 'citrus::notpredicate', html: '<a href="classes/Citrus/NotPredicate.html#M000079"><span class="method_name">to_s</span> <span class="module_name">(Citrus::NotPredicate)</span></a>' },
+          { method: 'to_s', module: 'citrus::alias', html: '<a href="classes/Citrus/Alias.html#M000074"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Alias)</span></a>' },
+          { method: 'to_s', module: 'citrus::butpredicate', html: '<a href="classes/Citrus/ButPredicate.html#M000081"><span class="method_name">to_s</span> <span class="module_name">(Citrus::ButPredicate)</span></a>' },
           { method: 'to_s', module: 'citrus::terminal', html: '<a href="classes/Citrus/Terminal.html#M000071"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Terminal)</span></a>' },
-          { method: 'to_s', module: 'citrus::match', html: '<a href="classes/Citrus/Match.html#M000100"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Match)</span></a>' },
-          { method: 'to_s', module: 'citrus::alias', html: '<a href="classes/Citrus/Alias.html#M000067"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Alias)</span></a>' },
-          { method: 'to_s', module: 'citrus::butpredicate', html: '<a href="classes/Citrus/ButPredicate.html#M000077"><span class="method_name">to_s</span> <span class="module_name">(Citrus::ButPredicate)</span></a>' },
-          { method: 'to_s', module: 'citrus::super', html: '<a href="classes/Citrus/Super.html#M000068"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Super)</span></a>' },
+          { method: 'to_s', module: 'citrus::stringterminal', html: '<a href="classes/Citrus/StringTerminal.html#M000073"><span class="method_name">to_s</span> <span class="module_name">(Citrus::StringTerminal)</span></a>' },
+          { method: 'to_s', module: 'citrus::label', html: '<a href="classes/Citrus/Label.html#M000085"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Label)</span></a>' },
           { method: 'version', module: 'citrus', html: '<a href="classes/Citrus.html#M000002"><span class="method_name">version</span> <span class="module_name">(Citrus)</span></a>' },
-          { method: 'zero_or_more', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000026"><span class="method_name">zero_or_more</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
-          { method: 'zero_or_one', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000027"><span class="method_name">zero_or_one</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
+          { method: 'zero_or_more', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000027"><span class="method_name">zero_or_more</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
+          { method: 'zero_or_one', module: 'citrus::grammarmethods', html: '<a href="classes/Citrus/GrammarMethods.html#M000028"><span class="method_name">zero_or_one</span> <span class="module_name">(Citrus::GrammarMethods)</span></a>' },
         ]
         $(document).observe('dom:loaded', function() {
         	// Setup search-during-typing.
@@ -4503,32 +4507,44 @@
       </form>
       <ol class='methods' id='search-results' style='display: none'></ol>
       <ol class='methods' id='index-entries'>
-        <li><a href="classes/Citrus/GrammarMethods.html#M000028"><span class="method_name">all</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
-        <li><a href="classes/Citrus/GrammarMethods.html#M000019"><span class="method_name">andp</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
-        <li><a href="classes/Citrus/GrammarMethods.html#M000029"><span class="method_name">any</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
-        <li><a href="classes/Citrus/GrammarMethods.html#M000021"><span class="method_name">but</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
-        <li><a href="classes/Citrus/GrammarMethods.html#M000022"><span class="method_name">butp</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
-        <li><a href="classes/Citrus/GrammarMethods.html#M000032"><span class="method_name">default_parse_options</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
-        <li><a href="classes/Citrus/ParseError.html#M000053"><span class="method_name">detail</span> <span class="module_name">(Citrus::ParseError)</span></a></li>
-        <li><a href="classes/Citrus/GrammarMethods.html#M000017"><span class="method_name">dot</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
+        <li><a href="classes/Citrus/Rule.html#M000034"><span class="method_name">[]</span> <span class="module_name">(Citrus::Rule)</span></a></li>
+        <li><a href="classes/Citrus/GrammarMethods.html#M000029"><span class="method_name">all</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
+        <li><a href="classes/Citrus/GrammarMethods.html#M000020"><span class="method_name">andp</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
+        <li><a href="classes/Citrus/GrammarMethods.html#M000030"><span class="method_name">any</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
+        <li><a href="classes/Citrus/GrammarMethods.html#M000022"><span class="method_name">but</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
+        <li><a href="classes/Citrus/GrammarMethods.html#M000023"><span class="method_name">butp</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
+        <li><a href="classes/Citrus/Terminal.html#M000070"><span class="method_name">case_sensitive?</span> <span class="module_name">(Citrus::Terminal)</span></a></li>
+        <li><a href="classes/Citrus/Match.html#M000101"><span class="method_name">creator</span> <span class="module_name">(Citrus::Match)</span></a></li>
+        <li><a href="classes/Citrus/ParseError.html#M000054"><span class="method_name">detail</span> <span class="module_name">(Citrus::ParseError)</span></a></li>
+        <li><a href="classes/Citrus/GrammarMethods.html#M000018"><span class="method_name">dot</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
+        <li><a href="classes/Citrus/Match.html#M000106"><span class="method_name">dump</span> <span class="module_name">(Citrus::Match)</span></a></li>
         <li><a href="classes/Citrus/Input.html#M000058"><span class="method_name">each_line</span> <span class="module_name">(Citrus::Input)</span></a></li>
-        <li><a href="classes/Citrus/Rule.html#M000041"><span class="method_name">embed</span> <span class="module_name">(Citrus::Rule)</span></a></li>
+        <li><a href="classes/Citrus/Rule.html#M000044"><span class="method_name">embed</span> <span class="module_name">(Citrus::Rule)</span></a></li>
         <li><a href="classes/Citrus.html#M000004"><span class="method_name">eval</span> <span class="module_name">(Citrus)</span></a></li>
-        <li><a href="classes/Citrus/Rule.html#M000033"><span class="method_name">eval</span> <span class="module_name">(Citrus::Rule)</span></a></li>
-        <li><a href="classes/Citrus/GrammarMethods.html#M000030"><span class="method_name">ext</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
+        <li><a href="classes/Citrus/Rule.html#M000032"><span class="method_name">eval</span> <span class="module_name">(Citrus::Rule)</span></a></li>
+        <li><a href="classes/Citrus/Label.html#M000084"><span class="method_name">exec</span> <span class="module_name">(Citrus::Label)</span></a></li>
+        <li><a href="classes/Citrus/NotPredicate.html#M000078"><span class="method_name">exec</span> <span class="module_name">(Citrus::NotPredicate)</span></a></li>
+        <li><a href="classes/Citrus/Proxy.html#M000048"><span class="method_name">exec</span> <span class="module_name">(Citrus::Proxy)</span></a></li>
+        <li><a href="classes/Citrus/Repeat.html#M000087"><span class="method_name">exec</span> <span class="module_name">(Citrus::Repeat)</span></a></li>
+        <li><a href="classes/Citrus/Choice.html#M000092"><span class="method_name">exec</span> <span class="module_name">(Citrus::Choice)</span></a></li>
+        <li><a href="classes/Citrus/Terminal.html#M000069"><span class="method_name">exec</span> <span class="module_name">(Citrus::Terminal)</span></a></li>
+        <li><a href="classes/Citrus/AndPredicate.html#M000076"><span class="method_name">exec</span> <span class="module_name">(Citrus::AndPredicate)</span></a></li>
+        <li><a href="classes/Citrus/Sequence.html#M000094"><span class="method_name">exec</span> <span class="module_name">(Citrus::Sequence)</span></a></li>
+        <li><a href="classes/Citrus/Input.html#M000064"><span class="method_name">exec</span> <span class="module_name">(Citrus::Input)</span></a></li>
+        <li><a href="classes/Citrus/ButPredicate.html#M000080"><span class="method_name">exec</span> <span class="module_name">(Citrus::ButPredicate)</span></a></li>
+        <li><a href="classes/Citrus/GrammarMethods.html#M000031"><span class="method_name">ext</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
         <li><a href="classes/Citrus/GrammarMethods.html#M000008"><span class="method_name">extend_object</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
+        <li><a href="classes/Citrus/Match.html#M000100"><span class="method_name">extenders</span> <span class="module_name">(Citrus::Match)</span></a></li>
         <li><a href="classes/Citrus/Rule.html#M000038"><span class="method_name">extension=</span> <span class="module_name">(Citrus::Rule)</span></a></li>
-        <li><a href="classes/Citrus/Match.html#M000097"><span class="method_name">find</span> <span class="module_name">(Citrus::Match)</span></a></li>
-        <li><a href="classes/Citrus/Match.html#M000098"><span class="method_name">first</span> <span class="module_name">(Citrus::Match)</span></a></li>
+        <li><a href="classes/Citrus/Match.html#M000103"><span class="method_name">find</span> <span class="module_name">(Citrus::Match)</span></a></li>
+        <li><a href="classes/Citrus/Match.html#M000104"><span class="method_name">first</span> <span class="module_name">(Citrus::Match)</span></a></li>
         <li><a href="classes/Object.html#M000001"><span class="method_name">grammar</span> <span class="module_name">(Object)</span></a></li>
-        <li><a href="classes/Citrus/Nonterminal.html#M000047"><span class="method_name">grammar=</span> <span class="module_name">(Citrus::Nonterminal)</span></a></li>
-        <li><a href="classes/Citrus/Match.html#M000095"><span class="method_name">has_name?</span> <span class="module_name">(Citrus::Match)</span></a></li>
-        <li><a href="classes/Citrus/GrammarMethods.html#M000013"><span class="method_name">has_rule?</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
-        <li><a href="classes/Citrus/Rule.html#M000036"><span class="method_name">id</span> <span class="module_name">(Citrus::Rule)</span></a></li>
+        <li><a href="classes/Citrus/Match.html#M000099"><span class="method_name">has_name?</span> <span class="module_name">(Citrus::Match)</span></a></li>
+        <li><a href="classes/Citrus/GrammarMethods.html#M000014"><span class="method_name">has_rule?</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
         <li><a href="classes/Citrus/Grammar.html#M000007"><span class="method_name">included</span> <span class="module_name">(Citrus::Grammar)</span></a></li>
-        <li><a href="classes/Citrus/GrammarMethods.html#M000010"><span class="method_name">included_grammars</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
-        <li><a href="classes/Citrus/GrammarMethods.html#M000023"><span class="method_name">label</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
-        <li><a href="classes/Citrus/Label.html#M000079"><span class="method_name">label=</span> <span class="module_name">(Citrus::Label)</span></a></li>
+        <li><a href="classes/Citrus/GrammarMethods.html#M000011"><span class="method_name">included_grammars</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
+        <li><a href="classes/Citrus/GrammarMethods.html#M000024"><span class="method_name">label</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
+        <li><a href="classes/Citrus/Label.html#M000083"><span class="method_name">label=</span> <span class="module_name">(Citrus::Label)</span></a></li>
         <li><a href="classes/Citrus/Input.html#M000056"><span class="method_name">length</span> <span class="module_name">(Citrus::Input)</span></a></li>
         <li><a href="classes/Citrus/Input.html#M000063"><span class="method_name">line</span> <span class="module_name">(Citrus::Input)</span></a></li>
         <li><a href="classes/Citrus/Input.html#M000060"><span class="method_name">line_index</span> <span class="module_name">(Citrus::Input)</span></a></li>
@@ -4537,74 +4553,66 @@
         <li><a href="classes/Citrus/Input.html#M000062"><span class="method_name">lineno</span> <span class="module_name">(Citrus::Input)</span></a></li>
         <li><a href="classes/Citrus/Input.html#M000057"><span class="method_name">lines</span> <span class="module_name">(Citrus::Input)</span></a></li>
         <li><a href="classes/Citrus.html#M000003"><span class="method_name">load</span> <span class="module_name">(Citrus)</span></a></li>
-        <li><a href="classes/Citrus/Choice.html#M000088"><span class="method_name">match</span> <span class="module_name">(Citrus::Choice)</span></a></li>
-        <li><a href="classes/Citrus/Proxy.html#M000045"><span class="method_name">match</span> <span class="module_name">(Citrus::Proxy)</span></a></li>
-        <li><a href="classes/Citrus/ButPredicate.html#M000076"><span class="method_name">match</span> <span class="module_name">(Citrus::ButPredicate)</span></a></li>
-        <li><a href="classes/Citrus/Label.html#M000080"><span class="method_name">match</span> <span class="module_name">(Citrus::Label)</span></a></li>
-        <li><a href="classes/Citrus/NotPredicate.html#M000074"><span class="method_name">match</span> <span class="module_name">(Citrus::NotPredicate)</span></a></li>
-        <li><a href="classes/Citrus/Input.html#M000064"><span class="method_name">match</span> <span class="module_name">(Citrus::Input)</span></a></li>
-        <li><a href="classes/Citrus/Terminal.html#M000070"><span class="method_name">match</span> <span class="module_name">(Citrus::Terminal)</span></a></li>
-        <li><a href="classes/Citrus/Repeat.html#M000083"><span class="method_name">match</span> <span class="module_name">(Citrus::Repeat)</span></a></li>
-        <li><a href="classes/Citrus/AndPredicate.html#M000072"><span class="method_name">match</span> <span class="module_name">(Citrus::AndPredicate)</span></a></li>
-        <li><a href="classes/Citrus/Sequence.html#M000090"><span class="method_name">match</span> <span class="module_name">(Citrus::Sequence)</span></a></li>
-        <li><a href="classes/Citrus/Match.html#M000096"><span class="method_name">matches</span> <span class="module_name">(Citrus::Match)</span></a></li>
-        <li><a href="classes/Citrus/Repeat.html#M000085"><span class="method_name">max</span> <span class="module_name">(Citrus::Repeat)</span></a></li>
-        <li><a href="classes/Citrus/Input.html#M000066"><span class="method_name">memoize!</span> <span class="module_name">(Citrus::Input)</span></a></li>
-        <li><a href="classes/Citrus/Input.html#M000065"><span class="method_name">memoized?</span> <span class="module_name">(Citrus::Input)</span></a></li>
-        <li><a href="classes/Citrus/Match.html#M000101"><span class="method_name">method_missing</span> <span class="module_name">(Citrus::Match)</span></a></li>
-        <li><a href="classes/Citrus/Repeat.html#M000084"><span class="method_name">min</span> <span class="module_name">(Citrus::Repeat)</span></a></li>
-        <li><a href="classes/Citrus/Match.html#M000094"><span class="method_name">name</span> <span class="module_name">(Citrus::Match)</span></a></li>
-        <li><a href="classes/Citrus/GrammarMethods.html#M000009"><span class="method_name">name</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
-        <li><a href="classes/Citrus/Rule.html#M000037"><span class="method_name">name=</span> <span class="module_name">(Citrus::Rule)</span></a></li>
-        <li><a href="classes/Citrus/Match.html#M000093"><span class="method_name">names</span> <span class="module_name">(Citrus::Match)</span></a></li>
-        <li><a href="classes/Citrus/SyntaxError.html#M000051"><span class="method_name">new</span> <span class="module_name">(Citrus::SyntaxError)</span></a></li>
-        <li><a href="classes/Citrus/Input.html#M000054"><span class="method_name">new</span> <span class="module_name">(Citrus::Input)</span></a></li>
-        <li><a href="classes/Citrus/Repeat.html#M000082"><span class="method_name">new</span> <span class="module_name">(Citrus::Repeat)</span></a></li>
-        <li><a href="classes/Citrus/Label.html#M000078"><span class="method_name">new</span> <span class="module_name">(Citrus::Label)</span></a></li>
-        <li><a href="classes/Citrus/Match.html#M000092"><span class="method_name">new</span> <span class="module_name">(Citrus::Match)</span></a></li>
-        <li><a href="classes/Citrus/Rule.html#M000034"><span class="method_name">new</span> <span class="module_name">(Citrus::Rule)</span></a></li>
-        <li><a href="classes/Citrus/Proxy.html#M000042"><span class="method_name">new</span> <span class="module_name">(Citrus::Proxy)</span></a></li>
-        <li><a href="classes/Citrus/Predicate.html#M000048"><span class="method_name">new</span> <span class="module_name">(Citrus::Predicate)</span></a></li>
-        <li><a href="classes/Citrus/Terminal.html#M000069"><span class="method_name">new</span> <span class="module_name">(Citrus::Terminal)</span></a></li>
-        <li><a href="classes/Citrus/ParseError.html#M000052"><span class="method_name">new</span> <span class="module_name">(Citrus::ParseError)</span></a></li>
+        <li><a href="classes/Citrus/Match.html#M000102"><span class="method_name">matches</span> <span class="module_name">(Citrus::Match)</span></a></li>
+        <li><a href="classes/Citrus/Repeat.html#M000089"><span class="method_name">max</span> <span class="module_name">(Citrus::Repeat)</span></a></li>
+        <li><a href="classes/Citrus/Input.html#M000067"><span class="method_name">memoize!</span> <span class="module_name">(Citrus::Input)</span></a></li>
+        <li><a href="classes/Citrus/Input.html#M000066"><span class="method_name">memoized?</span> <span class="module_name">(Citrus::Input)</span></a></li>
+        <li><a href="classes/Citrus/Match.html#M000105"><span class="method_name">method_missing</span> <span class="module_name">(Citrus::Match)</span></a></li>
+        <li><a href="classes/Citrus/Repeat.html#M000088"><span class="method_name">min</span> <span class="module_name">(Citrus::Repeat)</span></a></li>
+        <li><a href="classes/Citrus/GrammarMethods.html#M000010"><span class="method_name">name</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
+        <li><a href="classes/Citrus/Rule.html#M000036"><span class="method_name">name</span> <span class="module_name">(Citrus::Rule)</span></a></li>
+        <li><a href="classes/Citrus/Match.html#M000098"><span class="method_name">name</span> <span class="module_name">(Citrus::Match)</span></a></li>
+        <li><a href="classes/Citrus/Rule.html#M000035"><span class="method_name">name=</span> <span class="module_name">(Citrus::Rule)</span></a></li>
+        <li><a href="classes/Citrus/Rule.html#M000037"><span class="method_name">named?</span> <span class="module_name">(Citrus::Rule)</span></a></li>
+        <li><a href="classes/Citrus/Match.html#M000097"><span class="method_name">names</span> <span class="module_name">(Citrus::Match)</span></a></li>
+        <li><a href="classes/Citrus/ParseError.html#M000053"><span class="method_name">new</span> <span class="module_name">(Citrus::ParseError)</span></a></li>
+        <li><a href="classes/Citrus/Label.html#M000082"><span class="method_name">new</span> <span class="module_name">(Citrus::Label)</span></a></li>
+        <li><a href="classes/Citrus/Input.html#M000055"><span class="method_name">new</span> <span class="module_name">(Citrus::Input)</span></a></li>
+        <li><a href="classes/Citrus/Predicate.html#M000050"><span class="method_name">new</span> <span class="module_name">(Citrus::Predicate)</span></a></li>
+        <li><a href="classes/Citrus/Nonterminal.html#M000049"><span class="method_name">new</span> <span class="module_name">(Citrus::Nonterminal)</span></a></li>
+        <li><a href="classes/Citrus/Rule.html#M000033"><span class="method_name">new</span> <span class="module_name">(Citrus::Rule)</span></a></li>
         <li><a href="classes/Citrus/Grammar.html#M000006"><span class="method_name">new</span> <span class="module_name">(Citrus::Grammar)</span></a></li>
-        <li><a href="classes/Citrus/Nonterminal.html#M000046"><span class="method_name">new</span> <span class="module_name">(Citrus::Nonterminal)</span></a></li>
-        <li><a href="classes/Citrus/Rule.html#M000035"><span class="method_name">new_id</span> <span class="module_name">(Citrus::Rule)</span></a></li>
-        <li><a href="classes/Citrus/GrammarMethods.html#M000020"><span class="method_name">notp</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
-        <li><a href="classes/Citrus/GrammarMethods.html#M000025"><span class="method_name">one_or_more</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
-        <li><a href="classes/Citrus/Repeat.html#M000086"><span class="method_name">operator</span> <span class="module_name">(Citrus::Repeat)</span></a></li>
-        <li><a href="classes/Citrus/List.html#M000050"><span class="method_name">paren?</span> <span class="module_name">(Citrus::List)</span></a></li>
-        <li><a href="classes/Citrus/Rule.html#M000040"><span class="method_name">paren?</span> <span class="module_name">(Citrus::Rule)</span></a></li>
-        <li><a href="classes/Citrus/GrammarMethods.html#M000031"><span class="method_name">parse</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
+        <li><a href="classes/Citrus/Proxy.html#M000045"><span class="method_name">new</span> <span class="module_name">(Citrus::Proxy)</span></a></li>
+        <li><a href="classes/Citrus/Match.html#M000096"><span class="method_name">new</span> <span class="module_name">(Citrus::Match)</span></a></li>
+        <li><a href="classes/Citrus/Terminal.html#M000068"><span class="method_name">new</span> <span class="module_name">(Citrus::Terminal)</span></a></li>
+        <li><a href="classes/Citrus/StringTerminal.html#M000072"><span class="method_name">new</span> <span class="module_name">(Citrus::StringTerminal)</span></a></li>
+        <li><a href="classes/Citrus/Repeat.html#M000086"><span class="method_name">new</span> <span class="module_name">(Citrus::Repeat)</span></a></li>
+        <li><a href="classes/Citrus/GrammarMethods.html#M000021"><span class="method_name">notp</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
+        <li><a href="classes/Citrus/GrammarMethods.html#M000026"><span class="method_name">one_or_more</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
+        <li><a href="classes/Citrus/Repeat.html#M000090"><span class="method_name">operator</span> <span class="module_name">(Citrus::Repeat)</span></a></li>
+        <li><a href="classes/Citrus/Rule.html#M000043"><span class="method_name">paren?</span> <span class="module_name">(Citrus::Rule)</span></a></li>
+        <li><a href="classes/Citrus/List.html#M000052"><span class="method_name">paren?</span> <span class="module_name">(Citrus::List)</span></a></li>
+        <li><a href="classes/Citrus/Rule.html#M000039"><span class="method_name">parse</span> <span class="module_name">(Citrus::Rule)</span></a></li>
         <li><a href="classes/Citrus.html#M000005"><span class="method_name">parse</span> <span class="module_name">(Citrus)</span></a></li>
-        <li><a href="classes/Citrus/GrammarMethods.html#M000024"><span class="method_name">rep</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
-        <li><a href="classes/Citrus/Input.html#M000055"><span class="method_name">reset</span> <span class="module_name">(Citrus::Input)</span></a></li>
-        <li><a href="classes/Citrus/GrammarMethods.html#M000016"><span class="method_name">root</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
-        <li><a href="classes/Citrus/GrammarMethods.html#M000015"><span class="method_name">rule</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
-        <li><a href="classes/Citrus/Predicate.html#M000049"><span class="method_name">rule</span> <span class="module_name">(Citrus::Predicate)</span></a></li>
-        <li><a href="classes/Citrus/Proxy.html#M000044"><span class="method_name">rule</span> <span class="module_name">(Citrus::Proxy)</span></a></li>
-        <li><a href="classes/Citrus/Proxy.html#M000043"><span class="method_name">rule_name=</span> <span class="module_name">(Citrus::Proxy)</span></a></li>
-        <li><a href="classes/Citrus/GrammarMethods.html#M000011"><span class="method_name">rule_names</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
-        <li><a href="classes/Citrus/GrammarMethods.html#M000012"><span class="method_name">rules</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
-        <li><a href="classes/Citrus/GrammarMethods.html#M000018"><span class="method_name">sup</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
-        <li><a href="classes/Citrus/GrammarMethods.html#M000014"><span class="method_name">super_rule</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
-        <li><a href="classes/Citrus/Rule.html#M000039"><span class="method_name">terminal?</span> <span class="module_name">(Citrus::Rule)</span></a></li>
-        <li><a href="classes/Citrus/Match.html#M000099"><span class="method_name">terminal?</span> <span class="module_name">(Citrus::Match)</span></a></li>
-        <li><a href="classes/Citrus/Match.html#M000102"><span class="method_name">to_ary</span> <span class="module_name">(Citrus::Match)</span></a></li>
-        <li><a href="classes/Citrus/Choice.html#M000089"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Choice)</span></a></li>
-        <li><a href="classes/Citrus/Repeat.html#M000087"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Repeat)</span></a></li>
-        <li><a href="classes/Citrus/Sequence.html#M000091"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Sequence)</span></a></li>
-        <li><a href="classes/Citrus/Label.html#M000081"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Label)</span></a></li>
-        <li><a href="classes/Citrus/NotPredicate.html#M000075"><span class="method_name">to_s</span> <span class="module_name">(Citrus::NotPredicate)</span></a></li>
-        <li><a href="classes/Citrus/AndPredicate.html#M000073"><span class="method_name">to_s</span> <span class="module_name">(Citrus::AndPredicate)</span></a></li>
+        <li><a href="classes/Citrus/GrammarMethods.html#M000009"><span class="method_name">parse</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
+        <li><a href="classes/Citrus/Rule.html#M000042"><span class="method_name">propagates_extensions?</span> <span class="module_name">(Citrus::Rule)</span></a></li>
+        <li><a href="classes/Citrus/GrammarMethods.html#M000025"><span class="method_name">rep</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
+        <li><a href="classes/Citrus/GrammarMethods.html#M000017"><span class="method_name">root</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
+        <li><a href="classes/Citrus/Proxy.html#M000047"><span class="method_name">rule</span> <span class="module_name">(Citrus::Proxy)</span></a></li>
+        <li><a href="classes/Citrus/GrammarMethods.html#M000016"><span class="method_name">rule</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
+        <li><a href="classes/Citrus/Predicate.html#M000051"><span class="method_name">rule</span> <span class="module_name">(Citrus::Predicate)</span></a></li>
+        <li><a href="classes/Citrus/Proxy.html#M000046"><span class="method_name">rule_name=</span> <span class="module_name">(Citrus::Proxy)</span></a></li>
+        <li><a href="classes/Citrus/GrammarMethods.html#M000012"><span class="method_name">rule_names</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
+        <li><a href="classes/Citrus/GrammarMethods.html#M000013"><span class="method_name">rules</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
+        <li><a href="classes/Citrus/GrammarMethods.html#M000019"><span class="method_name">sup</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
+        <li><a href="classes/Citrus/GrammarMethods.html#M000015"><span class="method_name">super_rule</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
+        <li><a href="classes/Citrus/Rule.html#M000041"><span class="method_name">terminal?</span> <span class="module_name">(Citrus::Rule)</span></a></li>
+        <li><a href="classes/Citrus/Rule.html#M000040"><span class="method_name">test</span> <span class="module_name">(Citrus::Rule)</span></a></li>
+        <li><a href="classes/Citrus/Input.html#M000065"><span class="method_name">test</span> <span class="module_name">(Citrus::Input)</span></a></li>
+        <li><a href="classes/Citrus/Choice.html#M000093"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Choice)</span></a></li>
+        <li><a href="classes/Citrus/AndPredicate.html#M000077"><span class="method_name">to_s</span> <span class="module_name">(Citrus::AndPredicate)</span></a></li>
+        <li><a href="classes/Citrus/Sequence.html#M000095"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Sequence)</span></a></li>
+        <li><a href="classes/Citrus/Super.html#M000075"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Super)</span></a></li>
+        <li><a href="classes/Citrus/Repeat.html#M000091"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Repeat)</span></a></li>
+        <li><a href="classes/Citrus/NotPredicate.html#M000079"><span class="method_name">to_s</span> <span class="module_name">(Citrus::NotPredicate)</span></a></li>
+        <li><a href="classes/Citrus/Alias.html#M000074"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Alias)</span></a></li>
+        <li><a href="classes/Citrus/ButPredicate.html#M000081"><span class="method_name">to_s</span> <span class="module_name">(Citrus::ButPredicate)</span></a></li>
         <li><a href="classes/Citrus/Terminal.html#M000071"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Terminal)</span></a></li>
-        <li><a href="classes/Citrus/Match.html#M000100"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Match)</span></a></li>
-        <li><a href="classes/Citrus/Alias.html#M000067"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Alias)</span></a></li>
-        <li><a href="classes/Citrus/ButPredicate.html#M000077"><span class="method_name">to_s</span> <span class="module_name">(Citrus::ButPredicate)</span></a></li>
-        <li><a href="classes/Citrus/Super.html#M000068"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Super)</span></a></li>
+        <li><a href="classes/Citrus/StringTerminal.html#M000073"><span class="method_name">to_s</span> <span class="module_name">(Citrus::StringTerminal)</span></a></li>
+        <li><a href="classes/Citrus/Label.html#M000085"><span class="method_name">to_s</span> <span class="module_name">(Citrus::Label)</span></a></li>
         <li><a href="classes/Citrus.html#M000002"><span class="method_name">version</span> <span class="module_name">(Citrus)</span></a></li>
-        <li><a href="classes/Citrus/GrammarMethods.html#M000026"><span class="method_name">zero_or_more</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
-        <li><a href="classes/Citrus/GrammarMethods.html#M000027"><span class="method_name">zero_or_one</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
+        <li><a href="classes/Citrus/GrammarMethods.html#M000027"><span class="method_name">zero_or_more</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
+        <li><a href="classes/Citrus/GrammarMethods.html#M000028"><span class="method_name">zero_or_one</span> <span class="module_name">(Citrus::GrammarMethods)</span></a></li>
       </ol>
     </div>
   </body>

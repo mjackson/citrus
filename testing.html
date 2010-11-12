@@ -52,12 +52,11 @@ case that could be used to test that our grammar works properly.</p>
 end
 </code></pre>
 
-<p>The key here is using the <code>root</code>
-<a href="api/classes/Citrus/GrammarMethods.html#M000031">option</a> when performing the
-parse to specify the name of the rule at which the parse should start. In
-<code>test_number</code>, since <code>:number</code> was given the parse will start at that rule as if
-it were the root rule of the entire grammar. The ability to change the root rule
-on the fly like this enables easy unit testing of the entire grammar.</p>
+<p>The key here is using the <code>:root</code> option when performing the parse to specify
+the name of the rule at which the parse should start. In <code>test_number</code>, since
+<code>:number</code> was given the parse will start at that rule as if it were the root
+rule of the entire grammar. The ability to change the root rule on the fly like
+this enables easy unit testing of the entire grammar.</p>
 
 <p>Also note that because match objects are themselves strings, assertions may be
 made to test equality of match objects with string values.</p>
@@ -66,9 +65,9 @@ made to test equality of match objects with string values.</p>
 
 <p>When a parse fails, a <a href="api/classes/Citrus/ParseError.html">ParseError</a> object is
 generated which provides a wealth of information about exactly where the parse
-failed. Using this object, you could possibly provide some useful feedback to
-the user about why the input was bad. The following code demonstrates one way
-to do this.</p>
+failed including the offset, line number, line text, and line offset. Using this
+object, you could possibly provide some useful feedback to the user about why
+the input was bad. The following code demonstrates one way to do this.</p>
 
 <pre><code>def parse_some_stuff(stuff)
   match = StuffGrammar.parse(stuff)
@@ -78,17 +77,10 @@ rescue Citrus::ParseError =&gt; e
 end
 </code></pre>
 
-<p>In addition to useful error objects, Citrus also includes a special file that
-should help grammar authors when debugging grammars. To get this extra
-functionality, simply <code>require 'citrus/debug'</code> instead of <code>require 'citrus'</code>
-when running your code.</p>
-
-<p>When debugging is enabled, you can visualize parse trees in the console as XML
-documents. This can help when determining which rules are generating which
-matches and how they are organized in the output. Also when debugging, each
-match object automatically records its offset in the original input, which can
-also be very helpful in keeping track of which offsets in the input generated
-which matches.</p>
+<p>In addition to useful error objects, Citrus also includes a means of visualizing
+match trees in the console via <code>Match#dump</code>. This can help when determining
+which rules are generating which matches and how they are organized in the
+match tree.</p>
 
               <p class="copyright"><a href="license.html">Copyright</a> &copy; 2010 <a href="http://mjijackson.com/">Michael Jackson</a></p>
           </div>

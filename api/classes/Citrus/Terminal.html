@@ -45,16 +45,9 @@
             <p>
             A <a href="Terminal.html">Terminal</a> is a <a href="Rule.html">Rule</a>
             that matches directly on the input stream and may not contain any other
-            rule. Terminals may be created from either a String or a Regexp object.
-            When created from strings, the <a href="../Citrus.html">Citrus</a> notation
-            is any sequence of characters enclosed in either single or double quotes,
-            e.g.:
-            </p>
-            <pre>'expr'&#x000A;&quot;expr&quot;</pre>
-            <p>
-            When created from a regular expression, the <a
-            href="../Citrus.html">Citrus</a> notation is identical to Ruby&#8217;s
-            regular expression notation, e.g.:
+            rule. Terminals are essentially wrappers for regular expressions. As such,
+            the <a href="../Citrus.html">Citrus</a> notation is identical to
+            Ruby&#8217;s regular expression notation, e.g.:
             </p>
             <pre>/expr/</pre>
             <p>
@@ -68,11 +61,12 @@
             <h2>Methods</h2>
             <h3>public class</h3>
             <ol>
-              <li><a href="#M000069">new</a></li>
+              <li><a href="#M000068">new</a></li>
             </ol>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000070">match</a></li>
+              <li><a href="#M000070">case_sensitive?</a></li>
+              <li><a href="#M000069">exec</a></li>
               <li><a href="#M000071">to_s</a></li>
             </ol>
           </div>
@@ -102,37 +96,54 @@
             </div>
             <div id='methods'>
               <h2>Public class methods</h2>
-              <div class='method public-class' id='method-M000069'>
-                <a name='M000069'></a>
+              <div class='method public-class' id='method-M000068'>
+                <a name='M000068'></a>
                 <div class='synopsis'>
                   <span class='name'>new</span>
-                  <span class='arguments'>(rule='')</span>
+                  <span class='arguments'>(rule=/^/)</span>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000069-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000068-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000069-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 690</span>&#x000A;690:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">rule</span>=<span class="ruby-value str">''</span>)&#x000A;691:       <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">rule</span>&#x000A;692:       <span class="ruby-keyword kw">when</span> <span class="ruby-constant">String</span>&#x000A;693:         <span class="ruby-ivar">@string</span> = <span class="ruby-identifier">rule</span>&#x000A;694:         <span class="ruby-ivar">@rule</span> = <span class="ruby-constant">Regexp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Regexp</span>.<span class="ruby-identifier">escape</span>(<span class="ruby-identifier">rule</span>))&#x000A;695:       <span class="ruby-keyword kw">when</span> <span class="ruby-constant">Regexp</span>&#x000A;696:         <span class="ruby-ivar">@rule</span> = <span class="ruby-identifier">rule</span>&#x000A;697:       <span class="ruby-keyword kw">else</span>&#x000A;698:         <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-value str">&quot;Cannot create terminal from object: %s&quot;</span> <span class="ruby-operator">%</span> &#x000A;699:           <span class="ruby-identifier">rule</span>.<span class="ruby-identifier">inspect</span>&#x000A;700:       <span class="ruby-keyword kw">end</span>&#x000A;701:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000068-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 633</span>&#x000A;633:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">rule</span>=<span class="ruby-regexp re">/^/</span>)&#x000A;634:       <span class="ruby-keyword kw">super</span>&#x000A;635:       <span class="ruby-ivar">@rule</span> = <span class="ruby-identifier">rule</span>&#x000A;636:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <h2>Public instance methods</h2>
               <div class='method public-instance' id='method-M000070'>
                 <a name='M000070'></a>
                 <div class='synopsis'>
-                  <span class='name'>match</span>
-                  <span class='arguments'>(input)</span>
+                  <span class='name'>case_sensitive?</span>
+                  <span class='arguments'>()</span>
                 </div>
                 <div class='description'>
                   <p>
-                  Returns the <a href="Match.html">Match</a> for this rule on <tt>input</tt>,
-                  <tt>nil</tt> if no match can be made.
+                  Returns <tt>true</tt> if this rule is case sensitive.
                   </p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('M000070-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000070-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 707</span>&#x000A;707:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">match</span>(<span class="ruby-identifier">input</span>)&#x000A;708:       <span class="ruby-identifier">m</span> = <span class="ruby-identifier">input</span>.<span class="ruby-identifier">scan</span>(<span class="ruby-identifier">rule</span>)&#x000A;709:       <span class="ruby-identifier">create_match</span>(<span class="ruby-identifier">m</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">m</span>&#x000A;710:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000070-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 653</span>&#x000A;653:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">case_sensitive?</span>&#x000A;654:       <span class="ruby-operator">!</span><span class="ruby-identifier">rule</span>.<span class="ruby-identifier">casefold?</span>&#x000A;655:     <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-M000069'>
+                <a name='M000069'></a>
+                <div class='synopsis'>
+                  <span class='name'>exec</span>
+                  <span class='arguments'>(input, events=[])</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Returns an array of events for this rule on the given <tt>input</tt>.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000069-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000069-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 642</span>&#x000A;642:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">exec</span>(<span class="ruby-identifier">input</span>, <span class="ruby-identifier">events</span>=[])&#x000A;643:       <span class="ruby-identifier">length</span> = <span class="ruby-identifier">input</span>.<span class="ruby-identifier">scan_full</span>(<span class="ruby-identifier">rule</span>, <span class="ruby-keyword kw">false</span>, <span class="ruby-keyword kw">false</span>)&#x000A;644:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">length</span>&#x000A;645:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">id</span>&#x000A;646:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">CLOSE</span>&#x000A;647:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">length</span>&#x000A;648:       <span class="ruby-keyword kw">end</span>&#x000A;649:       <span class="ruby-identifier">events</span>&#x000A;650:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-M000071'>
@@ -151,7 +162,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('M000071-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000071-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 713</span>&#x000A;713:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">to_s</span>&#x000A;714:       (<span class="ruby-ivar">@string</span> <span class="ruby-operator">||</span> <span class="ruby-ivar">@rule</span>).<span class="ruby-identifier">inspect</span>&#x000A;715:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000071-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 658</span>&#x000A;658:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">to_s</span>&#x000A;659:       <span class="ruby-identifier">rule</span>.<span class="ruby-identifier">inspect</span>&#x000A;660:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>
