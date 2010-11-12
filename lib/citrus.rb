@@ -551,7 +551,6 @@ module Citrus
       input.memoize! if opts[:memoize]
       input.pos = opts[:offset] if opts[:offset] > 0
 
-      start = input.pos
       events = input.exec(self)
       length = events[-1]
 
@@ -559,7 +558,7 @@ module Citrus
         raise ParseError.new(input)
       end
 
-      Match.new(string.slice(start, length), events)
+      Match.new(string.slice(opts[:offset], length), events)
     end
 
     # The default set of options to use when parsing.
@@ -1135,11 +1134,6 @@ module Citrus
       end
     end
 
-    # Returns a reference to the Rule object that first created this match.
-    def creator
-      extenders.first
-    end
-
     # Returns an array of Match objects that are submatches of this match in the
     # order they appeared in the input.
     def matches
@@ -1186,6 +1180,11 @@ module Citrus
     def first(name=nil)
       name ? find(name, false).first : matches.first
     end
+
+    # The default value for a match is its string value. This method is
+    # overridden in most cases to be more meaningful according to the desired
+    # interpretation.
+    alias value to_s
 
     # Allows sub-matches of this match to be retrieved by name as instance
     # methods.
