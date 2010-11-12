@@ -25,7 +25,6 @@ Gem::Specification.new do |s|
 
   s.test_files = s.files.select {|path| path =~ /^test\/.*_test.rb/ }
 
-  s.add_dependency('builder')
   s.add_development_dependency('rake')
 
   s.has_rdoc = true
