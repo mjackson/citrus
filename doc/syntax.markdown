@@ -12,6 +12,7 @@ the same rules as Ruby string and regular expression literals.
 
     'abc'         # match "abc"
     "abc\n"       # match "abc\n"
+    /abc/i        # match "abc" in any case
     /\xFF/        # match "\xFF"
 
 Character classes and the dot (match anything) symbol are supported as well for
@@ -21,7 +22,13 @@ compatibility with other parsing expression implementations.
     [\x00-\xFF]   # match any octet
     .             # match any single character, including new lines
 
-See [Terminal](api/classes/Citrus/Terminal.html) for more information.
+Also, strings may use backticks instead of quotes to indicate that they should
+match in a case-insensitive manner.
+
+    `abc`         # match "abc" in any case
+
+See [Terminal](api/classes/Citrus/Terminal.html) and
+[StringTerminal](api/classes/Citrus/StringTerminal.html) for more information.
 
 ## Repetition
 
@@ -36,13 +43,13 @@ and `M` is the maximum number of times the expression may match.
 Additionally, the minimum and maximum may be omitted entirely to specify that an
 expression may match zero or more times.
 
-    'abc'*        # match "abc" any number of times, including zero
+    'abc'*        # match "abc" zero or more times
 
 The `+` and `?` operators are supported as well for the common cases of `1*` and
 `*1` respectively.
 
-    'abc'+        # match "abc" at least once
-    'abc'?        # match "abc" a maximum of once
+    'abc'+        # match "abc" one or more times
+    'abc'?        # match "abc" zero or one time
 
 See [Repeat](api/classes/Citrus/Repeat.html) for more information.
 
@@ -79,10 +86,15 @@ See [Sequence](api/classes/Citrus/Sequence.html) for more information.
 ## Choices
 
 Ordered choice is indicated by a vertical bar that separates two expressions.
-Note that any operator binds more tightly than the bar.
+When using choice, each expression is tried in order. When one matches, the
+rule returns the match immediately without trying the remaining rules.
 
     'a' | 'b'       # match "a" or "b"
     'a' 'b' | 'c'   # match "a" then "b" (in sequence), or "c"
+
+It is important to note when using ordered choice that any operator binds more
+tightly than the vertical bar. A full chart of operators and their respective
+levels of precedence is below.
 
 See [Choice](api/classes/Citrus/Choice.html) for more information.
 
@@ -128,6 +140,14 @@ objects.
       end
     }
 
+## Super
+
+When including a grammar inside another, all rules in the child that have the
+same name as a rule in the parent also have access to the `super` keyword to
+invoke the parent rule.
+
+See [Super](api/classes/Citrus/Super.html) for more information.
+
 ## Precedence
 
 The following table contains a list of all Citrus symbols and operators and
@@ -137,6 +157,7 @@ Operator                  | Name                      | Precedence
 ------------------------- | ------------------------- | ----------
 `''`                      | String (single quoted)    | 6
 `""`                      | String (double quoted)    | 6
+<code>``</code>           | String (case insensitive) | 6
 `[]`                      | Character class           | 6
 `.`                       | Dot (any character)       | 6
 `//`                      | Regular expression        | 6

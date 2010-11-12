@@ -115,6 +115,7 @@ the same rules as Ruby string and regular expression literals.
 
     'abc'         # match "abc"
     "abc\n"       # match "abc\n"
+    /abc/i        # match "abc" in any case
     /\xFF/        # match "\xFF"
 
 Character classes and the dot (match anything) symbol are supported as well for
@@ -124,7 +125,13 @@ compatibility with other parsing expression implementations.
     [\x00-\xFF]   # match any octet
     .             # match any single character, including new lines
 
-See [Terminal](api/classes/Citrus/Terminal.html) for more information.
+Also, strings may use backticks instead of quotes to indicate that they should
+match in a case-insensitive manner.
+
+    `abc`         # match "abc" in any case
+
+See [Terminal](api/classes/Citrus/Terminal.html) and
+[StringTerminal](api/classes/Citrus/StringTerminal.html) for more information.
 
 ## Repetition
 
@@ -139,13 +146,13 @@ and `M` is the maximum number of times the expression may match.
 Additionally, the minimum and maximum may be omitted entirely to specify that an
 expression may match zero or more times.
 
-    'abc'*        # match "abc" any number of times, including zero
+    'abc'*        # match "abc" zero or more times
 
 The `+` and `?` operators are supported as well for the common cases of `1*` and
 `*1` respectively.
 
-    'abc'+        # match "abc" at least once
-    'abc'?        # match "abc" a maximum of once
+    'abc'+        # match "abc" one or more times
+    'abc'?        # match "abc" zero or one time
 
 See [Repeat](api/classes/Citrus/Repeat.html) for more information.
 
@@ -182,10 +189,15 @@ See [Sequence](api/classes/Citrus/Sequence.html) for more information.
 ## Choices
 
 Ordered choice is indicated by a vertical bar that separates two expressions.
-Note that any operator binds more tightly than the bar.
+When using choice, each expression is tried in order. When one matches, the
+rule returns the match immediately without trying the remaining rules.
 
     'a' | 'b'       # match "a" or "b"
     'a' 'b' | 'c'   # match "a" then "b" (in sequence), or "c"
+
+It is important to note when using ordered choice that any operator binds more
+tightly than the vertical bar. A full chart of operators and their respective
+levels of precedence is below.
 
 See [Choice](api/classes/Citrus/Choice.html) for more information.
 
@@ -248,6 +260,7 @@ Operator  | Name                      | Precedence
 --------- | ------------------------- | ----------
 ''        | String (single quoted)    | 6
 ""        | String (double quoted)    | 6
+``        | String (case insensitive) | 6
 []        | Character class           | 6
 .         | Dot (any character)       | 6
 //        | Regular expression        | 6
@@ -444,12 +457,11 @@ case that could be used to test that our grammar works properly.
       end
     end
 
-The key here is using the `root`
-[option](api/classes/Citrus/GrammarMethods.html#M000031) when performing the
-parse to specify the name of the rule at which the parse should start. In
-`test_number`, since `:number` was given the parse will start at that rule as if
-it were the root rule of the entire grammar. The ability to change the root rule
-on the fly like this enables easy unit testing of the entire grammar.
+The key here is using the `:root` option when performing the parse to specify
+the name of the rule at which the parse should start. In `test_number`, since
+`:number` was given the parse will start at that rule as if it were the root
+rule of the entire grammar. The ability to change the root rule on the fly like
+this enables easy unit testing of the entire grammar.
 
 Also note that because match objects are themselves strings, assertions may be
 made to test equality of match objects with string values.
@@ -458,9 +470,9 @@ made to test equality of match objects with string values.
 
 When a parse fails, a [ParseError](api/classes/Citrus/ParseError.html) object is
 generated which provides a wealth of information about exactly where the parse
-failed. Using this object, you could possibly provide some useful feedback to
-the user about why the input was bad. The following code demonstrates one way
-to do this.
+failed including the offset, line number, line text, and line offset. Using this
+object, you could possibly provide some useful feedback to the user about why
+the input was bad. The following code demonstrates one way to do this.
 
     def parse_some_stuff(stuff)
       match = StuffGrammar.parse(stuff)
@@ -469,17 +481,10 @@ to do this.
         [e.line_number, e.line_offset]
     end
 
-In addition to useful error objects, Citrus also includes a special file that
-should help grammar authors when debugging grammars. To get this extra
-functionality, simply `require 'citrus/debug'` instead of `require 'citrus'`
-when running your code.
-
-When debugging is enabled, you can visualize parse trees in the console as XML
-documents. This can help when determining which rules are generating which
-matches and how they are organized in the output. Also when debugging, each
-match object automatically records its offset in the original input, which can
-also be very helpful in keeping track of which offsets in the input generated
-which matches.
+In addition to useful error objects, Citrus also includes a means of visualizing
+match trees in the console via `Match#dump`. This can help when determining
+which rules are generating which matches and how they are organized in the
+match tree.
 
 
 # Extras
