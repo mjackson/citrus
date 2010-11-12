@@ -1,5 +1,6 @@
 .DS_Store
 *.swp
+*.rbc
 api
 dist
 benchmark/*.dat
