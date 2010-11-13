@@ -719,7 +719,18 @@ module Citrus
 
     # Returns an array of events for this rule on the given +input+.
     def exec(input, events=[])
-      input.exec(rule, events)
+      events << id
+
+      index = events.size
+      start = index - 1
+      if input.exec(rule, events).size > index
+        events << CLOSE
+        events << events[-2]
+      else
+        events.slice!(start, events.size)
+      end
+
+      events
     end
   end
 
@@ -915,7 +926,18 @@ module Citrus
 
     # Returns an array of events for this rule on the given +input+.
     def exec(input, events=[])
-      input.exec(rule, events)
+      events << id
+
+      index = events.size
+      start = index - 1
+      if input.exec(rule, events).size > index
+        events << CLOSE
+        events << events[-2]
+      else
+        events.slice!(start, events.size)
+      end
+
+      events
     end
 
     # Returns the Citrus notation of this rule as a string.
