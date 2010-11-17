@@ -8,7 +8,7 @@ require 'strscan'
 module Citrus
   autoload :File, 'citrus/file'
 
-  VERSION = [2, 2, 1]
+  VERSION = [2, 2, 2]
 
   # Returns the current version of Citrus as a string.
   def self.version
