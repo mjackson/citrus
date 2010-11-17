@@ -611,6 +611,11 @@ module Citrus
     def inspect # :nodoc:
       to_s
     end
+
+    def extend_match(match) # :nodoc:
+      match.names << name if named?
+      match.extend(extension) if extension
+    end
   end
 
   # A Terminal is a Rule that matches directly on the input stream and may not
@@ -944,6 +949,11 @@ module Citrus
     def to_s
       label.to_s + ':' + rule.embed
     end
+
+    def extend_match(match) # :nodoc:
+      match.names << label
+      super
+    end
   end
 
   # A Repeat is a Predicate that specifies a minimum and maximum number of times
@@ -1237,11 +1247,9 @@ module Citrus
 
   private
 
-    # Extends this match with the extensions provided by its #rules.
     def extend! # :nodoc:
       extenders.each do |rule|
-        self.names << rule.name if rule.named?
-        extend(rule.extension) if rule.extension
+        rule.extend_match(self)
       end
     end
   end
