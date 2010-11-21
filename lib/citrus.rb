@@ -587,11 +587,11 @@ module Citrus
     end
 
     # Returns +true+ if this rule is able to propagate extensions from child
-    # rules to the scope of the parent, +false+ otherwise. In general, this will
-    # return +false+ for any rule whose match value is derived from an arbitrary
-    # number of child rules, such as a Repeat or a Sequence. Note that this is
-    # not true for Choice objects because they rely on exactly 1 rule to match,
-    # as do Proxy objects.
+    # rules to the scope of the parent when extending matches. In general, this
+    # returns +false+ for any rule that uses an arbitrary number of child rules
+    # when determining whether or not it can match, such as a Repeat or a
+    # Sequence. This is not true for Choice objects because they rely on exactly
+    # one rule to match, as do Proxy objects.
     def propagates_extensions?
       case self
       when AndPredicate, NotPredicate, ButPredicate, Repeat, Sequence
@@ -1218,18 +1218,20 @@ module Citrus
     def extenders
       @extenders ||= begin
         extenders = []
+
         @events.each do |event|
           break if event == CLOSE
           rule = event
           extenders.unshift(rule)
           break unless rule.propagates_extensions?
         end
+
         extenders
       end
     end
 
-    # Returns an array of Match objects that are submatches of this match in the
-    # order they appeared in the input.
+    # Returns an array of Match objects that are immediate submatches of this
+    # match in the order they appeared in the input.
     def matches
       @matches ||= begin
         matches = []
