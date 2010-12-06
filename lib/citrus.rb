@@ -621,6 +621,49 @@ module Citrus
       match.names << name if named?
       match.extend(extension) if extension
     end
+
+    class Application
+      def initialize(rule, len, comp=nil)
+        @rule = rule
+        @length = len
+        @compositions = comp
+      end
+
+      # The rule being applied
+      attr_reader :rule
+
+      # The length of the text matched by this application
+      attr_reader :length
+
+      # The applications this application is composed of
+      attr_reader :compositions
+
+      def show(indent="")
+        puts "#{indent}#{@rule} -- #{@length}"
+        @compositions.each do |n|
+          n.show "  #{indent}"
+        end
+      end
+
+      # For the event stream, reconstruct highlevel info about the rules
+      # and operands
+      def self.from_events(events)
+        id = events.shift
+        rule = Rule[id]
+        unless rule
+          raise "invalid stream"
+        end
+
+        sub = []
+        until events[0] == CLOSE
+          sub << from_events(events)
+        end
+
+        events.shift # close
+
+        Application.new(rule, events.shift, sub)
+      end
+    end
   end
 
   # A Terminal is a Rule that matches directly on the input stream and may not
@@ -738,6 +781,7 @@ module Citrus
 
       events
     end
+
   end
 
   # An Alias is a Proxy for a rule in the same grammar. It is used in rule
@@ -932,13 +976,18 @@ module Citrus
     def exec(input, events=[])
       events << id
 
-      index = events.size
-      start = index - 1
+      prev_size = events.size
+      start = prev_size - 1
 
-      if input.exec(rule, events).size > index
+      # If the associated rule matches (adds events)
+      # then close the label and set it's stream position
+      # to be the position of the matched expression.
+      if input.exec(rule, events).size > prev_size
         events << CLOSE
         events << events[-2]
       else
+        # Remove the label rule since the associated expression
+        # didn't match.
         events.slice!(start, events.size)
       end
 
@@ -996,10 +1045,13 @@ module Citrus
         n += 1
       end
 
+      # If enough rules match, register the repeat as matched
+      # by closing it.
       if n >= min
         events << CLOSE
         events << length
       else
+        # Otherwise remove the repeat entry from the event stream
         events.slice!(start, events.size)
       end
 
@@ -1135,8 +1187,16 @@ module Citrus
 
     alias_method :to_str, :to_s
 
+    def inspect
+      @string.inspect
+    end
+
     # The array of events that was passed to the constructor.
     attr_reader :events
+
+    def application
+      Rule::Application.from_events(@events.dup)
+    end
 
     # An array of all names of this match. A name is added to a match object
     # for each rule that returns that object when matching. These names can then
