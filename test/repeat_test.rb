@@ -7,7 +7,7 @@ class RepeatTest < Test::Unit::TestCase
   end
 
   def test_exec_zero_or_one
-    abc = Rule.new('abc')
+    abc = Rule.for('abc')
     rule = Repeat.new(abc, 0, 1)
 
     events = rule.exec(Input.new(''))
@@ -21,7 +21,7 @@ class RepeatTest < Test::Unit::TestCase
   end
 
   def test_exec_zero_or_more
-    abc = Rule.new('abc')
+    abc = Rule.for('abc')
     rule = Repeat.new(abc, 0, Infinity)
 
     events = rule.exec(Input.new(''))
@@ -43,7 +43,7 @@ class RepeatTest < Test::Unit::TestCase
   end
 
   def test_exec_one_or_more
-    abc = Rule.new('abc')
+    abc = Rule.for('abc')
     rule = Repeat.new(abc, 1, Infinity)
 
     events = rule.exec(Input.new(''))
@@ -65,7 +65,7 @@ class RepeatTest < Test::Unit::TestCase
   end
 
   def test_exec_one
-    abc = Rule.new('abc')
+    abc = Rule.for('abc')
     rule = Repeat.new(abc, 1, 1)
 
     events = rule.exec(Input.new(''))

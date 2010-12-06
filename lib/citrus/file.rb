@@ -71,7 +71,7 @@ module Citrus
     rule :rule_body do
       zero_or_one(:choice) {
         # An empty rule definition matches the empty string.
-        matches.length > 0 ? choice.value : Rule.new('')
+        matches.length > 0 ? choice.value : Rule.for('')
       }
     end
 

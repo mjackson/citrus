@@ -21,13 +21,13 @@ class MatchTest < Test::Unit::TestCase
   end
 
   def test_names
-    a = Rule.new('a')
+    a = Rule.for('a')
     a.name = 'a'
-    b = Rule.new('b')
+    b = Rule.for('b')
     b.name = 'b'
-    c = Rule.new('c')
+    c = Rule.for('c')
     c.name = 'c'
-    s = Rule.new([ a, b, c ])
+    s = Rule.for([ a, b, c ])
     s.name = 's'
     r = Repeat.new(s, 0, Infinity)
     r.name = 'r'
@@ -62,10 +62,10 @@ class MatchTest < Test::Unit::TestCase
   end
 
   def test_matches
-    a = Rule.new('a')
-    b = Rule.new('b')
-    c = Rule.new('c')
-    s = Rule.new([ a, b, c ])
+    a = Rule.for('a')
+    b = Rule.for('b')
+    c = Rule.for('c')
+    s = Rule.for([ a, b, c ])
     s.name = 's'
     r = Repeat.new(s, 0, Infinity)
 

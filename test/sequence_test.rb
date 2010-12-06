@@ -7,9 +7,9 @@ class SequenceTest < Test::Unit::TestCase
   end
 
   def test_exec
-    a = Rule.new('a')
-    b = Rule.new('b')
-    c = Rule.new('c')
+    a = Rule.for('a')
+    b = Rule.for('b')
+    c = Rule.for('c')
     rule = Sequence.new([ a, b, c ])
 
     events = rule.exec(Input.new(''))

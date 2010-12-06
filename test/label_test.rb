@@ -7,7 +7,7 @@ class LabelTest < Test::Unit::TestCase
   end
 
   def test_match
-    abc = Rule.new('abc')
+    abc = Rule.for('abc')
     abc.name = 'abc'
     label = Label.new(abc, 'a_label')
     label.name = 'label'

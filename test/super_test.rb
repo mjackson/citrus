@@ -7,7 +7,7 @@ class SuperTest < Test::Unit::TestCase
   end
 
   def test_exec
-    ghi = Rule.new('ghi')
+    ghi = Rule.for('ghi')
     grammar1 = Grammar.new {
       rule :a, 'abc'
     }

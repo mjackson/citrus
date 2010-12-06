@@ -7,8 +7,8 @@ class ChoiceTest < Test::Unit::TestCase
   end
 
   def test_exec
-    a = Rule.new('a')
-    b = Rule.new('b')
+    a = Rule.for('a')
+    b = Rule.for('b')
     rule = Choice.new([ a, b ])
 
     events = rule.exec(Input.new(''))

@@ -340,7 +340,7 @@ module Citrus
       if obj
         rule_names << sym unless has_rule?(sym)
 
-        rule = Rule.new(obj)
+        rule = Rule.for(obj)
         rule.name = name
         setup_super(rule, name)
         rule.grammar = self
@@ -364,7 +364,7 @@ module Citrus
     # Creates a new rule that will match any single character. A block may be
     # provided to specify semantic behavior (via #ext).
     def dot(&block)
-      ext(Rule.new(DOT), block)
+      ext(Rule.for(DOT), block)
     end
 
     # Creates a new Super for the rule currently being defined in the grammar. A
@@ -437,7 +437,7 @@ module Citrus
     # the given +rule+. A block may also be given that will be used to create
     # an anonymous module. See Rule#ext=.
     def ext(rule, mod=nil, &block)
-      rule = Rule.new(rule)
+      rule = Rule.for(rule)
       mod = block if block
       rule.extension = mod if mod
       rule
@@ -446,7 +446,7 @@ module Citrus
 
   # A Rule is an object that is used by a grammar to create matches on the
   # Input during parsing.
-  module Rule
+  class Rule
     # Evaluates the given expression and creates a new rule object from it.
     #
     #     Citrus::Rule.eval('"a" | "b"')
@@ -456,7 +456,7 @@ module Citrus
     end
 
     # Returns a new Rule object depending on the type of object given.
-    def self.new(obj)
+    def self.for(obj)
       case obj
       when Rule     then obj
       when Symbol   then Alias.new(obj)
@@ -631,9 +631,7 @@ module Citrus
   #     [a-zA-Z]
   #     .
   #
-  class Terminal
-    include Rule
-
+  class Terminal < Rule
     def initialize(rule=/^/)
       super
       @rule = rule
@@ -701,9 +699,7 @@ module Citrus
   # name of some other rule in the grammar internally and resolves it to the
   # actual Rule object at runtime. This lazy evaluation permits us to create
   # Proxy objects for rules that we may not know the definition of yet.
-  module Proxy
-    include Rule
-
+  class Proxy < Rule
     def initialize(rule_name='<proxy>')
       super
       self.rule_name = rule_name
@@ -745,9 +741,7 @@ module Citrus
   #
   #     name
   #
-  class Alias
-    include Proxy
-
+  class Alias < Proxy
     # Returns the Citrus notation of this rule as a string.
     def to_s
       rule_name.to_s
@@ -770,9 +764,7 @@ module Citrus
   #
   #     super
   #
-  class Super
-    include Proxy
-
+  class Super < Proxy
     # Returns the Citrus notation of this rule as a string.
     def to_s
       'super'
@@ -792,12 +784,10 @@ module Citrus
   # other rules. Nonterminals may not match directly on the input, but instead
   # invoke the rule(s) they contain to determine if a match can be made from
   # the collective result.
-  module Nonterminal
-    include Rule
-
+  class Nonterminal < Rule
     def initialize(rules=[])
       super
-      @rules = rules.map {|r| Rule.new(r) }
+      @rules = rules.map {|r| Rule.for(r) }
     end
 
     # An array of the actual Rule objects this rule uses to match.
@@ -810,9 +800,7 @@ module Citrus
   end
 
   # A Predicate is a Nonterminal that contains one other rule.
-  module Predicate
-    include Nonterminal
-
+  class Predicate < Nonterminal
     def initialize(rule='')
       super([rule])
     end
@@ -829,9 +817,7 @@ module Citrus
   #
   #     &expr
   #
-  class AndPredicate
-    include Predicate
-
+  class AndPredicate < Predicate
     # Returns an array of events for this rule on the given +input+.
     def exec(input, events=[])
       if input.test(rule)
@@ -854,9 +840,7 @@ module Citrus
   #
   #     !expr
   #
-  class NotPredicate
-    include Predicate
-
+  class NotPredicate < Predicate
     # Returns an array of events for this rule on the given +input+.
     def exec(input, events=[])
       unless input.test(rule)
@@ -879,10 +863,8 @@ module Citrus
   #
   #     ~expr
   #
-  class ButPredicate
-    include Predicate
-
-    DOT_RULE = Rule.new(DOT)
+  class ButPredicate < Predicate
+    DOT_RULE = Rule.for(DOT)
 
     # Returns an array of events for this rule on the given +input+.
     def exec(input, events=[])
@@ -913,9 +895,7 @@ module Citrus
   #
   #     label:expr
   #
-  class Label
-    include Predicate
-
+  class Label < Predicate
     def initialize(rule='', label='<label>')
       super(rule)
       self.label = label
@@ -975,9 +955,7 @@ module Citrus
   #     expr+
   #     expr?
   #
-  class Repeat
-    include Predicate
-
+  class Repeat < Predicate
     def initialize(rule='', min=1, max=Infinity)
       raise ArgumentError, "Min cannot be greater than max" if min > max
       super(rule)
@@ -1037,9 +1015,7 @@ module Citrus
 
   # A List is a Nonterminal that contains any number of other rules and tests
   # them for matches in sequential order.
-  module List
-    include Nonterminal
-
+  class List < Nonterminal
     # See Rule#paren?.
     def paren?
       rules.length > 1
@@ -1051,9 +1027,7 @@ module Citrus
   #
   #     expr | expr
   #
-  class Choice
-    include List
-
+  class Choice < List
     # Returns an array of events for this rule on the given +input+.
     def exec(input, events=[])
       events << id
@@ -1086,9 +1060,7 @@ module Citrus
   #
   #     expr expr
   #
-  class Sequence
-    include List
-
+  class Sequence < List
     # Returns an array of events for this rule on the given +input+.
     def exec(input, events=[])
       events << id

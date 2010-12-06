@@ -25,10 +25,10 @@ class InputTest < Test::Unit::TestCase
   end
 
   def test_events
-    a = Rule.new('a')
-    b = Rule.new('b')
-    c = Rule.new('c')
-    s = Rule.new([ a, b, c ])
+    a = Rule.for('a')
+    b = Rule.for('b')
+    c = Rule.for('c')
+    s = Rule.for([ a, b, c ])
     r = Repeat.new(s, 0, Infinity)
 
     input = Input.new("abcabcabc")
@@ -58,11 +58,11 @@ class InputTest < Test::Unit::TestCase
   end
 
   def test_events2
-    a = Rule.new('a')
-    b = Rule.new('b')
+    a = Rule.for('a')
+    b = Rule.for('b')
     c = Choice.new([ a, b ])
     r = Repeat.new(c, 0, Infinity)
-    s = Rule.new([ a, r ])
+    s = Rule.for([ a, r ])
 
     input = Input.new('abbababba')
     events = input.exec(s)
