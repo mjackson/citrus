@@ -95,13 +95,6 @@ module Citrus
     # The maximum offset in the input that was successfully parsed.
     attr_reader :max_offset
 
-    # A nested hash of rule id's to offsets and their respective matches. Only
-    # present if memoing is enabled.
-    attr_reader :cache
-
-    # The number of times the cache was hit. Only present if memoing is enabled.
-    attr_reader :cache_hits
-
     # Resets all internal variables so that this object may be used in another
     # parse.
     def reset # :nodoc:
@@ -187,44 +180,52 @@ module Citrus
       rule.exec(self)[-1]
     end
 
-    # Returns +true+ when using memoization to cache match results.
     def memoized?
-      !!@cache
+      false
     end
+  end
 
+  class MemoizingInput < Input
     # Modifies this object to cache match results during a parse. This technique
     # (also known as "Packrat" parsing) guarantees parsers will operate in
     # linear time but costs significantly more in terms of time and memory
     # required to perform a parse. For more information, please read the paper
     # on Packrat parsing at http://pdos.csail.mit.edu/~baford/packrat/icfp02/.
-    def memoize!
-      return if memoized?
-
+    def initialize(string)
+      super string
       @cache = {}
       @cache_hits = 0
+    end
 
-      # Using +instance_eval+ here preserves access to +super+ within the
-      # methods we define inside the block.
-      instance_eval do
-        def exec(rule, events=[]) # :nodoc:
-          c = @cache[rule.id] ||= {}
+    # A nested hash of rule id's to offsets and their respective matches. Only
+    # present if memoing is enabled.
+    attr_reader :cache
 
-          e = if c[pos]
-            @cache_hits += 1
-            c[pos]
-          else
-            c[pos] = super(rule)
-          end
+    # The number of times the cache was hit. Only present if memoing is enabled.
+    attr_reader :cache_hits
 
-          events.concat(e)
-        end
+    def exec(rule, events=[]) # :nodoc:
+      c = @cache[rule.id] ||= {}
 
-        def reset # :nodoc:
-          @cache.clear
-          @cache_hits = 0
-          super
-        end
+      e = if c[pos]
+        @cache_hits += 1
+        c[pos]
+      else
+        c[pos] = super(rule)
       end
+
+      events.concat(e)
+    end
+
+    def reset # :nodoc:
+      @cache.clear
+      @cache_hits = 0
+      super
+    end
+
+    # Returns +true+ when using memoization to cache match results.
+    def memoized?
+      true
     end
   end
 
@@ -547,8 +548,12 @@ module Citrus
     def parse(string, options={})
       opts = default_parse_options.merge(options)
 
-      input = Input.new(string)
-      input.memoize! if opts[:memoize]
+      if opts[:memoize]
+        input = MemoizingInput.new(string)
+      else
+        input = Input.new(string)
+      end
+
       input.pos = opts[:offset] if opts[:offset] > 0
 
       events = input.exec(self)

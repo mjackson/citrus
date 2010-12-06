@@ -2,9 +2,8 @@ require File.expand_path('../helper', __FILE__)
 
 class InputTest < Test::Unit::TestCase
   def test_memoized?
-    input = Input.new('')
-    input.memoize!
-    assert(input.memoized?)
+    assert !Input.new('').memoized?
+    assert MemoizingInput.new('').memoized?
   end
 
   def test_offsets_new
@@ -121,22 +120,19 @@ class InputTest < Test::Unit::TestCase
   end
 
   def test_cache_hits1
-    input = Input.new('a')
-    input.memoize!
+    input = MemoizingInput.new('a')
     input.exec(LetterA.rule(:top))
     assert_equal(3, input.cache_hits)
   end
 
   def test_cache_hits2
-    input = Input.new('aa')
-    input.memoize!
+    input = MemoizingInput.new('aa')
     input.exec(LetterA.rule(:top))
     assert_equal(2, input.cache_hits)
   end
 
   def test_cache_hits3
-    input = Input.new('aaa')
-    input.memoize!
+    input = MemoizingInput.new('aaa')
     input.exec(LetterA.rule(:top))
     assert_equal(0, input.cache_hits)
   end
