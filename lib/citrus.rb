@@ -59,9 +59,7 @@ module Citrus
       @line_offset = input.line_offset(offset)
       @line_number = input.line_number(offset)
       @line = input.line(offset)
-      msg = "Failed to parse input on line %d at offset %d\n%s" %
-        [line_number, line_offset, detail]
-      super(msg)
+      super "Failed to parse input on line #{line_number} at offset #{line_offset}\n#{detail}"
     end
 
     # The 0-based offset at which the error occurred in the input, i.e. the
@@ -82,7 +80,7 @@ module Citrus
     # Returns a string that, when printed, gives a visual representation of
     # exactly where the error occurred on its line in the input.
     def detail
-      "%s\n%s^" % [line, ' ' * line_offset]
+      "#{line}\n#{' ' * line_offset}^"
     end
   end
 
@@ -191,7 +189,7 @@ module Citrus
 
     # Returns +true+ when using memoization to cache match results.
     def memoized?
-      !! @cache
+      !!@cache
     end
 
     # Modifies this object to cache match results during a parse. This technique
@@ -350,7 +348,9 @@ module Citrus
 
       rules[sym] || super_rule(sym)
     rescue => e
-      raise 'Cannot create rule "%s": %s' % [name, e.message]
+      # This preserves the backtrace
+      e.message.replace("Cannot create rule \"#{name}\": #{e.message}")
+      raise e
     end
 
     # Gets/sets the +name+ of the root rule of this grammar. If no root rule is
@@ -508,7 +508,7 @@ module Citrus
 
     # Returns +true+ if this rule has a name, +false+ otherwise.
     def named?
-      !! @name
+      !!@name
     end
 
     # Specifies a module that will be used to extend all Match objects that
@@ -605,7 +605,7 @@ module Citrus
     # Returns a string version of this rule that is suitable to be used in the
     # string representation of another rule.
     def embed
-      named? ? name.to_s : (paren? ? '(%s)' % to_s : to_s)
+      named? ? name.to_s : (paren? ? "(#{to_s})" : to_s)
     end
 
     def inspect # :nodoc:
@@ -752,8 +752,14 @@ module Citrus
     # Searches this proxy's grammar and any included grammars for a rule with
     # this proxy's #rule_name. Raises an error if one cannot be found.
     def resolve!
-      grammar.rule(rule_name) or raise RuntimeError,
-        'No rule named "%s" in grammar %s' % [rule_name, grammar.name]
+      val = grammar.rule(rule_name)
+
+      unless val
+        raise RuntimeError,
+          "No rule named \"#{rule_name}\" in grammar #{grammar.name}"
+      end
+
+      return val
     end
   end
 
@@ -775,8 +781,14 @@ module Citrus
     # Searches this proxy's included grammars for a rule with this proxy's
     # #rule_name. Raises an error if one cannot be found.
     def resolve!
-      grammar.super_rule(rule_name) or raise RuntimeError,
-        'No rule named "%s" in hierarchy of grammar %s' % [rule_name, grammar.name]
+      val = grammar.super_rule(rule_name)
+
+      unless val
+        raise RuntimeError,
+          "No rule named \"#{rule_name}\" in hierarchy of grammar #{grammar.name}"
+      end
+
+      return val
     end
   end
 
@@ -869,11 +881,13 @@ module Citrus
     # Returns an array of events for this rule on the given +input+.
     def exec(input, events=[])
       length = 0
+
       until input.test(rule)
         len = input.exec(DOT_RULE)[-1]
         break unless len
         length += len
       end
+
       if length > 0
         events << id
         events << CLOSE
@@ -915,6 +929,7 @@ module Citrus
 
       index = events.size
       start = index - 1
+
       if input.exec(rule, events).size > index
         events << CLOSE
         events << events[-2]
@@ -969,6 +984,7 @@ module Citrus
       index = events.size
       start = index - 1
       length = n = 0
+
       while n < max && input.exec(rule, events).size > index
         index = events.size
         length += events[-1]
@@ -1035,6 +1051,7 @@ module Citrus
       index = events.size
       start = index - 1
       n = 0
+
       while n < rules.length && input.exec(rules[n], events).size == index
         n += 1
       end
@@ -1068,6 +1085,7 @@ module Citrus
       index = events.size
       start = index - 1
       length = n = 0
+
       while n < rules.length && input.exec(rules[n], events).size > index
         index = events.size
         length += events[-1]
@@ -1086,7 +1104,7 @@ module Citrus
 
     # Returns the Citrus notation of this rule as a string.
     def to_s
-      rules.map {|r| r.embed }.join(' ')
+      rules.map { |r| r.embed }.join(' ')
     end
   end
 
@@ -1095,8 +1113,10 @@ module Citrus
   # convenient tree traversal methods that help when examining parse results.
   class Match
     def initialize(string, events=[])
-      raise ArgumentError, "Invalid events for match length %d" %
-        string.length if events[-1] && string.length != events[-1]
+      if events[-1] && string.length != events[-1]
+        raise ArgumentError,
+               "Invalid events for match length #{string.length}"
+      end
 
       @string = string
       @events = events
@@ -1213,8 +1233,14 @@ module Citrus
       if @string.respond_to?(sym)
         @string.__send__ sym, *args
       else
-        first(sym) or raise NoMatchError, 'No match named "%s" in %s (%s)' %
-          [sym, self, name]
+        val = first(sym)
+
+        unless val
+          raise NoMatchError,
+            "No match named \"#{sym}\" in #{self} (#{name})"
+        end
+
+        return val
       end
     end
 
@@ -1226,9 +1252,10 @@ module Citrus
 
     def dump_lines(indent='  ') # :nodoc:
       line = to_s.inspect
-      line << ' (%s)' % names.join(',') unless names.empty?
+      line << " (" << names.join(',') << ")" unless names.empty?
+
       matches.inject([line]) do |lines, m|
-        lines.concat(m.dump_lines(indent).map {|line| indent + line })
+        lines.concat(m.dump_lines(indent).map { |line| indent + line })
       end
     end
 
