@@ -484,6 +484,7 @@ module Citrus
 
     # Returns the Rule object with the given +id+.
     def self.[](id)
+      return id if id.kind_of?(self)
       @rules[id]
     end
 
@@ -493,6 +494,19 @@ module Citrus
 
     # An integer id that is unique to this rule.
     attr_accessor :id
+
+    alias_method :to_i, :id
+
+    def ==(other)
+      case other
+      when Rule
+        @string == other.to_s
+      when Numeric
+        other == @id
+      else
+        super
+      end
+    end
 
     # The grammar this rule belongs to.
     attr_accessor :grammar
@@ -692,7 +706,7 @@ module Citrus
     def exec(input, events=[])
       length = input.scan_full(rule, false, false)
       if length
-        events << id
+        events << self
         events << CLOSE
         events << length
       end
@@ -768,7 +782,7 @@ module Citrus
 
     # Returns an array of events for this rule on the given +input+.
     def exec(input, events=[])
-      events << id
+      events << self
 
       index = events.size
       start = index - 1
@@ -882,7 +896,7 @@ module Citrus
     # Returns an array of events for this rule on the given +input+.
     def exec(input, events=[])
       if input.test(rule)
-        events << id
+        events << self
         events << CLOSE
         events << 0
       end
@@ -905,7 +919,7 @@ module Citrus
     # Returns an array of events for this rule on the given +input+.
     def exec(input, events=[])
       unless input.test(rule)
-        events << id
+        events << self
         events << CLOSE
         events << 0
       end
@@ -938,7 +952,7 @@ module Citrus
       end
 
       if length > 0
-        events << id
+        events << self
         events << CLOSE
         events << length
       end
@@ -974,7 +988,7 @@ module Citrus
 
     # Returns an array of events for this rule on the given +input+.
     def exec(input, events=[])
-      events << id
+      events << self
 
       prev_size = events.size
       start = prev_size - 1
@@ -1033,7 +1047,7 @@ module Citrus
 
     # Returns an array of events for this rule on the given +input+.
     def exec(input, events=[])
-      events << id
+      events << self
 
       index = events.size
       start = index - 1
@@ -1103,7 +1117,7 @@ module Citrus
   class Choice < List
     # Returns an array of events for this rule on the given +input+.
     def exec(input, events=[])
-      events << id
+      events << self
 
       index = events.size
       start = index - 1
@@ -1137,7 +1151,7 @@ module Citrus
   class Sequence < List
     # Returns an array of events for this rule on the given +input+.
     def exec(input, events=[])
-      events << id
+      events << self
 
       index = events.size
       start = index - 1
