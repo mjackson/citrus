@@ -325,7 +325,7 @@ module Citrus
     end
 
     # Gets/sets the rule with the given +name+. If +obj+ is given the rule
-    # will be set to the value of +obj+ passed through Rule#new. If a block is
+    # will be set to the value of +obj+ passed through Rule.for. If a block is
     # given, its return value will be used for the value of +obj+.
     #
     # It is important to note that this method will also check any included
