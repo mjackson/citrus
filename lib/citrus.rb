@@ -107,7 +107,11 @@ module Citrus
 
     # Returns an array containing the lines of text in the input.
     def lines
-      string.send(string.respond_to?(:lines) ? :lines : :to_s).to_a
+      if string.respond_to?(:lines)
+        string.lines.to_a
+      else
+        [string.to_s]
+      end
     end
 
     # Iterates over the lines of text in the input using the given +block+.
@@ -119,7 +123,7 @@ module Citrus
     # on which it is found. +pos+ defaults to the current pointer position.
     def line_offset(pos=pos)
       p = 0
-      each_line do |line|
+      string.each_line do |line|
         len = line.length
         return (pos - p) if p + len >= pos
         p += len
@@ -131,7 +135,7 @@ module Citrus
     # given +pos+. +pos+ defaults to the current pointer position.
     def line_index(pos=pos)
       p = n = 0
-      each_line do |line|
+      string.each_line do |line|
         p += line.length
         return n if p >= pos
         n += 1
