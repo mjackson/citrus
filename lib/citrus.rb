@@ -1093,16 +1093,22 @@ module Citrus
   # The base class for all matches. Matches are organized into a tree where any
   # match may contain any number of other matches. This class provides several
   # convenient tree traversal methods that help when examining parse results.
-  class Match < String
+  class Match
     def initialize(string, events=[])
       raise ArgumentError, "Invalid events for match length %d" %
         string.length if events[-1] && string.length != events[-1]
 
-      super(string)
+      @string = string
       @events = events
 
       extend!
     end
+
+    def to_s
+      @string
+    end
+
+    alias_method :to_str, :to_s
 
     # The array of events that was passed to the constructor.
     attr_reader :events
@@ -1190,13 +1196,22 @@ module Citrus
     # interpretation.
     alias value to_s
 
+    def ==(other)
+      case other
+      when String
+        return @string == other
+      when Match
+        return @string == other.to_s
+      else
+        super
+      end
+    end
+
     # Allows sub-matches of this match to be retrieved by name as instance
     # methods.
     def method_missing(sym, *args)
-      if sym == :to_ary
-        # This is a workaround for a bug in Ruby 1.9 with classes that
-        # extend String.
-        super
+      if @string.respond_to?(sym)
+        @string.__send__ sym, *args
       else
         first(sym) or raise NoMatchError, 'No match named "%s" in %s (%s)' %
           [sym, self, name]
