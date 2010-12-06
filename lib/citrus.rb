@@ -445,6 +445,13 @@ module Citrus
       rule.extension = mod if mod
       rule
     end
+
+    # Make the extension to rule be a module which is extended to the Match
+    # object
+    def mod(rule, &block)
+      rule.extension = Module.new(&block)
+      rule
+    end
   end
 
   # A Rule is an object that is used by a grammar to create matches on the
@@ -516,13 +523,7 @@ module Citrus
     # anonymous module.
     def extension=(mod)
       if Proc === mod
-        begin
-          tmp = Module.new(&mod)
-          raise ArgumentError if tmp.instance_methods.empty?
-          mod = tmp
-        rescue NoMethodError, ArgumentError, NameError
-          mod = Module.new { define_method(:value, &mod) }
-        end
+        mod = Module.new { define_method(:value, &mod) }
       end
 
       raise ArgumentError unless Module === mod

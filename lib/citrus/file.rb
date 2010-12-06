@@ -34,13 +34,13 @@ module Citrus
     end
 
     rule :grammar do
-      all(:grammar_keyword, :module_name, :grammar_body, :end_keyword) {
+      mod all(:grammar_keyword, :module_name, :grammar_body, :end_keyword) do
         include ModuleNameHelpers
 
         def value
           module_namespace.const_set(module_basename, grammar_body.value)
         end
-      }
+      end
     end
 
     rule :grammar_body do
@@ -76,7 +76,7 @@ module Citrus
     end
 
     rule :choice do
-      all(:sequence, zero_or_more([ :bar, :sequence ])) {
+      mod all(:sequence, zero_or_more([ :bar, :sequence ])) do
         def rules
           @rules ||= begin
             [ sequence.value ] + matches[1].matches.map do |m|
@@ -88,11 +88,11 @@ module Citrus
         def value
           rules.length > 1 ? Choice.new(rules) : rules.first
         end
-      }
+      end
     end
 
     rule :sequence do
-      one_or_more(:expression) {
+      mod one_or_more(:expression) do
         def rules
           @rules ||= matches.map {|m| m.value }
         end
@@ -100,7 +100,7 @@ module Citrus
         def value
           rules.length > 1 ? Sequence.new(rules) : rules.first
         end
-      }
+      end
     end
 
     rule :expression do
@@ -145,13 +145,13 @@ module Citrus
     end
 
     rule :include do
-      all(:include_keyword, :module_name) {
+      mod all(:include_keyword, :module_name) do
         include ModuleNameHelpers
 
         def value
           module_namespace.const_get(module_basename)
         end
-      }
+      end
     end
 
     rule :root do
@@ -187,7 +187,7 @@ module Citrus
     end
 
     rule :quoted_string do
-      all(/(["'])(?:\\?.)*?\1/, :space) {
+      mod all(/(["'])(?:\\?.)*?\1/, :space) do
         def value
           eval(first)
         end
@@ -195,11 +195,11 @@ module Citrus
         def flags
           0
         end
-      }
+      end
     end
 
     rule :case_insensitive_string do
-      all(/`(?:\\?.)*?`/, :space) {
+      mod all(/`(?:\\?.)*?`/, :space) do
         def value
           eval(first.gsub(/^`|`$/, '"'))
         end
@@ -207,7 +207,7 @@ module Citrus
         def flags
           Regexp::IGNORECASE
         end
-      }
+      end
     end
 
     rule :terminal do
@@ -239,13 +239,13 @@ module Citrus
     end
 
     rule :tag do
-      all(:lt, :module_name, :gt) {
+      mod all(:lt, :module_name, :gt) do
         include ModuleNameHelpers
 
         def value
           module_namespace.const_get(module_basename)
         end
-      }
+      end
     end
 
     rule :block do
@@ -289,21 +289,21 @@ module Citrus
     end
 
     rule :question do
-      all('?', :space) {
+      mod all('?', :space) do
         def min; 0 end
         def max; 1 end
-      }
+      end
     end
 
     rule :plus do
-      all('+', :space) {
+      mod all('+', :space) do
         def min; 1 end
         def max; Infinity end
-      }
+      end
     end
 
     rule :star do
-      all(/[0-9]*/, '*', /[0-9]*/, :space) {
+      mod all(/[0-9]*/, '*', /[0-9]*/, :space) do
         def min
           matches[0] == '' ? 0 : matches[0].to_i
         end
@@ -311,7 +311,7 @@ module Citrus
         def max
           matches[2] == '' ? Infinity : matches[2].to_i
         end
-      }
+      end
     end
 
     rule :module_name do

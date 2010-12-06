@@ -7,13 +7,11 @@ class ExtensionTest < Test::Unit::TestCase
     end
   end
 
-  NumericProc = Proc.new {
+  module NumericModule
     def add_one
       to_i + 1
     end
-  }
-
-  NumericModule = Module.new(&NumericProc)
+  end
 
   NumericProcBare = Proc.new {
     to_i + 1
@@ -25,14 +23,6 @@ class ExtensionTest < Test::Unit::TestCase
     match = rule.parse('abc')
     assert(match)
     assert_equal(:test, match.a_test)
-  end
-
-  def test_numeric_proc
-    rule = StringTerminal.new('1')
-    rule.extension = NumericProc
-    match = rule.parse('1')
-    assert(match)
-    assert_equal(2, match.add_one)
   end
 
   def test_numeric_module
