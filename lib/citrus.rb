@@ -1243,7 +1243,8 @@ module Citrus
           if close
             start = stack.pop
             if stack.size == extenders.size
-              matches << Match.new(slice(offset, event), @events[start..index])
+              matches << Match.new(@string.slice(offset, event),
+                                   @events[start..index])
               offset += event
             end
             close = false
