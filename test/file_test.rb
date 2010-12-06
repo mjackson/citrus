@@ -5,14 +5,14 @@ class CitrusFileTest < Test::Unit::TestCase
   ## File tests
 
   def run_file_test(file, root)
-    match = File.parse(F.read(file), :root => root)
+    match = File.parse(::File.read(file), :root => root)
     assert(match)
   end
 
   %w<rule grammar>.each do |type|
-    Dir[F.dirname(__FILE__) + "/_files/#{type}*.citrus"].each do |path|
+    Dir[::File.dirname(__FILE__) + "/_files/#{type}*.citrus"].each do |path|
       module_eval(<<-CODE.gsub(/^        /, ''), __FILE__, __LINE__ + 1)
-        def test_#{F.basename(path, '.citrus')}
+        def test_#{::File.basename(path, '.citrus')}
           run_file_test("#{path}", :#{type})
         end
       CODE
