@@ -473,38 +473,21 @@ module Citrus
       end
     end
 
-    @unique_id = 0
-
-    # A global registry for Rule objects. Keyed by rule id.
-    @rules = {}
-
-    # Adds the given +rule+ to the global registry and gives it an id.
-    def self.<<(rule) # :nodoc:
-      rule.id = (@unique_id += 1)
-      @rules[rule.id] = rule
-    end
-
     # Returns the Rule object with the given +id+.
     def self.[](id)
       return id if id.kind_of?(self)
-      @rules[id]
+      raise "There are no more numeric Rule ids"
     end
 
-    def initialize(*args) # :nodoc:
-      Rule << self
+    # Here for backwards compatibility now that rule ids are gone
+    def id
+      self
     end
-
-    # An integer id that is unique to this rule.
-    attr_accessor :id
-
-    alias_method :to_i, :id
 
     def ==(other)
       case other
       when Rule
-        @string == other.to_s
-      when Numeric
-        other == @id
+        kind_of?(other.class) and @string == other.to_s
       else
         super
       end
@@ -664,8 +647,7 @@ module Citrus
       # For the event stream, reconstruct highlevel info about the rules
       # and operands
       def self.from_events(events)
-        id = events.shift
-        rule = Rule[id]
+        rule = events.shift
         unless rule
           raise "invalid stream"
         end
@@ -697,7 +679,7 @@ module Citrus
   #
   class Terminal < Rule
     def initialize(rule=/^/)
-      super
+      super()
       @rule = rule
     end
 
@@ -765,7 +747,7 @@ module Citrus
   # Proxy objects for rules that we may not know the definition of yet.
   class Proxy < Rule
     def initialize(rule_name='<proxy>')
-      super
+      super()
       self.rule_name = rule_name
     end
 
@@ -863,7 +845,7 @@ module Citrus
   # the collective result.
   class Nonterminal < Rule
     def initialize(rules=[])
-      super
+      super()
       @rules = rules.map {|r| Rule.for(r) }
     end
 
@@ -1237,7 +1219,7 @@ module Citrus
         extenders = []
         @events.each do |event|
           break if event == CLOSE
-          rule = Rule[event]
+          rule = event
           extenders.unshift(rule)
           break unless rule.propagates_extensions?
         end
