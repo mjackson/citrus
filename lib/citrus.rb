@@ -603,14 +603,14 @@ module Citrus
 
     # Returns +true+ if this rule needs to be surrounded by parentheses when
     # using #embed.
-    def paren?
-      false
+    def needs_paren?
+      is_a?(Nonterminal) && rules.length > 1
     end
 
     # Returns a string version of this rule that is suitable to be used in the
     # string representation of another rule.
     def embed
-      named? ? name.to_s : (paren? ? "(#{to_s})" : to_s)
+      named? ? name.to_s : (needs_paren? ? "(#{to_s})" : to_s)
     end
 
     def inspect # :nodoc:
@@ -1085,21 +1085,12 @@ module Citrus
     end
   end
 
-  # A List is a Nonterminal that contains any number of other rules and tests
-  # them for matches in sequential order.
-  class List < Nonterminal
-    # See Rule#paren?.
-    def paren?
-      rules.length > 1
-    end
-  end
-
   # A Choice is a List where only one rule must match. The Citrus notation is
   # two or more expressions separated by a vertical bar, e.g.:
   #
   #     expr | expr
   #
-  class Choice < List
+  class Choice < Nonterminal
     # Returns an array of events for this rule on the given +input+.
     def exec(input, events=[])
       events << self
@@ -1133,7 +1124,7 @@ module Citrus
   #
   #     expr expr
   #
-  class Sequence < List
+  class Sequence < Nonterminal
     # Returns an array of events for this rule on the given +input+.
     def exec(input, events=[])
       events << self
