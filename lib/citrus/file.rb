@@ -28,8 +28,8 @@ module Citrus
 
     rule :file do
       all(:space, zero_or_more(any(:require, :grammar))) {
-        find(:require).each { |r| require r.value }
-        find(:grammar).map { |g| g.value }
+        find(:require).each {|r| require r.value }
+        find(:grammar).map {|g| g.value }
       }
     end
 
@@ -94,7 +94,7 @@ module Citrus
     rule :sequence do
       mod one_or_more(:expression) do
         def rules
-          @rules ||= matches.map { |m| m.value }
+          @rules ||= matches.map {|m| m.value }
         end
 
         def value

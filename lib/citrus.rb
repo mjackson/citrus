@@ -284,7 +284,7 @@ module Citrus
     # Returns an array of all grammars that have been included in this grammar
     # in the reverse order they were included.
     def included_grammars
-      included_modules.select { |mod| mod.include?(Grammar) }
+      included_modules.select {|mod| mod.include?(Grammar) }
     end
 
     # Returns an array of all names of rules in this grammar as symbols ordered
@@ -309,7 +309,7 @@ module Citrus
     # +name+.
     def setup_super(rule, name) # :nodoc:
       if Nonterminal === rule
-        rule.rules.each { |r| setup_super(r, name) }
+        rule.rules.each {|r| setup_super(r, name) }
       elsif Super === rule
         rule.rule_name = name
       end
@@ -847,7 +847,7 @@ module Citrus
   class Nonterminal < Rule
     def initialize(rules=[])
       super()
-      @rules = rules.map { |r| Rule.for(r) }
+      @rules = rules.map {|r| Rule.for(r) }
     end
 
     # An array of the actual Rule objects this rule uses to match.
@@ -855,7 +855,7 @@ module Citrus
 
     def grammar=(grammar) # :nodoc:
       super
-      @rules.each { |r| r.grammar = grammar }
+      @rules.each {|r| r.grammar = grammar }
     end
   end
 
@@ -1075,7 +1075,7 @@ module Citrus
         when [0, 1] then '?'
         when [1, Infinity] then '+'
         else
-          [min, max].map { |n| n == 0 || n == Infinity ? '' : n.to_s }.join('*')
+          [min, max].map {|n| n == 0 || n == Infinity ? '' : n.to_s }.join('*')
         end
     end
 
@@ -1124,7 +1124,7 @@ module Citrus
 
     # Returns the Citrus notation of this rule as a string.
     def to_s
-      rules.map { |r| r.embed }.join(' | ')
+      rules.map {|r| r.embed }.join(' | ')
     end
   end
 
@@ -1160,7 +1160,7 @@ module Citrus
 
     # Returns the Citrus notation of this rule as a string.
     def to_s
-      rules.map { |r| r.embed }.join(' ')
+      rules.map {|r| r.embed }.join(' ')
     end
   end
 
@@ -1264,8 +1264,8 @@ module Citrus
     # +false+, returns only sub-matches that are immediate descendants of this
     # match.
     def find(name, deep=true)
-      ms = matches.select { |m| m.has_name?(name) }
-      matches.each { |m| ms.concat(m.find(name, deep)) } if deep
+      ms = matches.select {|m| m.has_name?(name) }
+      matches.each {|m| ms.concat(m.find(name, deep)) } if deep
       ms
     end
 
@@ -1320,7 +1320,7 @@ module Citrus
       line << " (" << names.join(',') << ")" unless names.empty?
 
       matches.inject([line]) do |lines, m|
-        lines.concat(m.dump_lines(indent).map { |line| indent + line })
+        lines.concat(m.dump_lines(indent).map {|line| indent + line })
       end
     end
 
