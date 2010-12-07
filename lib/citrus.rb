@@ -110,7 +110,7 @@ module Citrus
       if string.respond_to?(:lines)
         string.lines.to_a
       else
-        [string.to_s]
+        string.to_a
       end
     end
 
