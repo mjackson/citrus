@@ -11,13 +11,13 @@ class RepeatTest < Test::Unit::TestCase
     rule = Repeat.new(abc, 0, 1)
 
     events = rule.exec(Input.new(''))
-    assert_equal([rule.id, CLOSE, 0], events)
+    assert_equal([rule, CLOSE, 0], events)
 
     events = rule.exec(Input.new('abc'))
-    assert_equal([rule.id, abc.id, CLOSE, 3, CLOSE, 3], events)
+    assert_equal([rule, abc, CLOSE, 3, CLOSE, 3], events)
 
     events = rule.exec(Input.new('abc' * 3))
-    assert_equal([rule.id, abc.id, CLOSE, 3, CLOSE, 3], events)
+    assert_equal([rule, abc, CLOSE, 3, CLOSE, 3], events)
   end
 
   def test_exec_zero_or_more
@@ -25,16 +25,16 @@ class RepeatTest < Test::Unit::TestCase
     rule = Repeat.new(abc, 0, Infinity)
 
     events = rule.exec(Input.new(''))
-    assert_equal([rule.id, CLOSE, 0], events)
+    assert_equal([rule, CLOSE, 0], events)
 
     events = rule.exec(Input.new('abc'))
-    assert_equal([rule.id, abc.id, CLOSE, 3, CLOSE, 3], events)
+    assert_equal([rule, abc, CLOSE, 3, CLOSE, 3], events)
 
     expected_events = [
-      rule.id,
-        abc.id, CLOSE, 3,
-        abc.id, CLOSE, 3,
-        abc.id, CLOSE, 3,
+      rule,
+        abc, CLOSE, 3,
+        abc, CLOSE, 3,
+        abc, CLOSE, 3,
       CLOSE, 9
     ]
 
@@ -50,13 +50,13 @@ class RepeatTest < Test::Unit::TestCase
     assert_equal([], events)
 
     events = rule.exec(Input.new('abc'))
-    assert_equal([rule.id, abc.id, CLOSE, 3, CLOSE, 3], events)
+    assert_equal([rule, abc, CLOSE, 3, CLOSE, 3], events)
 
     expected_events = [
-      rule.id,
-        abc.id, CLOSE, 3,
-        abc.id, CLOSE, 3,
-        abc.id, CLOSE, 3,
+      rule,
+        abc, CLOSE, 3,
+        abc, CLOSE, 3,
+        abc, CLOSE, 3,
       CLOSE, 9
     ]
 
@@ -72,10 +72,10 @@ class RepeatTest < Test::Unit::TestCase
     assert_equal([], events)
 
     events = rule.exec(Input.new('abc'))
-    assert_equal([rule.id, abc.id, CLOSE, 3, CLOSE, 3], events)
+    assert_equal([rule, abc, CLOSE, 3, CLOSE, 3], events)
 
     events = rule.exec(Input.new('abc' * 3))
-    assert_equal([rule.id, abc.id, CLOSE, 3, CLOSE, 3], events)
+    assert_equal([rule, abc, CLOSE, 3, CLOSE, 3], events)
   end
 
   def test_operator

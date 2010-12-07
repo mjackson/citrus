@@ -33,21 +33,21 @@ class MatchTest < Test::Unit::TestCase
     r.name = 'r'
 
     events = [
-      r.id,
-        s.id,
-          a.id, CLOSE, 1,
-          b.id, CLOSE, 1,
-          c.id, CLOSE, 1,
+      r,
+        s,
+          a, CLOSE, 1,
+          b, CLOSE, 1,
+          c, CLOSE, 1,
         CLOSE, 3,
-        s.id,
-          a.id, CLOSE, 1,
-          b.id, CLOSE, 1,
-          c.id, CLOSE, 1,
+        s,
+          a, CLOSE, 1,
+          b, CLOSE, 1,
+          c, CLOSE, 1,
         CLOSE, 3,
-        s.id,
-          a.id, CLOSE, 1,
-          b.id, CLOSE, 1,
-          c.id, CLOSE, 1,
+        s,
+          a, CLOSE, 1,
+          b, CLOSE, 1,
+          c, CLOSE, 1,
         CLOSE, 3,
       CLOSE, 9
     ]
@@ -70,21 +70,21 @@ class MatchTest < Test::Unit::TestCase
     r = Repeat.new(s, 0, Infinity)
 
     events = [
-      r.id,
-        s.id,
-          a.id, CLOSE, 1,
-          b.id, CLOSE, 1,
-          c.id, CLOSE, 1,
+      r,
+        s,
+          a, CLOSE, 1,
+          b, CLOSE, 1,
+          c, CLOSE, 1,
         CLOSE, 3,
-        s.id,
-          a.id, CLOSE, 1,
-          b.id, CLOSE, 1,
-          c.id, CLOSE, 1,
+        s,
+          a, CLOSE, 1,
+          b, CLOSE, 1,
+          c, CLOSE, 1,
         CLOSE, 3,
-        s.id,
-          a.id, CLOSE, 1,
-          b.id, CLOSE, 1,
-          c.id, CLOSE, 1,
+        s,
+          a, CLOSE, 1,
+          b, CLOSE, 1,
+          c, CLOSE, 1,
         CLOSE, 3,
       CLOSE, 9
     ]
@@ -94,10 +94,10 @@ class MatchTest < Test::Unit::TestCase
     assert_equal(3, match.matches.length)
 
     sub_events = [
-      s.id,
-        a.id, CLOSE, 1,
-        b.id, CLOSE, 1,
-        c.id, CLOSE, 1,
+      s,
+        a, CLOSE, 1,
+        b, CLOSE, 1,
+        c, CLOSE, 1,
       CLOSE, 3
     ]
 

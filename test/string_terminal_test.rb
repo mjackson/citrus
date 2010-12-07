@@ -9,7 +9,7 @@ class StringTerminalTest < Test::Unit::TestCase
   def test_exec
     rule = StringTerminal.new('abc')
     events = rule.exec(Input.new('abc'))
-    assert_equal([rule.id, CLOSE, 3], events)
+    assert_equal([rule, CLOSE, 3], events)
   end
 
   def test_exec_miss
@@ -27,20 +27,20 @@ class StringTerminalTest < Test::Unit::TestCase
   def test_exec_long
     rule = StringTerminal.new('abc')
     events = rule.exec(Input.new('abcd'))
-    assert_equal([rule.id, CLOSE, 3], events)
+    assert_equal([rule, CLOSE, 3], events)
   end
 
   def test_exec_case_insensitive
     rule = StringTerminal.new('abc', Regexp::IGNORECASE)
 
     events = rule.exec(Input.new('abc'))
-    assert_equal([rule.id, CLOSE, 3], events)
+    assert_equal([rule, CLOSE, 3], events)
 
     events = rule.exec(Input.new('ABC'))
-    assert_equal([rule.id, CLOSE, 3], events)
+    assert_equal([rule, CLOSE, 3], events)
 
     events = rule.exec(Input.new('Abc'))
-    assert_equal([rule.id, CLOSE, 3], events)
+    assert_equal([rule, CLOSE, 3], events)
   end
 
   def test_to_s

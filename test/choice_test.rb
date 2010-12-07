@@ -16,11 +16,11 @@ class ChoiceTest < Test::Unit::TestCase
 
     events = rule.exec(Input.new('a'))
     assert(events)
-    assert_equal([rule.id, a.id, CLOSE, 1, CLOSE, 1], events)
+    assert_equal([rule, a, CLOSE, 1, CLOSE, 1], events)
 
     events = rule.exec(Input.new('b'))
     assert(events)
-    assert_equal([rule.id, b.id, CLOSE, 1, CLOSE, 1], events)
+    assert_equal([rule, b, CLOSE, 1, CLOSE, 1], events)
   end
 
   def test_to_s

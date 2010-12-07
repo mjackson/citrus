@@ -9,13 +9,13 @@ class TerminalTest < Test::Unit::TestCase
   def test_exec
     rule = Terminal.new(/\d+/)
     events = rule.exec(Input.new('123'))
-    assert_equal([rule.id, CLOSE, 3], events)
+    assert_equal([rule, CLOSE, 3], events)
   end
 
   def test_exec_long
     rule = Terminal.new(/\d+/)
     events = rule.exec(Input.new('123 456'))
-    assert_equal([rule.id, CLOSE, 3], events)
+    assert_equal([rule, CLOSE, 3], events)
   end
 
   def test_exec_miss

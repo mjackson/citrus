@@ -21,15 +21,15 @@ class SuperTest < Test::Unit::TestCase
 
     events = rule_2a.exec(Input.new('abc'))
     assert_equal([
-      rule_2a.id,
-        rule_2a_sup.id,
-          rule_1a.id, CLOSE, 3,
+      rule_2a,
+        rule_2a_sup,
+          rule_1a, CLOSE, 3,
         CLOSE, 3,
       CLOSE, 3
     ], events)
 
     events = rule_2a.exec(Input.new('ghi'))
-    assert_equal([rule_2a.id, ghi.id, CLOSE, 3, CLOSE, 3], events)
+    assert_equal([rule_2a, ghi, CLOSE, 3, CLOSE, 3], events)
   end
 
   def test_exec_miss
@@ -64,19 +64,19 @@ class SuperTest < Test::Unit::TestCase
 
     events = rule_2a.exec(Input.new('abc'))
     assert_equal([
-      rule_2a.id,
-        rule_2a_sup.id,
-          rule_1a.id, CLOSE, 3,
+      rule_2a,
+        rule_2a_sup,
+          rule_1a, CLOSE, 3,
         CLOSE, 3,
       CLOSE, 3
     ], events)
 
     events = rule_2a.exec(Input.new('def'))
     assert_equal([
-      rule_2a.id,
-        rule_2a_als.id,
-          rule_2b.id,
-            rule_1b.id, CLOSE, 3,
+      rule_2a,
+        rule_2a_als,
+          rule_2b,
+            rule_1b, CLOSE, 3,
           CLOSE, 3,
         CLOSE, 3,
       CLOSE, 3

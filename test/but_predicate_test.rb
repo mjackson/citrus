@@ -10,10 +10,10 @@ class ButPredicateTest < Test::Unit::TestCase
     rule = ButPredicate.new('abc')
 
     events = rule.exec(Input.new('def'))
-    assert_equal([rule.id, CLOSE, 3], events)
+    assert_equal([rule, CLOSE, 3], events)
 
     events = rule.exec(Input.new('defabc'))
-    assert_equal([rule.id, CLOSE, 3], events)
+    assert_equal([rule, CLOSE, 3], events)
   end
 
   def test_exec_miss

@@ -16,10 +16,10 @@ class SequenceTest < Test::Unit::TestCase
     assert_equal([], events)
 
     expected_events = [
-      rule.id,
-        a.id, CLOSE, 1,
-        b.id, CLOSE, 1,
-        c.id, CLOSE, 1,
+      rule,
+        a, CLOSE, 1,
+        b, CLOSE, 1,
+        c, CLOSE, 1,
       CLOSE, 3
     ]
 

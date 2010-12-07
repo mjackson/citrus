@@ -207,7 +207,7 @@ module Citrus
     attr_reader :cache_hits
 
     def exec(rule, events=[]) # :nodoc:
-      c = @cache[rule.id] ||= {}
+      c = @cache[rule] ||= {}
 
       e = if c[pos]
         @cache_hits += 1
@@ -478,17 +478,6 @@ module Citrus
       else
         raise ArgumentError, "Invalid rule object: %s" % obj.inspect
       end
-    end
-
-    # Returns the Rule object with the given +id+.
-    def self.[](id)
-      return id if id.kind_of?(self)
-      raise "There are no more numeric Rule ids"
-    end
-
-    # Here for backwards compatibility now that rule ids are gone
-    def id
-      self
     end
 
     def ==(other)

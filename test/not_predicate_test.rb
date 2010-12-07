@@ -9,7 +9,7 @@ class NotPredicateTest < Test::Unit::TestCase
   def test_exec
     rule = NotPredicate.new('abc')
     events = rule.exec(Input.new('def'))
-    assert_equal([rule.id, CLOSE, 0], events)
+    assert_equal([rule, CLOSE, 0], events)
   end
 
   def test_exec_miss

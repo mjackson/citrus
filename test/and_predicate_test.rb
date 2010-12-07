@@ -9,7 +9,7 @@ class AndPredicateTest < Test::Unit::TestCase
   def test_exec
     rule = AndPredicate.new('abc')
     events = rule.exec(Input.new('abc'))
-    assert_equal([rule.id, CLOSE, 0], events)
+    assert_equal([rule, CLOSE, 0], events)
   end
 
   def test_exec_miss
