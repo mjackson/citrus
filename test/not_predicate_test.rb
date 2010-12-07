@@ -29,4 +29,10 @@ class NotPredicateTest < Test::Unit::TestCase
     rule = NotPredicate.new('a')
     assert_equal('!"a"', rule.to_s)
   end
+
+  def test_to_s_with_label
+    rule = NotPredicate.new('a')
+    rule.label = 'a_label'
+    assert_equal('a_label:!"a"', rule.to_s)
+  end
 end

@@ -271,9 +271,9 @@ Operator  | Name                      | Precedence
 &         | And predicate             | 4
 !         | Not predicate             | 4
 ~         | But predicate             | 4
-:         | Label                     | 4
 <>        | Extension (module name)   | 3
 {}        | Extension (literal)       | 3
+:         | Label                     | 3
 e1 e2     | Sequence                  | 2
 e1 | e2   | Ordered choice            | 1
 

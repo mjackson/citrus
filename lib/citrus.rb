@@ -393,12 +393,6 @@ module Citrus
       ext(ButPredicate.new(rule), block)
     end
 
-    # Creates a new Label using the given +rule+ and +label+. A block may be
-    # provided to specify semantic behavior (via #ext).
-    def label(rule, label, &block)
-      ext(Label.new(rule, label), block)
-    end
-
     # Creates a new Repeat using the given +rule+. +min+ and +max+ specify the
     # minimum and maximum number of times the rule must match. A block may be
     # provided to specify semantic behavior (via #ext).
@@ -433,6 +427,14 @@ module Citrus
       ext(Choice.new(args), block)
     end
 
+    # Adds +label+ to the given +rule+.A block may be provided to specify
+    # semantic behavior (via #ext).
+    def label(rule, label, &block)
+      rule = ext(rule, block)
+      rule.label = label
+      rule
+    end
+
     # Specifies a Module that will be used to extend all matches created with
     # the given +rule+. A block may also be given that will be used to create
     # an anonymous module. See Rule#ext=.
@@ -453,7 +455,7 @@ module Citrus
 
   # A Rule is an object that is used by a grammar to create matches on the
   # Input during parsing.
-  class Rule
+  module Rule
     # Evaluates the given expression and creates a new rule object from it.
     #
     #     Citrus::Rule.eval('"a" | "b"')
@@ -477,15 +479,6 @@ module Citrus
       end
     end
 
-    def ==(other)
-      case other
-      when Rule
-        kind_of?(other.class) and @string == other.to_s
-      else
-        super
-      end
-    end
-
     # The grammar this rule belongs to.
     attr_accessor :grammar
 
@@ -496,6 +489,14 @@ module Citrus
 
     # The name of this rule.
     attr_reader :name
+
+    # Sets the label of this rule.
+    def label=(label)
+      @label = label.to_sym
+    end
+
+    # The label this rule adds to all its matches.
+    attr_reader :label
 
     # Specifies a module that will be used to extend all Match objects that
     # result from this rule. If +mod+ is a Proc, it is used to create an
@@ -556,8 +557,7 @@ module Citrus
     # Tests whether or not this rule matches on the given +string+. Returns the
     # length of the match if any can be made, +nil+ otherwise.
     def test(string)
-      input = Input.new(string)
-      input.test(self)
+      Input.new(string).test(self)
     end
 
     # Returns +true+ if this rule is a Terminal.
@@ -565,32 +565,43 @@ module Citrus
       is_a?(Terminal)
     end
 
-    # Returns +true+ if this rule is able to propagate extensions from child
-    # rules to the scope of the parent when extending matches. In general, this
-    # returns +false+ for any rule that uses an arbitrary number of child rules
-    # when determining whether or not it can match, such as a Repeat or a
-    # Sequence. This is not true for Choice objects because they rely on exactly
-    # one rule to match, as do Proxy objects.
-    def propagates_extensions?
-      case self
-      when AndPredicate, NotPredicate, ButPredicate, Repeat, Sequence
-        false
-      else
-        true
-      end
-    end
-
     # Returns +true+ if this rule needs to be surrounded by parentheses when
-    # using #embed.
-    def needs_paren?
+    # using #to_embedded_s.
+    def needs_paren? # :nodoc:
       is_a?(Nonterminal) && rules.length > 1
     end
 
-    # Returns a string version of this rule that is suitable to be used in the
-    # string representation of another rule.
-    def embed
-      name ? name.to_s : (needs_paren? ? "(#{to_s})" : to_s)
+    # Returns the Citrus notation of this rule as a string.
+    def to_s
+      if label
+        "#{label}:" + (needs_paren? ? "(#{to_citrus})" : to_citrus)
+      else
+        to_citrus
+      end
     end
+
+    alias_method :to_str, :to_s
+
+    # Returns the Citrus notation of this rule as a string that is suitable to
+    # be embedded in the string representation of another rule.
+    def to_embedded_s # :nodoc:
+      if name
+        name.to_s
+      else
+        needs_paren? && label.nil? ? "(#{to_s})" : to_s
+      end
+    end
+
+    def ==(other)
+      case other
+      when Rule
+        to_s == other.to_s
+      else
+        super
+      end
+    end
+
+    alias_method :eql?, :==
 
     def inspect # :nodoc:
       to_s
@@ -598,6 +609,7 @@ module Citrus
 
     def extend_match(match) # :nodoc:
       match.names << name if name
+      match.names << label if label
       match.extend(extension) if extension
     end
 
@@ -644,6 +656,112 @@ module Citrus
     end
   end
 
+  # A Proxy is a Rule that is a placeholder for another rule. It stores the
+  # name of some other rule in the grammar internally and resolves it to the
+  # actual Rule object at runtime. This lazy evaluation permits us to create
+  # Proxy objects for rules that we may not know the definition of yet.
+  module Proxy
+    include Rule
+
+    def initialize(rule_name='<proxy>')
+      self.rule_name = rule_name
+    end
+
+    # Sets the name of the rule this rule is proxy for.
+    def rule_name=(rule_name)
+      @rule_name = rule_name.to_sym
+    end
+
+    # The name of this proxy's rule.
+    attr_reader :rule_name
+
+    # Returns the underlying Rule for this proxy.
+    def rule
+      @rule ||= resolve!
+    end
+
+    # Returns an array of events for this rule on the given +input+.
+    def exec(input, events=[])
+      index = events.size
+
+      if input.exec(rule, events).size > index
+        # Proxy objects insert themselves into the event stream in place of the
+        # rule they are proxy for.
+        events[index] = self
+      end
+
+      events
+    end
+
+    def extend_match(match) # :nodoc:
+      # Proxy objects preserve the extension of the rule they are proxy for, and
+      # may also use their own extension.
+      rule.extend_match(match)
+      super
+    end
+  end
+
+  # An Alias is a Proxy for a rule in the same grammar. It is used in rule
+  # definitions when a rule calls some other rule by name. The Citrus notation
+  # is simply the name of another rule without any other punctuation, e.g.:
+  #
+  #     name
+  #
+  class Alias
+    include Proxy
+
+    # Returns the Citrus notation of this rule as a string without a +label+.
+    def to_citrus # :nodoc:
+      rule_name.to_s
+    end
+
+  private
+
+    # Searches this proxy's grammar and any included grammars for a rule with
+    # this proxy's #rule_name. Raises an error if one cannot be found.
+    def resolve!
+      val = grammar.rule(rule_name)
+
+      unless val
+        raise RuntimeError,
+          "No rule named \"#{rule_name}\" in grammar #{grammar.name}"
+      end
+
+      val
+    end
+  end
+
+  # A Super is a Proxy for a rule of the same name that was defined previously
+  # in the grammar's inheritance chain. Thus, Super's work like Ruby's +super+,
+  # only for rules in a grammar instead of methods in a module. The Citrus
+  # notation is the word +super+ without any other punctuation, e.g.:
+  #
+  #     super
+  #
+  class Super
+    include Proxy
+
+    # Returns the Citrus notation of this rule as a string without a +label+.
+    def to_citrus # :nodoc:
+      'super'
+    end
+
+  private
+
+    # Searches this proxy's included grammars for a rule with this proxy's
+    # #rule_name. Raises an error if one cannot be found.
+    def resolve!
+      val = grammar.super_rule(rule_name)
+
+      unless val
+        raise RuntimeError,
+          "No rule named \"#{rule_name}\" in hierarchy of grammar #{grammar.name}"
+      end
+
+      val
+    end
+  end
+
   # A Terminal is a Rule that matches directly on the input stream and may not
   # contain any other rule. Terminals are essentially wrappers for regular
   # expressions. As such, the Citrus notation is identical to Ruby's regular
@@ -657,9 +775,10 @@ module Citrus
   #     [a-zA-Z]
   #     .
   #
-  class Terminal < Rule
+  class Terminal
+    include Rule
+
     def initialize(rule=/^/)
-      super()
       @rule = rule
     end
 
@@ -682,8 +801,8 @@ module Citrus
       !rule.casefold?
     end
 
-    # Returns the Citrus notation of this rule as a string.
-    def to_s
+    # Returns the Citrus notation of this rule as a string without a +label+.
+    def to_citrus # :nodoc:
       rule.inspect
     end
   end
@@ -711,8 +830,8 @@ module Citrus
       @string = rule
     end
 
-    # Returns the Citrus notation of this rule as a string.
-    def to_s
+    # Returns the Citrus notation of this rule as a string without a +label+.
+    def to_citrus # :nodoc:
       if case_sensitive?
         @string.inspect
       else
@@ -721,111 +840,14 @@ module Citrus
     end
   end
 
-  # A Proxy is a Rule that is a placeholder for another rule. It stores the
-  # name of some other rule in the grammar internally and resolves it to the
-  # actual Rule object at runtime. This lazy evaluation permits us to create
-  # Proxy objects for rules that we may not know the definition of yet.
-  class Proxy < Rule
-    def initialize(rule_name='<proxy>')
-      super()
-      self.rule_name = rule_name
-    end
-
-    # Sets the name of the rule this rule is proxy for.
-    def rule_name=(rule_name)
-      @rule_name = rule_name.to_sym
-    end
-
-    # The name of this proxy's rule.
-    attr_reader :rule_name
-
-    # Returns the underlying Rule for this proxy.
-    def rule
-      @rule ||= resolve!
-    end
-
-    # Returns an array of events for this rule on the given +input+.
-    def exec(input, events=[])
-      events << self
-
-      index = events.size
-      start = index - 1
-      if input.exec(rule, events).size > index
-        events << CLOSE
-        events << events[-2]
-      else
-        events.slice!(start, events.size)
-      end
-
-      events
-    end
-
-  end
-
-  # An Alias is a Proxy for a rule in the same grammar. It is used in rule
-  # definitions when a rule calls some other rule by name. The Citrus notation
-  # is simply the name of another rule without any other punctuation, e.g.:
-  #
-  #     name
-  #
-  class Alias < Proxy
-    # Returns the Citrus notation of this rule as a string.
-    def to_s
-      rule_name.to_s
-    end
-
-  private
-
-    # Searches this proxy's grammar and any included grammars for a rule with
-    # this proxy's #rule_name. Raises an error if one cannot be found.
-    def resolve!
-      val = grammar.rule(rule_name)
-
-      unless val
-        raise RuntimeError,
-          "No rule named \"#{rule_name}\" in grammar #{grammar.name}"
-      end
-
-      val
-    end
-  end
-
-  # A Super is a Proxy for a rule of the same name that was defined previously
-  # in the grammar's inheritance chain. Thus, Super's work like Ruby's +super+,
-  # only for rules in a grammar instead of methods in a module. The Citrus
-  # notation is the word +super+ without any other punctuation, e.g.:
-  #
-  #     super
-  #
-  class Super < Proxy
-    # Returns the Citrus notation of this rule as a string.
-    def to_s
-      'super'
-    end
-
-  private
-
-    # Searches this proxy's included grammars for a rule with this proxy's
-    # #rule_name. Raises an error if one cannot be found.
-    def resolve!
-      val = grammar.super_rule(rule_name)
-
-      unless val
-        raise RuntimeError,
-          "No rule named \"#{rule_name}\" in hierarchy of grammar #{grammar.name}"
-      end
-
-      val
-    end
-  end
-
   # A Nonterminal is a Rule that augments the matching behavior of one or more
   # other rules. Nonterminals may not match directly on the input, but instead
   # invoke the rule(s) they contain to determine if a match can be made from
   # the collective result.
-  class Nonterminal < Rule
+  module Nonterminal
+    include Rule
+
     def initialize(rules=[])
-      super()
       @rules = rules.map {|r| Rule.for(r) }
     end
 
@@ -838,8 +860,15 @@ module Citrus
     end
   end
 
-  # A Predicate is a Nonterminal that contains one other rule.
-  class Predicate < Nonterminal
+  # An AndPredicate is a Predicate that contains a rule that must match. Upon
+  # success an empty match is returned and no input is consumed. The Citrus
+  # notation is any expression preceded by an ampersand, e.g.:
+  #
+  #     &expr
+  #
+  class AndPredicate
+    include Nonterminal
+
     def initialize(rule='')
       super([rule])
     end
@@ -848,15 +877,7 @@ module Citrus
     def rule
       rules[0]
     end
-  end
 
-  # An AndPredicate is a Predicate that contains a rule that must match. Upon
-  # success an empty match is returned and no input is consumed. The Citrus
-  # notation is any expression preceded by an ampersand, e.g.:
-  #
-  #     &expr
-  #
-  class AndPredicate < Predicate
     # Returns an array of events for this rule on the given +input+.
     def exec(input, events=[])
       if input.test(rule)
@@ -864,12 +885,13 @@ module Citrus
         events << CLOSE
         events << 0
       end
+
       events
     end
 
-    # Returns the Citrus notation of this rule as a string.
-    def to_s
-      '&' + rule.embed
+    # Returns the Citrus notation of this rule as a string without a +label+.
+    def to_citrus # :nodoc:
+      '&' + rule.to_embedded_s
     end
   end
 
@@ -879,7 +901,18 @@ module Citrus
   #
   #     !expr
   #
-  class NotPredicate < Predicate
+  class NotPredicate
+    include Nonterminal
+
+    def initialize(rule='')
+      super([rule])
+    end
+
+    # Returns the Rule object this rule uses to match.
+    def rule
+      rules[0]
+    end
+
     # Returns an array of events for this rule on the given +input+.
     def exec(input, events=[])
       unless input.test(rule)
@@ -887,12 +920,13 @@ module Citrus
         events << CLOSE
         events << 0
       end
+
       events
     end
 
-    # Returns the Citrus notation of this rule as a string.
-    def to_s
-      '!' + rule.embed
+    # Returns the Citrus notation of this rule as a string without a +label+.
+    def to_citrus # :nodoc:
+      '!' + rule.to_embedded_s
     end
   end
 
@@ -902,8 +936,19 @@ module Citrus
   #
   #     ~expr
   #
-  class ButPredicate < Predicate
+  class ButPredicate
+    include Nonterminal
+
     DOT_RULE = Rule.for(DOT)
+
+    def initialize(rule='')
+      super([rule])
+    end
+
+    # Returns the Rule object this rule uses to match.
+    def rule
+      rules[0]
+    end
 
     # Returns an array of events for this rule on the given +input+.
     def exec(input, events=[])
@@ -920,66 +965,13 @@ module Citrus
         events << CLOSE
         events << length
       end
-      events
-    end
-
-    # Returns the Citrus notation of this rule as a string.
-    def to_s
-      '~' + rule.embed
-    end
-  end
-
-  # A Label is a Predicate that applies a new name to any matches made by its
-  # rule. The Citrus notation is any sequence of word characters (i.e.
-  # <tt>[a-zA-Z0-9_]</tt>) followed by a colon, followed by any other
-  # expression, e.g.:
-  #
-  #     label:expr
-  #
-  class Label < Predicate
-    def initialize(rule='', label='<label>')
-      super(rule)
-      self.label = label
-    end
-
-    # Sets the name of this label.
-    def label=(label)
-      @label = label.to_sym
-    end
-
-    # The label this rule adds to all its matches.
-    attr_reader :label
-
-    # Returns an array of events for this rule on the given +input+.
-    def exec(input, events=[])
-      events << self
-
-      prev_size = events.size
-      start = prev_size - 1
-
-      # If the associated rule matches (adds events)
-      # then close the label and set it's stream position
-      # to be the position of the matched expression.
-      if input.exec(rule, events).size > prev_size
-        events << CLOSE
-        events << events[-2]
-      else
-        # Remove the label rule since the associated expression
-        # didn't match.
-        events.slice!(start, events.size)
-      end
 
       events
     end
 
-    # Returns the Citrus notation of this rule as a string.
-    def to_s
-      label.to_s + ':' + rule.embed
-    end
-
-    def extend_match(match) # :nodoc:
-      match.names << label
-      super
+    # Returns the Citrus notation of this rule as a string without a +label+.
+    def to_citrus # :nodoc:
+      '~' + rule.to_embedded_s
     end
   end
 
@@ -1002,11 +994,18 @@ module Citrus
   #     expr+
   #     expr?
   #
-  class Repeat < Predicate
+  class Repeat
+    include Nonterminal
+
     def initialize(rule='', min=1, max=Infinity)
       raise ArgumentError, "Min cannot be greater than max" if min > max
-      super(rule)
+      super([rule])
       @range = Range.new(min, max)
+    end
+
+    # Returns the Rule object this rule uses to match.
+    def rule
+      rules[0]
     end
 
     # Returns an array of events for this rule on the given +input+.
@@ -1058,9 +1057,9 @@ module Citrus
         end
     end
 
-    # Returns the Citrus notation of this rule as a string.
-    def to_s
-      rule.embed + operator
+    # Returns the Citrus notation of this rule as a string without a +label+.
+    def to_citrus # :nodoc:
+      rule.to_embedded_s + operator
     end
   end
 
@@ -1069,7 +1068,9 @@ module Citrus
   #
   #     expr | expr
   #
-  class Choice < Nonterminal
+  class Choice
+    include Nonterminal
+
     # Returns an array of events for this rule on the given +input+.
     def exec(input, events=[])
       events << self
@@ -1092,9 +1093,9 @@ module Citrus
       events
     end
 
-    # Returns the Citrus notation of this rule as a string.
-    def to_s
-      rules.map {|r| r.embed }.join(' | ')
+    # Returns the Citrus notation of this rule as a string without a +label+.
+    def to_citrus # :nodoc:
+      rules.map {|r| r.to_embedded_s }.join(' | ')
     end
   end
 
@@ -1103,7 +1104,9 @@ module Citrus
   #
   #     expr expr
   #
-  class Sequence < Nonterminal
+  class Sequence
+    include Nonterminal
+
     # Returns an array of events for this rule on the given +input+.
     def exec(input, events=[])
       events << self
@@ -1128,9 +1131,9 @@ module Citrus
       events
     end
 
-    # Returns the Citrus notation of this rule as a string.
-    def to_s
-      rules.map {|r| r.embed }.join(' ')
+    # Returns the Citrus notation of this rule as a string without a +label+.
+    def to_citrus # :nodoc:
+      rules.map {|r| r.to_embedded_s }.join(' ')
     end
   end
 
@@ -1174,22 +1177,6 @@ module Citrus
       names.include?(name.to_sym)
     end
 
-    # Returns an array of all Rule objects that extend this match.
-    def extenders
-      @extenders ||= begin
-        extenders = []
-
-        @events.each do |event|
-          break if event == CLOSE
-          rule = event
-          extenders.unshift(rule)
-          break unless rule.propagates_extensions?
-        end
-
-        extenders
-      end
-    end
-
     # Returns an array of Match objects that are immediate submatches of this
     # match in the order they appeared in the input.
     def matches
@@ -1204,7 +1191,7 @@ module Citrus
           event = @events[index]
           if close
             start = stack.pop
-            if stack.size == extenders.size
+            if stack.size == 1
               matches << Match.new(@string.slice(offset, event),
                                    @events[start..index])
               offset += event
@@ -1238,22 +1225,6 @@ module Citrus
       name ? find(name, false).first : matches.first
     end
 
-    # The default value for a match is its string value. This method is
-    # overridden in most cases to be more meaningful according to the desired
-    # interpretation.
-    alias value to_s
-
-    def ==(other)
-      case other
-      when String
-        @string == other
-      when Match
-        @string == other.to_s
-      else
-        super
-      end
-    end
-
     # Allows methods of this match's string to be called directly and provides
     # a convenient interface for retrieving the first match with a given name.
     def method_missing(sym, *args, &block)
@@ -1277,6 +1248,24 @@ module Citrus
 
     alias_method :to_str, :to_s
 
+    # The default value for a match is its string value. This method is
+    # overridden in most cases to be more meaningful according to the desired
+    # interpretation.
+    alias_method :value, :to_s
+
+    def ==(other)
+      case other
+      when String
+        @string == other
+      when Match
+        @string == other.to_s
+      else
+        super
+      end
+    end
+
+    alias_method :eql?, :==
+
     def inspect
       @string.inspect
     end
@@ -1288,20 +1277,18 @@ module Citrus
     end
 
     def dump_lines(indent='  ') # :nodoc:
-      line = to_s.inspect
+      line = @string.inspect
       line << " (" << names.join(',') << ")" unless names.empty?
 
-      matches.inject([line]) do |lines, m|
-        lines.concat(m.dump_lines(indent).map {|line| indent + line })
+      matches.inject([line]) do |lines, match|
+        lines.concat(match.dump_lines(indent).map {|line| indent + line })
       end
     end
 
   private
 
     def extend! # :nodoc:
-      extenders.each do |rule|
-        rule.extend_match(self)
-      end
+      @events[0].extend_match(self) if @events[0]
     end
   end
 end

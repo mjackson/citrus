@@ -48,8 +48,8 @@ class Test::Unit::TestCase
   module CalcTestMethods
     # A helper method that tests the successful parsing and evaluation of the
     # given mathematical expression.
-    def do_test(expr)
-      match = Calc.parse(expr)
+    def do_test(expr, grammar)
+      match = grammar.parse(expr)
       assert(match)
       assert_equal(expr, match)
       assert_equal(expr.length, match.length)

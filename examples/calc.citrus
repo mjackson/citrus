@@ -8,7 +8,9 @@ grammar Calc
   ## Hierarchical syntax
 
   rule term
-    additive | factor
+    (additive | factor) {
+      first.value
+    }
   end
 
   rule additive
@@ -18,7 +20,9 @@ grammar Calc
   end
 
   rule factor
-    multiplicative | prefix
+    (multiplicative | prefix) {
+      first.value
+    }
   end
 
   rule multiplicative
@@ -28,7 +32,9 @@ grammar Calc
   end
 
   rule prefix
-    prefixed | exponent
+    (prefixed | exponent) {
+      first.value
+    }
   end
 
   rule prefixed
@@ -38,7 +44,9 @@ grammar Calc
   end
 
   rule exponent
-    exponential | primary
+    (exponential | primary) {
+      first.value
+    }
   end
 
   rule exponential
@@ -48,25 +56,35 @@ grammar Calc
   end
 
   rule primary
-    group | number
+    (group | number) {
+      first.value
+    }
   end
 
   rule group
-    (lparen term rparen) { term.value }
+    (lparen term rparen) {
+      term.value
+    }
   end
 
   ## Lexical syntax
 
   rule number
-    float | integer
+    (float | integer) {
+      first.value
+    }
   end
 
   rule float
-    (digits '.' digits space*) { strip.to_f }
+    (digits '.' digits space*) {
+      strip.to_f
+    }
   end
 
   rule integer
-    (digits space*) { strip.to_i }
+    (digits space*) {
+      strip.to_i
+    }
   end
 
   rule digits

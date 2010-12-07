@@ -227,6 +227,20 @@ class CitrusFileTest < Test::Unit::TestCase
     assert_instance_of(Sequence, match.value)
   end
 
+  def test_label_expression
+    match = File.parse('label:""', :root => :label_expression)
+    assert(match)
+    assert_kind_of(Rule, match.value)
+    assert_instance_of(StringTerminal, match.value)
+  end
+
+  def test_label_expression_space
+    match = File.parse('label :"" ', :root => :label_expression)
+    assert(match)
+    assert_kind_of(Rule, match.value)
+    assert_instance_of(StringTerminal, match.value)
+  end
+
   def test_expression_tag
     match = File.parse('"" <Module>', :root => :expression)
     assert(match)
@@ -262,18 +276,11 @@ class CitrusFileTest < Test::Unit::TestCase
     assert_instance_of(NotPredicate, match.value)
   end
 
-  def test_prefix_label
-    match = File.parse('label:""', :root => :prefix)
+  def test_prefix_but
+    match = File.parse('~""', :root => :prefix)
     assert(match)
     assert_kind_of(Rule, match.value)
-    assert_instance_of(Label, match.value)
-  end
-
-  def test_prefix_label_space
-    match = File.parse('label :"" ', :root => :prefix)
-    assert(match)
-    assert_kind_of(Rule, match.value)
-    assert_instance_of(Label, match.value)
+    assert_instance_of(ButPredicate, match.value)
   end
 
   def test_suffix_plus
@@ -603,17 +610,13 @@ class CitrusFileTest < Test::Unit::TestCase
   def test_label
     match = File.parse('label:', :root => :label)
     assert(match)
-    v = match.value('')
-    assert_instance_of(Label, v)
-    assert_equal(:label, v.label)
+    assert_equal(:label, match.value)
   end
 
   def test_label_spaced
     match = File.parse('a_label : ', :root => :label)
     assert(match)
-    v = match.value('')
-    assert_instance_of(Label, v)
-    assert_equal(:a_label, v.label)
+    assert_equal(:a_label, match.value)
   end
 
   def test_tag

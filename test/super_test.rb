@@ -16,20 +16,23 @@ class SuperTest < Test::Unit::TestCase
       rule :a, any(ghi, sup)
     }
     rule_2a = grammar2.rule(:a)
+    rule_2a_als = rule_2a.rules[0]
     rule_2a_sup = rule_2a.rules[1]
     rule_1a = grammar1.rule(:a)
 
     events = rule_2a.exec(Input.new('abc'))
     assert_equal([
       rule_2a,
-        rule_2a_sup,
-          rule_1a, CLOSE, 3,
-        CLOSE, 3,
+        rule_2a_sup, CLOSE, 3,
       CLOSE, 3
     ], events)
 
     events = rule_2a.exec(Input.new('ghi'))
-    assert_equal([rule_2a, ghi, CLOSE, 3, CLOSE, 3], events)
+    assert_equal([
+      rule_2a,
+        rule_2a_als, CLOSE, 3,
+      CLOSE, 3
+    ], events)
   end
 
   def test_exec_miss
@@ -65,20 +68,14 @@ class SuperTest < Test::Unit::TestCase
     events = rule_2a.exec(Input.new('abc'))
     assert_equal([
       rule_2a,
-        rule_2a_sup,
-          rule_1a, CLOSE, 3,
-        CLOSE, 3,
+        rule_2a_sup, CLOSE, 3,
       CLOSE, 3
     ], events)
 
     events = rule_2a.exec(Input.new('def'))
     assert_equal([
       rule_2a,
-        rule_2a_als,
-          rule_2b,
-            rule_1b, CLOSE, 3,
-          CLOSE, 3,
-        CLOSE, 3,
+        rule_2a_als, CLOSE, 3,
       CLOSE, 3
     ], events)
   end
@@ -86,5 +83,11 @@ class SuperTest < Test::Unit::TestCase
   def test_to_s
     rule = Super.new
     assert_equal('super', rule.to_s)
+  end
+
+  def test_to_s_with_label
+    rule = Super.new
+    rule.label = 'a_label'
+    assert_equal('a_label:super', rule.to_s)
   end
 end

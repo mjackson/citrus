@@ -92,7 +92,7 @@ module Citrus
     end
 
     rule :sequence do
-      mod one_or_more(:expression) do
+      mod one_or_more(:label_expression) do
         def rules
           @rules ||= matches.map {|m| m.value }
         end
@@ -101,6 +101,15 @@ module Citrus
           rules.length > 1 ? Sequence.new(rules) : rules.first
         end
       end
+    end
+
+    rule :label_expression do
+      all(zero_or_one(:label), :expression) {
+        rule = expression.value
+        label = matches[0].first
+        rule.label = label.value if label
+        rule
+      }
     end
 
     rule :expression do
@@ -131,17 +140,23 @@ module Citrus
     end
 
     rule :primary do
-      any(:grouping, :proxy, :string_terminal, :terminal)
+      any(:grouping, :proxy, :string_terminal, :terminal) {
+        first.value
+      }
     end
 
     rule :grouping do
-      all(:lparen, :rule_body, :rparen) { rule_body.value }
+      all(:lparen, :rule_body, :rparen) {
+        rule_body.value
+      }
     end
 
     ## Lexical syntax
 
     rule :require do
-      all(:require_keyword, :quoted_string) { quoted_string.value }
+      all(:require_keyword, :quoted_string) {
+        quoted_string.value
+      }
     end
 
     rule :include do
@@ -165,7 +180,9 @@ module Citrus
     end
 
     rule :proxy do
-      any(:super, :alias)
+      any(:super, :alias) {
+        first.value
+      }
     end
 
     rule :super do
@@ -182,14 +199,14 @@ module Citrus
 
     rule :string_terminal do
       any(:quoted_string, :case_insensitive_string) {
-        StringTerminal.new(super(), flags)
+        StringTerminal.new(first.value, first.flags)
       }
     end
 
     rule :quoted_string do
       mod all(/(["'])(?:\\?.)*?\1/, :space) do
         def value
-          eval(first)
+          eval(first.to_s)
         end
 
         def flags
@@ -201,7 +218,7 @@ module Citrus
     rule :case_insensitive_string do
       mod all(/`(?:\\?.)*?`/, :space) do
         def value
-          eval(first.gsub(/^`|`$/, '"'))
+          eval(first.to_s.gsub(/^`|`$/, '"'))
         end
 
         def flags
@@ -212,19 +229,19 @@ module Citrus
 
     rule :terminal do
       any(:regular_expression, :character_class, :dot) {
-        Terminal.new(super())
+        Terminal.new(first.value)
       }
     end
 
     rule :regular_expression do
       all(/\/(?:\\?.)*?\/[imxouesn]*/, :space) {
-        eval(first)
+        eval(first.to_s)
       }
     end
 
     rule :character_class do
       all(/\[(?:\\?.)*?\]/, :space) {
-        Regexp.new('\A' + first, nil, 'n')
+        Regexp.new('\A' + first.to_s, nil, 'n')
       }
     end
 
@@ -234,8 +251,16 @@ module Citrus
       }
     end
 
+    rule :label do
+      all(/[a-zA-Z0-9_]+/, :space, ':', :space) {
+        first.to_sym
+      }
+    end
+
     rule :extension do
-      any(:tag, :mod_block, :block)
+      any(:tag, :mod_block, :block) {
+        first.value
+      }
     end
 
     rule :tag do
@@ -275,7 +300,9 @@ module Citrus
     end
 
     rule :predicate do
-      any(:and, :not, :but, :label)
+      any(:and, :not, :but) { |rule|
+        first.value(rule)
+      }
     end
 
     rule :and do
@@ -296,15 +323,9 @@ module Citrus
       }
     end
 
-    rule :label do
-      all(/[a-zA-Z0-9_]+/, :space, ':', :space) { |rule|
-        Label.new(rule, first.to_s)
-      }
-    end
-
     rule :repeat do
       any(:question, :plus, :star) { |rule|
-        Repeat.new(rule, min, max)
+        Repeat.new(rule, first.min, first.max)
       }
     end
 

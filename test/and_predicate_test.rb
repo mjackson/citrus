@@ -29,4 +29,10 @@ class AndPredicateTest < Test::Unit::TestCase
     rule = AndPredicate.new('a')
     assert_equal('&"a"', rule.to_s)
   end
+
+  def test_to_s_with_label
+    rule = AndPredicate.new('a')
+    rule.label = 'a_label'
+    assert_equal('a_label:&"a"', rule.to_s)
+  end
 end

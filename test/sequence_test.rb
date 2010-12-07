@@ -32,10 +32,24 @@ class SequenceTest < Test::Unit::TestCase
     assert_equal('"a" "b"', rule.to_s)
   end
 
-  def test_to_s_embed
+  def test_to_s_with_label
+    rule = Sequence.new(%w<a b>)
+    rule.label = 'a_label'
+    assert_equal('a_label:("a" "b")', rule.to_s)
+  end
+
+  def test_to_embedded_s
     rule1 = Sequence.new(%w<a b>)
     rule2 = Sequence.new(%w<c d>)
     rule = Sequence.new([rule1, rule2])
     assert_equal('("a" "b") ("c" "d")', rule.to_s)
+  end
+
+  def test_to_embedded_s_with_label
+    rule1 = Sequence.new(%w<a b>)
+    rule2 = Sequence.new(%w<c d>)
+    rule2.label = 'a_label'
+    rule = Sequence.new([rule1, rule2])
+    assert_equal('("a" "b") a_label:("c" "d")', rule.to_s)
   end
 end
