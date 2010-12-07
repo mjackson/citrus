@@ -508,15 +508,8 @@ module Citrus
       @name = name.to_sym
     end
 
-    # Returns the name of this rule.
-    def name
-      @name || '<anonymous>'
-    end
-
-    # Returns +true+ if this rule has a name, +false+ otherwise.
-    def named?
-      !!@name
-    end
+    # The name of this rule.
+    attr_reader :name
 
     # Specifies a module that will be used to extend all Match objects that
     # result from this rule. If +mod+ is a Proc, it is used to create an
@@ -610,7 +603,7 @@ module Citrus
     # Returns a string version of this rule that is suitable to be used in the
     # string representation of another rule.
     def embed
-      named? ? name.to_s : (needs_paren? ? "(#{to_s})" : to_s)
+      name ? name.to_s : (needs_paren? ? "(#{to_s})" : to_s)
     end
 
     def inspect # :nodoc:
@@ -618,7 +611,7 @@ module Citrus
     end
 
     def extend_match(match) # :nodoc:
-      match.names << name if named?
+      match.names << name if name
       match.extend(extension) if extension
     end
 
