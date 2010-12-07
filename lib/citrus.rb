@@ -389,11 +389,9 @@ module Citrus
 
     # Creates a new ButPredicate using the given +rule+. A block may be provided
     # to specify semantic behavior (via #ext).
-    def but(rule, &block)
+    def butp(rule, &block)
       ext(ButPredicate.new(rule), block)
     end
-
-    alias butp but # For consistency with #andp and #notp.
 
     # Creates a new Label using the given +rule+ and +label+. A block may be
     # provided to specify semantic behavior (via #ext).
