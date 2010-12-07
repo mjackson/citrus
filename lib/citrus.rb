@@ -82,8 +82,8 @@ module Citrus
     end
   end
 
-  # This class represents the core of the parsing algorithm. It wraps the input
-  # string and serves matches to all nonterminals.
+  # An Input is a scanner that is responsible for executing rules at different
+  # positions in the input string and persisting event streams.
   class Input < StringScanner
     def initialize(string)
       super(string)
@@ -93,8 +93,6 @@ module Citrus
     # The maximum offset in the input that was successfully parsed.
     attr_reader :max_offset
 
-    # Resets all internal variables so that this object may be used in another
-    # parse.
     def reset # :nodoc:
       @max_offset = 0
       super
@@ -149,7 +147,7 @@ module Citrus
       line_index(pos) + 1
     end
 
-    alias lineno line_number
+    alias_method :lineno, :line_number
 
     # Returns the text of the line that contains the character at the given
     # +pos+. +pos+ defaults to the current pointer position.
@@ -158,8 +156,8 @@ module Citrus
     end
 
     # Returns an array of events for the given +rule+ at the current pointer
-    # position. Objects in this array may be one of three types: a rule id,
-    # Citrus::CLOSE, or a length.
+    # position. Objects in this array may be one of three types: a Rule,
+    # Citrus::CLOSE, or a length (integer).
     def exec(rule, events=[])
       start = pos
       index = events.size
@@ -182,29 +180,36 @@ module Citrus
       rule.exec(self)[-1]
     end
 
+    # Returns +true+ when using memoization to cache match results.
     def memoized?
       false
     end
   end
 
+  # A MemoizingInput is an Input that caches segments of the event stream for
+  # particular rules in a parse. This technique (also known as "Packrat"
+  # parsing) guarantees parsers will operate in linear time but costs
+  # significantly more in terms of time and memory required to perform a parse.
+  # For more information, please read the paper on Packrat parsing at
+  # http://pdos.csail.mit.edu/~baford/packrat/icfp02/.
   class MemoizingInput < Input
-    # Modifies this object to cache match results during a parse. This technique
-    # (also known as "Packrat" parsing) guarantees parsers will operate in
-    # linear time but costs significantly more in terms of time and memory
-    # required to perform a parse. For more information, please read the paper
-    # on Packrat parsing at http://pdos.csail.mit.edu/~baford/packrat/icfp02/.
     def initialize(string)
-      super string
+      super(string)
       @cache = {}
       @cache_hits = 0
     end
 
-    # A nested hash of rule id's to offsets and their respective matches. Only
-    # present if memoing is enabled.
+    # A nested hash of rules to offsets and their respective matches.
     attr_reader :cache
 
-    # The number of times the cache was hit. Only present if memoing is enabled.
+    # The number of times the cache was hit.
     attr_reader :cache_hits
+
+    def reset # :nodoc:
+      @cache.clear
+      @cache_hits = 0
+      super
+    end
 
     def exec(rule, events=[]) # :nodoc:
       c = @cache[rule] ||= {}
@@ -217,12 +222,6 @@ module Citrus
       end
 
       events.concat(e)
-    end
-
-    def reset # :nodoc:
-      @cache.clear
-      @cache_hits = 0
-      super
     end
 
     # Returns +true+ when using memoization to cache match results.
@@ -789,7 +788,7 @@ module Citrus
           "No rule named \"#{rule_name}\" in grammar #{grammar.name}"
       end
 
-      return val
+      val
     end
   end
 
@@ -818,7 +817,7 @@ module Citrus
           "No rule named \"#{rule_name}\" in hierarchy of grammar #{grammar.name}"
       end
 
-      return val
+      val
     end
   end
 
@@ -1153,16 +1152,6 @@ module Citrus
       extend!
     end
 
-    def to_s
-      @string
-    end
-
-    alias_method :to_str, :to_s
-
-    def inspect
-      @string.inspect
-    end
-
     # The array of events that was passed to the constructor.
     attr_reader :events
 
@@ -1259,19 +1248,19 @@ module Citrus
     def ==(other)
       case other
       when String
-        return @string == other
+        @string == other
       when Match
-        return @string == other.to_s
+        @string == other.to_s
       else
         super
       end
     end
 
-    # Allows sub-matches of this match to be retrieved by name as instance
-    # methods.
-    def method_missing(sym, *args)
+    # Allows methods of this match's string to be called directly and provides
+    # a convenient interface for retrieving the first match with a given name.
+    def method_missing(sym, *args, &block)
       if @string.respond_to?(sym)
-        @string.__send__ sym, *args
+        @string.__send__(sym, *args, &block)
       else
         val = first(sym)
 
@@ -1280,8 +1269,18 @@ module Citrus
             "No match named \"#{sym}\" in #{self} (#{name})"
         end
 
-        return val
+        val
       end
+    end
+
+    def to_s
+      @string
+    end
+
+    alias_method :to_str, :to_s
+
+    def inspect
+      @string.inspect
     end
 
     # Returns a string representation of this match that displays the entire
