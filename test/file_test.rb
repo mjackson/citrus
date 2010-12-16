@@ -121,25 +121,28 @@ class CitrusFileTest < Test::Unit::TestCase
     assert_instance_of(Repeat, match.value)
   end
 
-  def test_rule_body_choice
-    match = File.parse('"a" | "b"', :root => :rule_body)
-    assert(match)
-    assert_kind_of(Rule, match.value)
-    assert_instance_of(Choice, match.value)
-
+  def test_rule_body_choice_terminal
     match = File.parse('/./ | /./', :root => :rule_body)
     assert(match)
     assert_kind_of(Rule, match.value)
     assert_instance_of(Choice, match.value)
-    assert_equal(1, match.find(:bar).length)
-    assert_equal(2, match.find(:regular_expression).length)
-    assert_equal(0, match.find(:dot).length)
+  end
 
+  def test_rule_body_choice_string_terminal
+    match = File.parse('"a" | "b"', :root => :rule_body)
+    assert(match)
+    assert_kind_of(Rule, match.value)
+    assert_instance_of(Choice, match.value)
+  end
+
+  def test_rule_body_choice_mixed
     match = File.parse('("a" | /./)', :root => :rule_body)
     assert(match)
     assert_kind_of(Rule, match.value)
     assert_instance_of(Choice, match.value)
+  end
 
+  def test_rule_body_choice_extended
     match = File.parse('("a" | "b") <Module>', :root => :rule_body)
     assert(match)
     assert_kind_of(Rule, match.value)

@@ -46,9 +46,6 @@ module Citrus
   # A standard error class that all Citrus errors extend.
   class Error < RuntimeError; end
 
-  # Raised when a match cannot be found.
-  class NoMatchError < Error; end
-
   # Raised when a parse fails.
   class ParseError < Error
     # The +input+ given here is an instance of Citrus::Input.
@@ -350,7 +347,7 @@ module Citrus
 
       rules[sym] || super_rule(sym)
     rescue => e
-      # This preserves the backtrace
+      # This preserves the backtrace.
       e.message.replace("Cannot create rule \"#{name}\": #{e.message}")
       raise e
     end
@@ -788,11 +785,13 @@ module Citrus
     # Returns an array of events for this rule on the given +input+.
     def exec(input, events=[])
       length = input.scan_full(rule, false, false)
+
       if length
         events << self
         events << CLOSE
         events << length
       end
+
       events
     end
 
@@ -1163,18 +1162,35 @@ module Citrus
     # An array of all names of this match. A name is added to a match object
     # for each rule that returns that object when matching. These names can then
     # be used to determine which rules were satisfied by a given match.
+    #
+    # Note: Deprecated.
     def names
       @names ||= []
     end
 
     # The name of the lowest level rule that originally created this match.
+    #
+    # Note: Deprecated.
     def name
       names.first
     end
 
     # Returns +true+ if this match has the given +name+.
+    #
+    # Note: Deprecated.
     def has_name?(name)
       names.include?(name.to_sym)
+    end
+
+    # Returns an array of all sub-matches with the given +name+. If +deep+ is
+    # +false+, returns only sub-matches that are immediate descendants of this
+    # match.
+    #
+    # Note: Deprecated.
+    def find(name, deep=true)
+      ms = matches.select {|m| m.has_name?(name) }
+      matches.each {|m| ms.concat(m.find(name, deep)) } if deep
+      ms
     end
 
     # Returns an array of Match objects that are immediate submatches of this
@@ -1209,20 +1225,82 @@ module Citrus
       end
     end
 
-    # Returns an array of all sub-matches with the given +name+. If +deep+ is
-    # +false+, returns only sub-matches that are immediate descendants of this
-    # match.
-    def find(name, deep=true)
-      ms = matches.select {|m| m.has_name?(name) }
-      matches.each {|m| ms.concat(m.find(name, deep)) } if deep
-      ms
+    # Returns a hash of capture names to arrays of matches with that name,
+    # in the order they appeared in the input.
+    def captures
+      @captures ||= begin
+        captures = {}
+        stack = []
+        offset = 0
+        close = false
+        index = 0
+        last_length = nil
+        in_proxy = false
+
+        while index < @events.size
+          event = @events[index]
+
+          if close
+            start = stack.pop
+
+            if Rule === start
+              rule = start
+              os = stack.pop
+              start = stack.pop
+
+              match = Match.new(@string.slice(os, event), @events[start..index])
+
+              if Proxy === rule
+                if captures[rule.rule_name]
+                  captures[rule.rule_name] << match
+                else
+                  captures[rule.rule_name] = [match]
+                end
+              end
+
+              if rule.label
+                if captures[rule.label]
+                  captures[rule.label] << match
+                else
+                  captures[rule.label] = [match]
+                end
+              end
+
+              in_proxy = false
+            end
+
+            unless last_length
+              last_length = event
+            end
+
+            close = false
+          elsif event == CLOSE
+            close = true
+          else
+            stack << index
+
+            if last_length
+              offset += last_length
+              last_length = nil
+            end
+
+            unless in_proxy || stack.size == 1
+              stack << offset
+              stack << event
+              in_proxy = true if Proxy === event
+            end
+          end
+
+          index += 1
+        end
+
+        captures
+      end
     end
 
-    # A shortcut for retrieving the first immediate sub-match of this match. If
-    # +name+ is given, attempts to retrieve the first immediate sub-match named
-    # +name+.
-    def first(name=nil)
-      name ? find(name, false).first : matches.first
+    # A shortcut for retrieving the first immediate sub-match of this match.
+    def first
+      matches.first
     end
 
     # Allows methods of this match's string to be called directly and provides
@@ -1231,14 +1309,7 @@ module Citrus
       if @string.respond_to?(sym)
         @string.__send__(sym, *args, &block)
       else
-        val = first(sym)
-
-        unless val
-          raise NoMatchError,
-            "No match named \"#{sym}\" in #{self} (#{name})"
-        end
-
-        val
+        captures[sym].first if captures[sym]
       end
     end
 

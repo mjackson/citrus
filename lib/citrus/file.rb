@@ -28,8 +28,11 @@ module Citrus
 
     rule :file do
       all(:space, zero_or_more(any(:require, :grammar))) {
-        find(:require).each {|r| require r.value }
-        find(:grammar).map {|g| g.value }
+        if captures[:require]
+          captures[:require].each {|r| require r.value }
+        end
+
+        (captures[:grammar] || []).map {|g| g.value }
       }
     end
 
@@ -47,15 +50,14 @@ module Citrus
       zero_or_more(any(:include, :root, :rule)) {
         grammar = Grammar.new
 
-        find(:include).map do |inc|
-          grammar.include(inc.value)
+        if captures[:include]
+          captures[:include].each {|inc| grammar.include(inc.value) }
         end
 
-        root = find(:root).last
         grammar.root(root.value) if root
 
-        find(:rule).each do |r|
-          grammar.rule(r.rule_name.value, r.value)
+        if captures[:rule]
+          captures[:rule].each {|r| grammar.rule(r.rule_name.value, r.value) }
         end
 
         grammar
@@ -71,18 +73,14 @@ module Citrus
     rule :rule_body do
       zero_or_one(:choice) {
         # An empty rule definition matches the empty string.
-        matches.length > 0 ? choice.value : Rule.for('')
+        choice ? choice.value : Rule.for('')
       }
     end
 
     rule :choice do
       mod all(:sequence, zero_or_more([ :bar, :sequence ])) do
         def rules
-          @rules ||= begin
-            [ sequence.value ] + matches[1].matches.map do |m|
-              m.matches[1].value
-            end
-          end
+          @rules ||= captures[:sequence].map {|s| s.value }
         end
 
         def value
@@ -94,7 +92,7 @@ module Citrus
     rule :sequence do
       mod one_or_more(:label_expression) do
         def rules
-          @rules ||= matches.map {|m| m.value }
+          @rules ||= captures[:label_expression].map {|e| e.value }
         end
 
         def value
@@ -106,7 +104,6 @@ module Citrus
     rule :label_expression do
       all(zero_or_one(:label), :expression) {
         rule = expression.value
-        label = matches[0].first
         rule.label = label.value if label
         rule
       }
@@ -115,7 +112,6 @@ module Citrus
     rule :expression do
       all(:prefix, zero_or_one(:extension)) {
         rule = prefix.value
-        extension = matches[1].first
         rule.extension = extension.value if extension
         rule
       }
@@ -124,7 +120,6 @@ module Citrus
     rule :prefix do
       all(zero_or_one(:predicate), :suffix) {
         rule = suffix.value
-        predicate = matches[0].first
         rule = predicate.value(rule) if predicate
         rule
       }
@@ -133,7 +128,6 @@ module Citrus
     rule :suffix do
       all(:primary, zero_or_one(:repeat)) {
         rule = primary.value
-        repeat = matches[1].first
         rule = repeat.value(rule) if repeat
         rule
       }
@@ -170,13 +164,17 @@ module Citrus
     end
 
     rule :root do
-      all(:root_keyword, :rule_name) { rule_name.value }
+      all(:root_keyword, :rule_name) {
+        rule_name.value
+      }
     end
 
     # Rule names may contain letters, numbers, underscores, and dashes. They
     # MUST start with a letter.
     rule :rule_name do
-      all(/[a-zA-Z][a-zA-Z0-9_-]*/, :space) { first.to_s }
+      all(/[a-zA-Z][a-zA-Z0-9_-]*/, :space) {
+        first.to_s
+      }
     end
 
     rule :proxy do
