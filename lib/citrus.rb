@@ -609,48 +609,6 @@ module Citrus
       match.names << label if label
       match.extend(extension) if extension
     end
-
-    class Application
-      def initialize(rule, len, comp=nil)
-        @rule = rule
-        @length = len
-        @compositions = comp
-      end
-
-      # The rule being applied
-      attr_reader :rule
-
-      # The length of the text matched by this application
-      attr_reader :length
-
-      # The applications this application is composed of
-      attr_reader :compositions
-
-      def show(indent="")
-        puts "#{indent}#{@rule} -- #{@length}"
-        @compositions.each do |n|
-          n.show "  #{indent}"
-        end
-      end
-
-      # For the event stream, reconstruct highlevel info about the rules
-      # and operands
-      def self.from_events(events)
-        rule = events.shift
-        unless rule
-          raise "invalid stream"
-        end
-
-        sub = []
-        until events[0] == CLOSE
-          sub << from_events(events)
-        end
-
-        events.shift # close
-
-        Application.new(rule, events.shift, sub)
-      end
-    end
   end
 
   # A Proxy is a Rule that is a placeholder for another rule. It stores the
@@ -1155,10 +1113,6 @@ module Citrus
     # The array of events that was passed to the constructor.
     attr_reader :events
 
-    def application
-      Rule::Application.from_events(@events.dup)
-    end
-
     # An array of all names of this match. A name is added to a match object
     # for each rule that returns that object when matching. These names can then
     # be used to determine which rules were satisfied by a given match.
@@ -1205,19 +1159,23 @@ module Citrus
 
         while index < @events.size
           event = @events[index]
+
           if close
             start = stack.pop
+
             if stack.size == 1
               matches << Match.new(@string.slice(offset, event),
                                    @events[start..index])
               offset += event
             end
+
             close = false
           elsif event == CLOSE
             close = true
           else
             stack << index
           end
+
           index += 1
         end
 
@@ -1250,6 +1208,8 @@ module Citrus
 
               match = Match.new(@string.slice(os, event), @events[start..index])
 
+              # We should be able to find matches that were created by proxy by
+              # the name of the rule they are proxy for.
               if Proxy === rule
                 if captures[rule.rule_name]
                   captures[rule.rule_name] << match
@@ -1258,6 +1218,7 @@ module Citrus
                 end
               end
 
+              # We should be able to find labelled matches by their label.
               if rule.label
                 if captures[rule.label]
                   captures[rule.label] << match
@@ -1279,11 +1240,16 @@ module Citrus
           else
             stack << index
 
+            # We can calculate the offset of this rule event by adding back the
+            # last match length.
             if last_length
               offset += last_length
               last_length = nil
             end
 
+            # We should not create captures when traversing the portion of the
+            # event stream that is masked by a proxy in the original rule
+            # definition.
             unless in_proxy || stack.size == 1
               stack << offset
               stack << event
@@ -1341,19 +1307,50 @@ module Citrus
       @string.inspect
     end
 
-    # Returns a string representation of this match that displays the entire
-    # match tree for easy viewing in the console.
-    def dump
-      dump_lines.join("\n")
-    end
+    # Prints the entire subtree of this match using the given +indent+ to
+    # indicate nested match levels. Useful for debugging.
+    def dump(indent=' ')
+      lines = []
+      stack = []
+      offset = 0
+      close = false
+      index = 0
+      last_length = nil
 
-    def dump_lines(indent='  ') # :nodoc:
-      line = @string.inspect
-      line << " (" << names.join(',') << ")" unless names.empty?
+      while index < @events.size
+        event = @events[index]
 
-      matches.inject([line]) do |lines, match|
-        lines.concat(match.dump_lines(indent).map {|line| indent + line })
+        if close
+          os = stack.pop
+          start = stack.pop
+          rule = stack.pop
+
+          space = indent * (stack.size / 3)
+          string = @string.slice(os, event)
+          lines[start] = "#{space}#{string.inspect} rule=#{rule}, offset=#{os}, length=#{event}"
+
+          unless last_length
+            last_length = event
+          end
+
+          close = false
+        elsif event == CLOSE
+          close = true
+        else
+          if last_length
+            offset += last_length
+            last_length = nil
+          end
+
+          stack << event
+          stack << index
+          stack << offset
+        end
+
+        index += 1
       end
+
+      puts lines.compact.join("\n")
     end
 
   private
