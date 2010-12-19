@@ -1,3 +1,5 @@
+$LOAD_PATH.unshift(File.expand_path('../../lib', __FILE__))
+
 require 'citrus'
 
 # This file contains a small suite of tests for the grammars found in ip.citrus.
