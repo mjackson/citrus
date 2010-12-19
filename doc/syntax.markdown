@@ -101,14 +101,12 @@ See [Choice](api/classes/Citrus/Choice.html) for more information.
 ## Labels
 
 Match objects may be referred to by a different name than the rule that
-originally generated them. Labels are created by placing the label and a colon
+originally generated them. Labels are added by placing the label and a colon
 immediately preceding any expression.
 
     chars:/[a-z]+/  # the characters matched by the regular expression
                     # may be referred to as "chars" in an extension
                     # method
-
-See [Label](api/classes/Citrus/Label.html) for more information.
 
 ## Grouping
 
@@ -128,17 +126,16 @@ in between less than and greater than symbols.
                               # times and extend the match with the
                               # CouponCode module
 
-Additionally, extensions may be specified inline using curly braces. Inside the
-curly braces you may embed method definitions that will be used to extend match
-objects.
+Additionally, extensions may be specified inline using curly braces. When using
+this method, the code inside the curly braces may be invoked by calling the
+`value` method on the match object.
 
-    # match any digit and return its integer value when calling the
-    # #value method on the match object
-    [0-9] {
-      def value
-        to_i
-      end
-    }
+    [0-9] { to_i }        # match any digit and return its integer value when
+                          # calling the #value method on the match object
+
+Note that when using the inline block method you may also specify arguments in
+between vertical bars immediately following the opening curly brace, just like
+in Ruby blocks.
 
 ## Super
 
@@ -155,21 +152,21 @@ their precedence. A higher precedence indicates tighter binding.
 
 Operator                  | Name                      | Precedence
 ------------------------- | ------------------------- | ----------
-`''`                      | String (single quoted)    | 6
-`""`                      | String (double quoted)    | 6
-<code>``</code>           | String (case insensitive) | 6
-`[]`                      | Character class           | 6
-`.`                       | Dot (any character)       | 6
-`//`                      | Regular expression        | 6
-`()`                      | Grouping                  | 6
-`*`                       | Repetition (arbitrary)    | 5
-`+`                       | Repetition (one or more)  | 5
-`?`                       | Repetition (zero or one)  | 5
-`&`                       | And predicate             | 4
-`!`                       | Not predicate             | 4
-`~`                       | But predicate             | 4
-`:`                       | Label                     | 4
-`<>`                      | Extension (module name)   | 3
-`{}`                      | Extension (literal)       | 3
+`''`                      | String (single quoted)    | 7
+`""`                      | String (double quoted)    | 7
+<code>``</code>           | String (case insensitive) | 7
+`[]`                      | Character class           | 7
+`.`                       | Dot (any character)       | 7
+`//`                      | Regular expression        | 7
+`()`                      | Grouping                  | 7
+`*`                       | Repetition (arbitrary)    | 6
+`+`                       | Repetition (one or more)  | 6
+`?`                       | Repetition (zero or one)  | 6
+`&`                       | And predicate             | 5
+`!`                       | Not predicate             | 5
+`~`                       | But predicate             | 5
+`<>`                      | Extension (module name)   | 4
+`{}`                      | Extension (literal)       | 4
+`:`                       | Label                     | 3
 `e1 e2`                   | Sequence                  | 2
 <code>e1 &#124; e2</code> | Ordered choice            | 1

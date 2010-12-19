@@ -675,14 +675,14 @@ module Citrus
     # Searches this proxy's grammar and any included grammars for a rule with
     # this proxy's #rule_name. Raises an error if one cannot be found.
     def resolve!
-      val = grammar.rule(rule_name)
+      rule = grammar.rule(rule_name)
 
-      unless val
+      unless rule
         raise RuntimeError,
           "No rule named \"#{rule_name}\" in grammar #{grammar.name}"
       end
 
-      val
+      rule
     end
   end
 
@@ -706,14 +706,14 @@ module Citrus
     # Searches this proxy's included grammars for a rule with this proxy's
     # #rule_name. Raises an error if one cannot be found.
     def resolve!
-      val = grammar.super_rule(rule_name)
+      rule = grammar.super_rule(rule_name)
 
-      unless val
+      unless rule
         raise RuntimeError,
           "No rule named \"#{rule_name}\" in hierarchy of grammar #{grammar.name}"
       end
 
-      val
+      rule
     end
   end
 
@@ -979,13 +979,10 @@ module Citrus
         n += 1
       end
 
-      # If enough rules match, register the repeat as matched
-      # by closing it.
       if n >= min
         events << CLOSE
         events << length
       else
-        # Otherwise remove the repeat entry from the event stream
         events.slice!(start, events.size)
       end
 

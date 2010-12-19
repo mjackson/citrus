@@ -70,31 +70,30 @@ of Ruby modules. Rules use these modules to extend the matches they create.
 
 ## Grammars
 
-A grammar is a container for rules. Usually the rules in a grammar collectively
-form a complete specification for some language, or a well-defined subset
-thereof.
+A [Grammar](api/classes/Citrus/Grammar.html) is a container for rules. Usually
+the rules in a grammar collectively form a complete specification for some
+language, or a well-defined subset thereof.
 
 A Citrus grammar is really just a souped-up Ruby
 [module](http://ruby-doc.org/core/classes/Module.html). These modules may be
 included in other grammar modules in the same way that Ruby modules are normally
 used. This property allows you to divide a complex grammar into more manageable,
-reusable pieces that may be combined at runtime. Any grammar rule with the same
-name as a rule in an included grammar may access that rule with a mechanism
-similar to Ruby's super keyword.
+reusable pieces that may be combined at runtime. Any rule with the same name as
+a rule in an included grammar may access that rule with a mechanism similar to
+Ruby's `super` keyword.
 
 ## Matches
 
-Matches are created by rule objects when they match on the input. A
-[Match](api/classes/Citrus/Match.html) is actually a
-[String](http://ruby-doc.org/core/classes/String.html) object with some extra
-information attached such as the name(s) of the rule(s) from which it was
-generated and any submatches it may contain.
+A [Match](api/classes/Citrus/Match.html) object represents a successful
+recognition of some piece of the input. Matches are created by rule objects during a parse.
 
-During a parse, matches are arranged in a tree structure where any match may
-contain any number of other matches. This structure is determined by the way in
-which the rule that generated each match is used in the grammar. For example, a
-match that is created from a non-terminal rule that contains several other
-terminals will likewise contain several matches, one for each terminal.
+Matches are arranged in a tree structure where any match may contain any number
+of other matches. Each match contains information about its own subtree. The
+structure of the tree is determined by the way in which the rule that generated
+each match is used in the grammar. For example, a match that is created from a
+nonterminal rule that contains several other terminals will likewise contain
+several matches, one for each terminal. However, this is an implementation
+detail and should be relatively transparent to the user.
 
 Match objects may be extended with semantic information in the form of methods.
 These methods should provide various interpretations for the semantic value of a
@@ -204,14 +203,12 @@ See [Choice](api/classes/Citrus/Choice.html) for more information.
 ## Labels
 
 Match objects may be referred to by a different name than the rule that
-originally generated them. Labels are created by placing the label and a colon
+originally generated them. Labels are added by placing the label and a colon
 immediately preceding any expression.
 
     chars:/[a-z]+/  # the characters matched by the regular expression
                     # may be referred to as "chars" in an extension
                     # method
-
-See [Label](api/classes/Citrus/Label.html) for more information.
 
 ## Grouping
 
@@ -231,17 +228,16 @@ in between less than and greater than symbols.
                               # times and extend the match with the
                               # CouponCode module
 
-Additionally, extensions may be specified inline using curly braces. Inside the
-curly braces you may embed method definitions that will be used to extend match
-objects.
+Additionally, extensions may be specified inline using curly braces. When using
+this method, the code inside the curly braces may be invoked by calling the
+`value` method on the match object.
 
-    # match any digit and return its integer value when calling the
-    # #value method on the match object
-    [0-9] {
-      def value
-        to_i
-      end
-    }
+    [0-9] { to_i }        # match any digit and return its integer value when
+                          # calling the #value method on the match object
+
+Note that when using the inline block method you may also specify arguments in
+between vertical bars immediately following the opening curly brace, just like
+in Ruby blocks.
 
 ## Super
 
@@ -258,21 +254,21 @@ their precedence. A higher precedence indicates tighter binding.
 
 Operator  | Name                      | Precedence
 --------- | ------------------------- | ----------
-''        | String (single quoted)    | 6
-""        | String (double quoted)    | 6
-``        | String (case insensitive) | 6
-[]        | Character class           | 6
-.         | Dot (any character)       | 6
-//        | Regular expression        | 6
-()        | Grouping                  | 6
-*         | Repetition (arbitrary)    | 5
-+         | Repetition (one or more)  | 5
-?         | Repetition (zero or one)  | 5
-&         | And predicate             | 4
-!         | Not predicate             | 4
-~         | But predicate             | 4
-<>        | Extension (module name)   | 3
-{}        | Extension (literal)       | 3
+''        | String (single quoted)    | 7
+""        | String (double quoted)    | 7
+``        | String (case insensitive) | 7
+[]        | Character class           | 7
+.         | Dot (any character)       | 7
+//        | Regular expression        | 7
+()        | Grouping                  | 7
+*         | Repetition (arbitrary)    | 6
++         | Repetition (one or more)  | 6
+?         | Repetition (zero or one)  | 6
+&         | And predicate             | 5
+!         | Not predicate             | 5
+~         | But predicate             | 5
+<>        | Extension (module name)   | 4
+{}        | Extension (literal)       | 4
 :         | Label                     | 3
 e1 e2     | Sequence                  | 2
 e1 | e2   | Ordered choice            | 1
@@ -305,7 +301,7 @@ integers separated by any amount of white space and a `+` symbol.
 Several things to note about the above example:
 
 * Grammar and rule declarations end with the `end` keyword
-* A Sequence of rules is created by separating expressions with a space
+* A sequence of rules is created by separating expressions with a space
 * Likewise, ordered choice is represented with a vertical bar
 * Parentheses may be used to override the natural binding order
 * Rules may refer to other rules in their own definitions simply by using the
@@ -326,24 +322,20 @@ Submatches are created whenever a rule contains another rule. For example, in
 the grammar above `number` matches a string of digits followed by white space.
 Thus, a match generated by this rule will contain two submatches.
 
-We can define methods inside a set of curly braces that will be used to extend
-matches when they are created. This works in similar fashion to using Ruby's
+We can define a method inside a set of curly braces that will be used to extend
+a particular rule's matches. This works in similar fashion to using Ruby's
 blocks. Let's extend the `Addition` grammar using this technique.
 
     grammar Addition
       rule additive
         (number plus term:(additive | number)) {
-          def value
-            number.value + term.value
-          end
+          number.value + term.first.value
         }
       end
 
       rule number
         ([0-9]+ space) {
-          def value
-            strip.to_i
-          end
+          to_i
         }
       end
 
@@ -357,27 +349,27 @@ blocks. Let's extend the `Addition` grammar using this technique.
     end
 
 In this version of the grammar we have added two semantic blocks, one each for
-the additive and number rules. These blocks contain methods that will be present
-on all match objects that result from matches of those particular rules. It's
+the `additive` and `number` rules. These blocks contain code that we can
+execute by calling `value` on match objects that result from those rules. It's
 easiest to explain what is going on here by starting with the lowest level
-block, which is defined within the number rule.
+block, which is defined within `number`.
 
-The semantic block associated with the number rule defines one method, `value`.
-Inside this method, we can see that the value of a number match is determined to
-be its text value, stripped of white space and converted to an integer.
-[Remember](background.html) that matches are simply strings, so the `strip`
-method in this case is actually
-[String#strip](http://ruby-doc.org/core/classes/String.html#M000820).
+Inside this block we see a call to another method, namely `to_i`. When called in
+the context of a match object, methods that are not defined may be called on a
+match's internal string object via `method_missing`. Thus, the call to `to_i`
+should return the integer value of the match.
 
-The `additive` rule also extends its matches with a `value` method. Notice the
-use of the `term` label within the rule definition. This label allows the match
-that is created by either the additive or the number rule to be retrieved using
-the `term` label. The value of an additive is determined to be the values of its
-`number` and `term` matches added together using Ruby's addition operator.
+Similarly, matches created by `additive` will also have a `value` method. Notice
+the use of the `term` label within the rule definition. This label allows the
+match that is created by the choice between `additive` and `number` to be
+retrieved using the `term` method. The value of an additive match is determined
+to be the values of its `number` and `term` matches added together using Ruby's
+addition operator.
 
-Since additive is the first rule defined in the grammar, any match that results
-from parsing a string with this grammar will have a `value` method that can be
-used to recursively calculate the collective value of the entire match tree.
+Since `additive` is the first rule defined in the grammar, any match that
+results from parsing a string with this grammar will have a `value` method that
+can be used to recursively calculate the collective value of the entire match
+tree.
 
 To give it a try, save the code for the `Addition` grammar in a file called
 addition.citrus. Next, assuming you have the Citrus
@@ -407,30 +399,6 @@ Take a look at
 [examples/calc.citrus](http://github.com/mjijackson/citrus/blob/master/examples/calc.citrus)
 for an example of a calculator that is able to parse and evaluate more complex
 mathematical expressions.
-
-## Implicit Value
-
-It is very common for a grammar to only have one interpretation for a given
-symbol. For this reason, you may find yourself writing a `value` method for
-every rule in your grammar. Because this can be tedious, Citrus allows you to
-omit defining such a method if you choose. For example, the `additive` and
-`number` rules from the simple calculator example above could also be written
-as:
-
-    rule additive
-      (number plus term:(additive | number)) {
-        number.value + term.value
-      }
-    end
-
-    rule number
-      ([0-9]+ space) {
-        strip.to_i
-      }
-    end
-
-Since no method name is explicitly specified in the semantic blocks, they may be
-called using the `value` method.
 
 
 # Testing
