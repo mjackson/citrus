@@ -95,11 +95,6 @@ module Citrus
       super
     end
 
-    # Returns the length of this input.
-    def length
-      string.length
-    end
-
     # Returns an array containing the lines of text in the input.
     def lines
       if string.respond_to?(:lines)
@@ -107,11 +102,6 @@ module Citrus
       else
         string.to_a
       end
-    end
-
-    # Iterates over the lines of text in the input using the given +block+.
-    def each_line(&block)
-      string.each_line(&block)
     end
 
     # Returns the 0-based offset of the given +pos+ in the input on the line
@@ -536,7 +526,7 @@ module Citrus
       events = input.exec(self)
       length = events[-1]
 
-      if !length || (opts[:consume] && length < (input.length - opts[:offset]))
+      if !length || (opts[:consume] && length < (string.length - opts[:offset]))
         raise ParseError.new(input)
       end
 
