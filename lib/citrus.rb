@@ -515,10 +515,10 @@ module Citrus
     def parse(string, options={})
       opts = default_parse_options.merge(options)
 
-      if opts[:memoize]
-        input = MemoizingInput.new(string)
+      input = if opts[:memoize]
+        MemoizingInput.new(string)
       else
-        input = Input.new(string)
+        Input.new(string)
       end
 
       input.pos = opts[:offset] if opts[:offset] > 0
