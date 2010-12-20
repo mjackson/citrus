@@ -34,7 +34,7 @@ module Citrus
   # scope. Returns an array of any grammar modules that are created. Implicitly
   # raises +SyntaxError+ on a failed parse.
   def self.eval(code)
-    parse(code, :consume => true).value
+    parse(code).value
   end
 
   # Parses the given Citrus +code+ using the given +options+. Returns the
@@ -448,7 +448,7 @@ module Citrus
     #     Citrus::Rule.eval('"a" | "b"')
     #
     def self.eval(expr)
-      Citrus.parse(expr, :root => :rule_body, :consume => true).value
+      Citrus.parse(expr, :root => :rule_body).value
     end
 
     # Returns a new Rule object depending on the type of object given.
@@ -511,7 +511,7 @@ module Citrus
     #             +false+.
     # consume::   If this is +true+ a ParseError will be raised during a parse
     #             unless the entire input string is consumed. Defaults to
-    #             +false+.
+    #             +true+.
     def parse(string, options={})
       opts = default_parse_options.merge(options)
 
@@ -537,7 +537,7 @@ module Citrus
     def default_parse_options # :nodoc:
       { :offset   => 0,
         :memoize  => false,
-        :consume  => false
+        :consume  => true
       }
     end
 

@@ -63,7 +63,7 @@ class GrammarTest < Test::Unit::TestCase
     grammar = Grammar.new {
       rule(:num) { all(1, 2, 3) }
     }
-    match = grammar.parse('1234')
+    match = grammar.parse('1234', :consume => false)
     assert(match)
     assert_equal('123', match)
     assert_equal(3, match.length)
