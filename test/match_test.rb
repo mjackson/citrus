@@ -20,47 +20,6 @@ class MatchTest < Test::Unit::TestCase
     assert_equal(false, match2 == match1)
   end
 
-  def test_names
-    a = Rule.for('a')
-    a.name = 'a'
-    b = Rule.for('b')
-    b.name = 'b'
-    c = Rule.for('c')
-    c.name = 'c'
-    s = Rule.for([ a, b, c ])
-    s.name = 's'
-    r = Repeat.new(s, 0, Infinity)
-    r.name = 'r'
-
-    events = [
-      r,
-        s,
-          a, CLOSE, 1,
-          b, CLOSE, 1,
-          c, CLOSE, 1,
-        CLOSE, 3,
-        s,
-          a, CLOSE, 1,
-          b, CLOSE, 1,
-          c, CLOSE, 1,
-        CLOSE, 3,
-        s,
-          a, CLOSE, 1,
-          b, CLOSE, 1,
-          c, CLOSE, 1,
-        CLOSE, 3,
-      CLOSE, 9
-    ]
-
-    match = Match.new("abcabcabc", events)
-    assert(match.names)
-    assert_equal([:r], match.names)
-
-    match.matches.each do |m|
-      assert_equal([:s], m.names)
-    end
-  end
-
   def test_matches
     a = Rule.for('a')
     b = Rule.for('b')
@@ -103,7 +62,6 @@ class MatchTest < Test::Unit::TestCase
 
     match.matches.each do |m|
       assert_equal(sub_events, m.events)
-      assert_equal(:s, m.name)
       assert_equal("abc", m)
       assert(m.matches)
       assert_equal(3, m.matches.length)

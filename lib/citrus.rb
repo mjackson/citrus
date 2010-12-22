@@ -595,8 +595,6 @@ module Citrus
     end
 
     def extend_match(match) # :nodoc:
-      match.names << name if name
-      match.names << label if label
       match.extend(extension) if extension
     end
   end
@@ -1100,76 +1098,6 @@ module Citrus
     # The array of events that was passed to the constructor.
     attr_reader :events
 
-    # An array of all names of this match. A name is added to a match object
-    # for each rule that returns that object when matching. These names can then
-    # be used to determine which rules were satisfied by a given match.
-    #
-    # Note: Deprecated.
-    def names
-      @names ||= []
-    end
-
-    # The name of the lowest level rule that originally created this match.
-    #
-    # Note: Deprecated.
-    def name
-      names.first
-    end
-
-    # Returns +true+ if this match has the given +name+.
-    #
-    # Note: Deprecated.
-    def has_name?(name)
-      names.include?(name.to_sym)
-    end
-
-    # Returns an array of all sub-matches with the given +name+. If +deep+ is
-    # +false+, returns only sub-matches that are immediate descendants of this
-    # match.
-    #
-    # Note: Deprecated.
-    def find(name, deep=true)
-      ms = matches.select {|m| m.has_name?(name) }
-      matches.each {|m| ms.concat(m.find(name, deep)) } if deep
-      ms
-    end
-
-    # Returns an array of Match objects that are immediate submatches of this
-    # match in the order they appeared in the input.
-    def matches
-      @matches ||= begin
-        matches = []
-        stack = []
-        offset = 0
-        close = false
-        index = 0
-
-        while index < @events.size
-          event = @events[index]
-
-          if close
-            start = stack.pop
-
-            if stack.size == 1
-              matches << Match.new(@string.slice(offset, event),
-                                   @events[start..index])
-              offset += event
-            end
-
-            close = false
-          elsif event == CLOSE
-            close = true
-          else
-            stack << index
-          end
-
-          index += 1
-        end
-
-        matches
-      end
-    end
-
     # Returns a hash of capture names to arrays of matches with that name,
     # in the order they appeared in the input.
     def captures
@@ -1181,6 +1109,7 @@ module Citrus
         index = 0
         last_length = nil
         in_proxy = false
+        count = 0
 
         while index < @events.size
           event = @events[index]
@@ -1195,8 +1124,14 @@ module Citrus
 
               match = Match.new(@string.slice(os, event), @events[start..index])
 
-              # We should be able to find matches that were created by proxy by
-              # the name of the rule they are proxy for.
+              # We can lookup immediate submatches by their index.
+              if stack.size == 1
+                captures[count] = match
+                count += 1
+              end
+
+              # We can lookup matches that were created by proxy by the name of
+              # the rule they are proxy for.
               if Proxy === rule
                 if captures[rule.rule_name]
                   captures[rule.rule_name] << match
@@ -1205,7 +1140,8 @@ module Citrus
                 end
               end
 
-              # We should be able to find labelled matches by their label.
+              # We can lookup matches that were created by rules with labels by
+              # that label.
               if rule.label
                 if captures[rule.label]
                   captures[rule.label] << match
@@ -1251,10 +1187,20 @@ module Citrus
       end
     end
 
-    # A shortcut for retrieving the first immediate sub-match of this match.
-    def first
-      matches.first
+    # Returns an array of all immediate submatches of this match.
+    def matches
+      @matches ||= (0...captures.size).map {|n| captures[n] }.compact
     end
+
+    # A shortcut for retrieving the first immediate submatch of this match.
+    def first
+      captures[0]
+    end
+
+    # The default value for a match is its string value. This method is
+    # overridden in most cases to be more meaningful according to the desired
+    # interpretation.
+    alias_method :value, :to_s
 
     # Allows methods of this match's string to be called directly and provides
     # a convenient interface for retrieving the first match with a given name.
@@ -1271,11 +1217,6 @@ module Citrus
     end
 
     alias_method :to_str, :to_s
-
-    # The default value for a match is its string value. This method is
-    # overridden in most cases to be more meaningful according to the desired
-    # interpretation.
-    alias_method :value, :to_s
 
     def ==(other)
       case other
