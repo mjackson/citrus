@@ -22,12 +22,10 @@ module Citrus
 
   CLOSE = -1
 
-  # Loads the grammar from the given +file+ into the global scope using #eval.
-  def self.load(file)
-    file << '.citrus' unless ::File.file?(file)
-    raise "Cannot find file #{file}" unless ::File.file?(file)
-    raise "Cannot read file #{file}" unless ::File.readable?(file)
-    eval(::File.read(file))
+  # Parses the given Citrus +code+ using the given +options+. Returns the
+  # generated match tree. Raises a +SyntaxError+ if the parse fails.
+  def self.parse(code, options={})
+    File.parse(code, options)
   end
 
   # Evaluates the given Citrus parsing expression grammar +code+ in the global
@@ -37,10 +35,20 @@ module Citrus
     parse(code).value
   end
 
-  # Parses the given Citrus +code+ using the given +options+. Returns the
-  # generated match tree. Raises a +SyntaxError+ if the parse fails.
-  def self.parse(code, options={})
-    File.parse(code, options)
+  # Evaluates the given expression and creates a new rule object from it.
+  #
+  #     Citrus::Rule.eval('"a" | "b"')
+  #
+  def self.rule(expr)
+    parse(expr, :root => :rule_body).value
+  end
+
+  # Loads the grammar from the given +file+ into the global scope using #eval.
+  def self.load(file)
+    file << '.citrus' unless ::File.file?(file)
+    raise "Cannot find file #{file}" unless ::File.file?(file)
+    raise "Cannot read file #{file}" unless ::File.readable?(file)
+    eval(::File.read(file))
   end
 
   # A standard error class that all Citrus errors extend.
@@ -443,14 +451,6 @@ module Citrus
   # A Rule is an object that is used by a grammar to create matches on the
   # Input during parsing.
   module Rule
-    # Evaluates the given expression and creates a new rule object from it.
-    #
-    #     Citrus::Rule.eval('"a" | "b"')
-    #
-    def self.eval(expr)
-      Citrus.parse(expr, :root => :rule_body).value
-    end
-
     # Returns a new Rule object depending on the type of object given.
     def self.for(obj)
       case obj
