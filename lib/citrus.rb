@@ -971,8 +971,9 @@ module Citrus
       index = events.size
       start = index - 1
       length = n = 0
+      m = max
 
-      while n < max && input.exec(rule, events).size > index
+      while n < m && input.exec(rule, events).size > index
         index = events.size
         length += events[-1]
         n += 1
@@ -1016,42 +1017,6 @@ module Citrus
     end
   end
 
-  # A Choice is a Nonterminal where only one rule must match. The Citrus
-  # notation is two or more expressions separated by a vertical bar, e.g.:
-  #
-  #     expr | expr
-  #
-  class Choice
-    include Nonterminal
-
-    # Returns an array of events for this rule on the given +input+.
-    def exec(input, events=[])
-      events << self
-
-      index = events.size
-      start = index - 1
-      n = 0
-
-      while n < rules.length && input.exec(rules[n], events).size == index
-        n += 1
-      end
-
-      if index < events.size
-        events << CLOSE
-        events << events[-2]
-      else
-        events.slice!(start, events.size)
-      end
-
-      events
-    end
-
-    # Returns the Citrus notation of this rule as a string.
-    def to_citrus # :nodoc:
-      rules.map {|r| r.to_embedded_s }.join(' | ')
-    end
-  end
-
   # A Sequence is a Nonterminal where all rules must match. The Citrus notation
   # is two or more expressions separated by a space, e.g.:
   #
@@ -1067,8 +1032,9 @@ module Citrus
       index = events.size
       start = index - 1
       length = n = 0
+      m = rules.length
 
-      while n < rules.length && input.exec(rules[n], events).size > index
+      while n < m && input.exec(rules[n], events).size > index
         index = events.size
         length += events[-1]
         n += 1
@@ -1087,6 +1053,43 @@ module Citrus
     # Returns the Citrus notation of this rule as a string.
     def to_citrus # :nodoc:
       rules.map {|r| r.to_embedded_s }.join(' ')
+    end
+  end
+
+  # A Choice is a Nonterminal where only one rule must match. The Citrus
+  # notation is two or more expressions separated by a vertical bar, e.g.:
+  #
+  #     expr | expr
+  #
+  class Choice
+    include Nonterminal
+
+    # Returns an array of events for this rule on the given +input+.
+    def exec(input, events=[])
+      events << self
+
+      index = events.size
+      start = index - 1
+      n = 0
+      m = rules.length
+
+      while n < m && input.exec(rules[n], events).size == index
+        n += 1
+      end
+
+      if index < events.size
+        events << CLOSE
+        events << events[-2]
+      else
+        events.slice!(start, events.size)
+      end
+
+      events
+    end
+
+    # Returns the Citrus notation of this rule as a string.
+    def to_citrus # :nodoc:
+      rules.map {|r| r.to_embedded_s }.join(' | ')
     end
   end
 
