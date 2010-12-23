@@ -469,7 +469,7 @@ module Citrus
       when Range    then Choice.new(obj.to_a)
       when Numeric  then StringTerminal.new(obj.to_s)
       else
-        raise ArgumentError, "Invalid rule object: %s" % obj.inspect
+        raise ArgumentError, "Invalid rule object: #{obj.inspect}"
       end
     end
 
