@@ -1098,7 +1098,7 @@ module Citrus
     def initialize(string, events=[])
       if events[-1] && string.length != events[-1]
         raise ArgumentError,
-               "Invalid events for match length #{string.length}"
+          "Invalid events for match length #{string.length}"
       end
 
       @string = string
@@ -1107,8 +1107,13 @@ module Citrus
       extend!
     end
 
-    # The array of events that was passed to the constructor.
+    # The array of events that was passed to #initialize.
     attr_reader :events
+
+    # Returns the length of this match.
+    def length
+      @string.length
+    end
 
     # Returns a hash of capture names to arrays of matches with that name,
     # in the order they appeared in the input.
