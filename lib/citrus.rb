@@ -22,22 +22,29 @@ module Citrus
 
   CLOSE = -1
 
-  # Parses the given Citrus +code+ using the given +options+. Returns the
-  # generated match tree. Raises a +SyntaxError+ if the parse fails.
+  # Parses the given Citrus +code+ using +options+.
   def self.parse(code, options={})
     File.parse(code, options)
   end
 
   # Evaluates the given Citrus parsing expression grammar +code+ in the global
-  # scope. Returns an array of any grammar modules that are created. Implicitly
-  # raises +SyntaxError+ on a failed parse.
+  # scope. Returns an array of any grammar modules that are created.
+  #
+  #     Citrus.eval(<<CITRUS)
+  #     grammar MyGrammar
+  #       rule abc
+  #         "abc"
+  #       end
+  #     end
+  #     CITRUS
+  #
   def self.eval(code)
     parse(code).value
   end
 
-  # Evaluates the given expression and creates a new rule object from it.
+  # Evaluates the given expression and creates a new Rule object from it.
   #
-  #     Citrus::Rule.eval('"a" | "b"')
+  #     Citrus.rule('"a" | "b"')
   #
   def self.rule(expr)
     parse(expr, :root => :rule_body).value
@@ -62,7 +69,7 @@ module Citrus
       @line_offset = input.line_offset(offset)
       @line_number = input.line_number(offset)
       @line = input.line(offset)
-      super "Failed to parse input on line #{line_number} at offset #{line_offset}\n#{detail}"
+      super("Failed to parse input on line #{line_number} at offset #{line_offset}\n#{detail}")
     end
 
     # The 0-based offset at which the error occurred in the input, i.e. the
@@ -448,7 +455,7 @@ module Citrus
     end
   end
 
-  # A Rule is an object that is used by a grammar to create matches on the
+  # A Rule is an object that is used by a grammar to create matches on an
   # Input during parsing.
   module Rule
     # Returns a new Rule object depending on the type of object given.
@@ -482,12 +489,14 @@ module Citrus
       @label = label.to_sym
     end
 
-    # The label this rule adds to all its matches.
+    # A label for this rule. If a rule has a label, all matches that it creates
+    # will be accessible as named captures from the scope of their parent match
+    # using that label.
     attr_reader :label
 
     # Specifies a module that will be used to extend all Match objects that
     # result from this rule. If +mod+ is a Proc, it is used to create an
-    # anonymous module.
+    # anonymous module with a +value+ method.
     def extension=(mod)
       if Proc === mod
         mod = Module.new { define_method(:value, &mod) }
@@ -653,7 +662,7 @@ module Citrus
   class Alias
     include Proxy
 
-    # Returns the Citrus notation of this rule as a string without a +label+.
+    # Returns the Citrus notation of this rule as a string.
     def to_citrus # :nodoc:
       rule_name.to_s
     end
@@ -684,7 +693,7 @@ module Citrus
   class Super
     include Proxy
 
-    # Returns the Citrus notation of this rule as a string without a +label+.
+    # Returns the Citrus notation of this rule as a string.
     def to_citrus # :nodoc:
       'super'
     end
@@ -718,6 +727,8 @@ module Citrus
   #     [a-zA-Z]
   #     .
   #
+  # Character classes have the same semantics as character classes inside Ruby
+  # regular expressions. The dot matches any character, including newlines.
   class Terminal
     include Rule
 
@@ -746,7 +757,7 @@ module Citrus
       !rule.casefold?
     end
 
-    # Returns the Citrus notation of this rule as a string without a +label+.
+    # Returns the Citrus notation of this rule as a string.
     def to_citrus # :nodoc:
       rule.inspect
     end
@@ -775,7 +786,7 @@ module Citrus
       @string = rule
     end
 
-    # Returns the Citrus notation of this rule as a string without a +label+.
+    # Returns the Citrus notation of this rule as a string.
     def to_citrus # :nodoc:
       if case_sensitive?
         @string.inspect
@@ -805,7 +816,7 @@ module Citrus
     end
   end
 
-  # An AndPredicate is a Predicate that contains a rule that must match. Upon
+  # An AndPredicate is a Nonterminal that contains a rule that must match. Upon
   # success an empty match is returned and no input is consumed. The Citrus
   # notation is any expression preceded by an ampersand, e.g.:
   #
@@ -834,14 +845,14 @@ module Citrus
       events
     end
 
-    # Returns the Citrus notation of this rule as a string without a +label+.
+    # Returns the Citrus notation of this rule as a string.
     def to_citrus # :nodoc:
       '&' + rule.to_embedded_s
     end
   end
 
-  # A NotPredicate is a Predicate that contains a rule that must not match. Upon
-  # success an empty match is returned and no input is consumed. The Citrus
+  # A NotPredicate is a Nonterminal that contains a rule that must not match.
+  # Upon success an empty match is returned and no input is consumed. The Citrus
   # notation is any expression preceded by an exclamation mark, e.g.:
   #
   #     !expr
@@ -869,13 +880,13 @@ module Citrus
       events
     end
 
-    # Returns the Citrus notation of this rule as a string without a +label+.
+    # Returns the Citrus notation of this rule as a string.
     def to_citrus # :nodoc:
       '!' + rule.to_embedded_s
     end
   end
 
-  # A ButPredicate is a Predicate that consumes all characters until its rule
+  # A ButPredicate is a Nonterminal that consumes all characters until its rule
   # matches. It must match at least one character in order to succeed. The
   # Citrus notation is any expression preceded by a tilde, e.g.:
   #
@@ -914,16 +925,16 @@ module Citrus
       events
     end
 
-    # Returns the Citrus notation of this rule as a string without a +label+.
+    # Returns the Citrus notation of this rule as a string.
     def to_citrus # :nodoc:
       '~' + rule.to_embedded_s
     end
   end
 
-  # A Repeat is a Predicate that specifies a minimum and maximum number of times
-  # its rule must match. The Citrus notation is an integer, +N+, followed by an
-  # asterisk, followed by another integer, +M+, all of which follow any other
-  # expression, e.g.:
+  # A Repeat is a Nonterminal that specifies a minimum and maximum number of
+  # times its rule must match. The Citrus notation is an integer, +N+, followed
+  # by an asterisk, followed by another integer, +M+, all of which follow any
+  # other expression, e.g.:
   #
   #     expr N*M
   #
@@ -999,14 +1010,14 @@ module Citrus
         end
     end
 
-    # Returns the Citrus notation of this rule as a string without a +label+.
+    # Returns the Citrus notation of this rule as a string.
     def to_citrus # :nodoc:
       rule.to_embedded_s + operator
     end
   end
 
-  # A Choice is a List where only one rule must match. The Citrus notation is
-  # two or more expressions separated by a vertical bar, e.g.:
+  # A Choice is a Nonterminal where only one rule must match. The Citrus
+  # notation is two or more expressions separated by a vertical bar, e.g.:
   #
   #     expr | expr
   #
@@ -1035,14 +1046,14 @@ module Citrus
       events
     end
 
-    # Returns the Citrus notation of this rule as a string without a +label+.
+    # Returns the Citrus notation of this rule as a string.
     def to_citrus # :nodoc:
       rules.map {|r| r.to_embedded_s }.join(' | ')
     end
   end
 
-  # A Sequence is a List where all rules must match. The Citrus notation is two
-  # or more expressions separated by a space, e.g.:
+  # A Sequence is a Nonterminal where all rules must match. The Citrus notation
+  # is two or more expressions separated by a space, e.g.:
   #
   #     expr expr
   #
@@ -1073,15 +1084,16 @@ module Citrus
       events
     end
 
-    # Returns the Citrus notation of this rule as a string without a +label+.
+    # Returns the Citrus notation of this rule as a string.
     def to_citrus # :nodoc:
       rules.map {|r| r.to_embedded_s }.join(' ')
     end
   end
 
   # The base class for all matches. Matches are organized into a tree where any
-  # match may contain any number of other matches. This class provides several
-  # convenient tree traversal methods that help when examining parse results.
+  # match may contain any number of other matches. Nodes of the tree are lazily
+  # instantiated as needed. This class provides several convenient tree
+  # traversal methods that help when examining and interpreting parse results.
   class Match
     def initialize(string, events=[])
       if events[-1] && string.length != events[-1]
