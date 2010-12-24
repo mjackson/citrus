@@ -1069,7 +1069,6 @@ module Citrus
       events << self
 
       index = events.size
-      start = index - 1
       n = 0
       m = rules.length
 
@@ -1081,7 +1080,7 @@ module Citrus
         events << CLOSE
         events << events[-2]
       else
-        events.slice!(start, events.size)
+        events.pop
       end
 
       events
