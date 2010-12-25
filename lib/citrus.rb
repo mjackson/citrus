@@ -1145,7 +1145,7 @@ module Citrus
       @events = events
     end
 
-    # The array of events that was passed to #initialize.
+    # The array of events for this match.
     attr_reader :events
 
     # Returns the length of this match.
