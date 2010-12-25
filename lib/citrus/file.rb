@@ -314,35 +314,27 @@ module Citrus
     end
 
     rule :repeat do
-      any(:question, :plus, :star) { |rule|
-        Repeat.new(rule, min, max)
-      }
+      any(:question, :plus, :star)
     end
 
     rule :question do
-      mod all('?', :space) do
-        def min; 0 end
-        def max; 1 end
-      end
+      all('?', :space) { |rule|
+        Repeat.new(rule, 0, 1)
+      }
     end
 
     rule :plus do
-      mod all('+', :space) do
-        def min; 1 end
-        def max; Infinity end
-      end
+      all('+', :space) { |rule|
+        Repeat.new(rule, 1, Infinity)
+      }
     end
 
     rule :star do
-      mod all(/[0-9]*/, '*', /[0-9]*/, :space) do
-        def min
-          matches[0] == '' ? 0 : matches[0].to_i
-        end
-
-        def max
-          matches[2] == '' ? Infinity : matches[2].to_i
-        end
-      end
+      all(/[0-9]*/, '*', /[0-9]*/, :space) { |rule|
+        min = captures[0] == '' ? 0 : captures[0].to_i
+        max = captures[2] == '' ? Infinity : captures[2].to_i
+        Repeat.new(rule, min, max)
+      }
     end
 
     rule :module_name do

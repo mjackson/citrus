@@ -546,60 +546,6 @@ class CitrusFileTest < Test::Unit::TestCase
     assert_equal(/a/i, match.value)
   end
 
-  def test_predicate_and
-    match = File.parse('&', :root => :predicate)
-    assert(match)
-    assert_instance_of(AndPredicate, match.value(''))
-  end
-
-  def test_predicate_not
-    match = File.parse('!', :root => :predicate)
-    assert(match)
-    assert_instance_of(NotPredicate, match.value(''))
-  end
-
-  def test_predicate_but
-    match = File.parse('~', :root => :predicate)
-    assert(match)
-    assert_instance_of(ButPredicate, match.value(''))
-  end
-
-  def test_and
-    match = File.parse('&', :root => :and)
-    assert(match)
-    assert_instance_of(AndPredicate, match.value(''))
-  end
-
-  def test_and_space
-    match = File.parse('& ', :root => :and)
-    assert(match)
-    assert_instance_of(AndPredicate, match.value(''))
-  end
-
-  def test_not
-    match = File.parse('!', :root => :not)
-    assert(match)
-    assert_instance_of(NotPredicate, match.value(''))
-  end
-
-  def test_not_space
-    match = File.parse('! ', :root => :not)
-    assert(match)
-    assert_instance_of(NotPredicate, match.value(''))
-  end
-
-  def test_but
-    match = File.parse('~', :root => :but)
-    assert(match)
-    assert_instance_of(ButPredicate, match.value(''))
-  end
-
-  def test_but_space
-    match = File.parse('~ ', :root => :but)
-    assert(match)
-    assert_instance_of(ButPredicate, match.value(''))
-  end
-
   def test_label
     match = File.parse('label:', :root => :label)
     assert(match)
@@ -679,6 +625,60 @@ class CitrusFileTest < Test::Unit::TestCase
     assert(match.value)
   end
 
+  def test_predicate_and
+    match = File.parse('&', :root => :predicate)
+    assert(match)
+    assert_instance_of(AndPredicate, match.value(''))
+  end
+
+  def test_predicate_not
+    match = File.parse('!', :root => :predicate)
+    assert(match)
+    assert_instance_of(NotPredicate, match.value(''))
+  end
+
+  def test_predicate_but
+    match = File.parse('~', :root => :predicate)
+    assert(match)
+    assert_instance_of(ButPredicate, match.value(''))
+  end
+
+  def test_and
+    match = File.parse('&', :root => :and)
+    assert(match)
+    assert_instance_of(AndPredicate, match.value(''))
+  end
+
+  def test_and_space
+    match = File.parse('& ', :root => :and)
+    assert(match)
+    assert_instance_of(AndPredicate, match.value(''))
+  end
+
+  def test_not
+    match = File.parse('!', :root => :not)
+    assert(match)
+    assert_instance_of(NotPredicate, match.value(''))
+  end
+
+  def test_not_space
+    match = File.parse('! ', :root => :not)
+    assert(match)
+    assert_instance_of(NotPredicate, match.value(''))
+  end
+
+  def test_but
+    match = File.parse('~', :root => :but)
+    assert(match)
+    assert_instance_of(ButPredicate, match.value(''))
+  end
+
+  def test_but_space
+    match = File.parse('~ ', :root => :but)
+    assert(match)
+    assert_instance_of(ButPredicate, match.value(''))
+  end
+
   def test_repeat_question
     match = File.parse('?', :root => :repeat)
     assert(match)
@@ -718,64 +718,82 @@ class CitrusFileTest < Test::Unit::TestCase
   def test_question
     match = File.parse('?', :root => :question)
     assert(match)
-    assert_equal(0, match.min)
-    assert_equal(1, match.max)
+    rule = match.value('')
+    assert_instance_of(Repeat, rule)
+    assert_equal(0, rule.min)
+    assert_equal(1, rule.max)
   end
 
   def test_question_space
     match = File.parse('? ', :root => :question)
     assert(match)
-    assert_equal(0, match.min)
-    assert_equal(1, match.max)
+    rule = match.value('')
+    assert_instance_of(Repeat, rule)
+    assert_equal(0, rule.min)
+    assert_equal(1, rule.max)
   end
 
   def test_plus
     match = File.parse('+', :root => :plus)
     assert(match)
-    assert_equal(1, match.min)
-    assert_equal(Infinity, match.max)
+    rule = match.value('')
+    assert_instance_of(Repeat, rule)
+    assert_equal(1, rule.min)
+    assert_equal(Infinity, rule.max)
   end
 
   def test_plus_space
     match = File.parse('+ ', :root => :plus)
     assert(match)
-    assert_equal(1, match.min)
-    assert_equal(Infinity, match.max)
+    rule = match.value('')
+    assert_instance_of(Repeat, rule)
+    assert_equal(1, rule.min)
+    assert_equal(Infinity, rule.max)
   end
 
   def test_star
     match = File.parse('*', :root => :star)
     assert(match)
-    assert_equal(0, match.min)
-    assert_equal(Infinity, match.max)
+    rule = match.value('')
+    assert_instance_of(Repeat, rule)
+    assert_equal(0, rule.min)
+    assert_equal(Infinity, rule.max)
   end
 
   def test_n_star
     match = File.parse('1*', :root => :star)
     assert(match)
-    assert_equal(1, match.min)
-    assert_equal(Infinity, match.max)
+    rule = match.value('')
+    assert_instance_of(Repeat, rule)
+    assert_equal(1, rule.min)
+    assert_equal(Infinity, rule.max)
   end
 
   def test_star_n
     match = File.parse('*2', :root => :star)
     assert(match)
-    assert_equal(0, match.min)
-    assert_equal(2, match.max)
+    rule = match.value('')
+    assert_instance_of(Repeat, rule)
+    assert_equal(0, rule.min)
+    assert_equal(2, rule.max)
   end
 
   def test_n_star_n
     match = File.parse('1*2', :root => :star)
     assert(match)
-    assert_equal(1, match.min)
-    assert_equal(2, match.max)
+    rule = match.value('')
+    assert_instance_of(Repeat, rule)
+    assert_equal(1, rule.min)
+    assert_equal(2, rule.max)
   end
 
   def test_n_star_n_space
     match = File.parse('1*2 ', :root => :star)
     assert(match)
-    assert_equal(1, match.min)
-    assert_equal(2, match.max)
+    rule = match.value('')
+    assert_instance_of(Repeat, rule)
+    assert_equal(1, rule.min)
+    assert_equal(2, rule.max)
   end
 
   def test_module_name
