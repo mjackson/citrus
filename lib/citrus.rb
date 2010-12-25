@@ -558,7 +558,7 @@ module Citrus
 
     # Returns +true+ if this rule is a Terminal.
     def terminal?
-      is_a?(Terminal)
+      false
     end
 
     # Returns +true+ if this rule should extend a match but should not appear in
@@ -767,6 +767,11 @@ module Citrus
     # Returns +true+ if this rule is case sensitive.
     def case_sensitive?
       !rule.casefold?
+    end
+
+    # Returns +true+ if this rule is a Terminal.
+    def terminal? # :nodoc:
+      true
     end
 
     # Returns the Citrus notation of this rule as a string.
