@@ -329,7 +329,7 @@ blocks. Let's extend the `Addition` grammar using this technique.
     grammar Addition
       rule additive
         (number plus term:(additive | number)) {
-          number.value + term.first.value
+          number.value + term.value
         }
       end
 

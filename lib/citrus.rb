@@ -561,6 +561,12 @@ module Citrus
       is_a?(Terminal)
     end
 
+    # Returns +true+ if this rule should extend a match but should not appear in
+    # its event stream.
+    def elide?
+      false
+    end
+
     # Returns +true+ if this rule needs to be surrounded by parentheses when
     # using #to_embedded_s.
     def needs_paren? # :nodoc:
@@ -643,6 +649,12 @@ module Citrus
       end
 
       events
+    end
+
+    # Returns +true+ if this rule should extend a match but should not appear in
+    # its event stream.
+    def elide? # :nodoc:
+      rule.elide?
     end
 
     def extend_match(match) # :nodoc:
@@ -1086,6 +1098,12 @@ module Citrus
       events
     end
 
+    # Returns +true+ if this rule should extend a match but should not appear in
+    # its event stream.
+    def elide? # :nodoc:
+      true
+    end
+
     # Returns the Citrus notation of this rule as a string.
     def to_citrus # :nodoc:
       rules.map {|r| r.to_embedded_s }.join(' | ')
@@ -1098,15 +1116,28 @@ module Citrus
   # traversal methods that help when examining and interpreting parse results.
   class Match
     def initialize(string, events=[])
-      if events[-1] && string.length != events[-1]
-        raise ArgumentError,
-          "Invalid events for match length #{string.length}"
+      @string = string
+
+      if events.length > 0
+        if events[-1] != string.length
+          raise ArgumentError "Invalid events for length #{string.length}"
+        end
+
+        elisions = []
+
+        while events[0].elide?
+          elisions.unshift(events.shift)
+          events = events.slice(0, events.length - 2)
+        end
+
+        events[0].extend_match(self)
+
+        elisions.each do |rule|
+          rule.extend_match(self)
+        end
       end
 
-      @string = string
       @events = events
-
-      extend!
     end
 
     # The array of events that was passed to #initialize.
@@ -1298,12 +1329,6 @@ module Citrus
       end
 
       puts lines.compact.join("\n")
-    end
-
-  private
-
-    def extend! # :nodoc:
-      @events[0].extend_match(self) if @events[0]
     end
   end
 end

@@ -24,175 +24,150 @@ class CitrusFileTest < Test::Unit::TestCase
   def test_rule_body_alias
     match = File.parse('rule_name', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Alias, match.value)
   end
 
   def test_rule_body_dot
     match = File.parse('.', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Terminal, match.value)
   end
 
   def test_rule_body_character_range
     match = File.parse('[a-z]', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Terminal, match.value)
   end
 
   def test_rule_body_terminal
     match = File.parse('/./', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Terminal, match.value)
   end
 
   def test_rule_body_string_terminal_empty
     match = File.parse('""', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(StringTerminal, match.value)
   end
 
   def test_rule_body_string_terminal
     match = File.parse('"a"', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(StringTerminal, match.value)
   end
 
   def test_rule_body_string_terminal_empty_block
     match = File.parse('"" {}', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(StringTerminal, match.value)
   end
 
   def test_rule_body_repeat_string_terminal
     match = File.parse('"a"*', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Repeat, match.value)
   end
 
   def test_rule_body_repeat_empty_string_terminal_block
     match = File.parse('""* {}', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Repeat, match.value)
   end
 
   def test_rule_body_repeat_sequence
     match = File.parse('("a" "b")*', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Repeat, match.value)
   end
 
   def test_rule_body_repeat_choice
     match = File.parse('("a" | "b")*', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Repeat, match.value)
   end
 
   def test_rule_body_repeat_sequence_block
     match = File.parse('("a" "b")* {}', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Repeat, match.value)
   end
 
   def test_rule_body_repeat_choice_block
     match = File.parse('("a" | "b")* {}', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Repeat, match.value)
   end
 
   def test_rule_body_repeat_sequence_extension
     match = File.parse('("a" "b")* <Module>', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Repeat, match.value)
   end
 
   def test_rule_body_repeat_sequence_extension_spaced
     match = File.parse('( "a" "b" )* <Module>', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Repeat, match.value)
   end
 
   def test_rule_body_repeat_choice_extension
     match = File.parse('("a" | "b")* <Module>', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Repeat, match.value)
   end
 
   def test_rule_body_choice_terminal
     match = File.parse('/./ | /./', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Choice, match.value)
   end
 
   def test_rule_body_choice_string_terminal
     match = File.parse('"a" | "b"', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Choice, match.value)
   end
 
   def test_rule_body_choice_mixed
     match = File.parse('("a" | /./)', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Choice, match.value)
   end
 
   def test_rule_body_choice_extended
     match = File.parse('("a" | "b") <Module>', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Choice, match.value)
   end
 
   def test_rule_body_sequence_terminal
     match = File.parse('/./ /./', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Sequence, match.value)
   end
 
   def test_rule_body_sequence_string_terminal
     match = File.parse('"a" "b"', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Sequence, match.value)
   end
 
   def test_rule_body_sequence_extension
     match = File.parse('( "a" "b" ) <Module>', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Sequence, match.value)
   end
 
   def test_rule_body_sequence_mixed
     match = File.parse('"a" ("b" | /./)* <Module>', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Sequence, match.value)
   end
 
   def test_rule_body_sequence_block
     match = File.parse('"a" ("b" | /./)* {}', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Sequence, match.value)
   end
 
@@ -200,7 +175,6 @@ class CitrusFileTest < Test::Unit::TestCase
     # Sequence should bind more tightly than Choice.
     match = File.parse('"a" "b" | "c"', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Choice, match.value)
   end
 
@@ -208,7 +182,6 @@ class CitrusFileTest < Test::Unit::TestCase
     # Parentheses should change binding precedence.
     match = File.parse('"a" ("b" | "c")', :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Sequence, match.value)
   end
 
@@ -216,7 +189,6 @@ class CitrusFileTest < Test::Unit::TestCase
     # Repeat should bind more tightly than AndPredicate.
     match = File.parse("&'a'+", :root => :rule_body)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(AndPredicate, match.value)
   end
 
@@ -228,42 +200,36 @@ class CitrusFileTest < Test::Unit::TestCase
   def test_choice
     match = File.parse('"a" | "b"', :root => :choice)
     assert(match)
-    assert_equal(2, match.rules.length)
     assert_instance_of(Choice, match.value)
   end
 
   def test_choice_embedded_sequence
     match = File.parse('"a" | ("b" "c")', :root => :choice)
     assert(match)
-    assert_equal(2, match.rules.length)
     assert_instance_of(Choice, match.value)
   end
 
   def test_sequence
     match = File.parse('"" ""', :root => :sequence)
     assert(match)
-    assert_equal(2, match.rules.length)
     assert_instance_of(Sequence, match.value)
   end
 
   def test_sequence_embedded_choice
     match = File.parse('"a" ("b" | "c")', :root => :sequence)
     assert(match)
-    assert_equal(2, match.rules.length)
     assert_instance_of(Sequence, match.value)
   end
 
   def test_label_expression
     match = File.parse('label:""', :root => :label_expression)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(StringTerminal, match.value)
   end
 
   def test_label_expression_space
     match = File.parse('label :"" ', :root => :label_expression)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(StringTerminal, match.value)
   end
 
@@ -291,77 +257,66 @@ class CitrusFileTest < Test::Unit::TestCase
   def test_prefix_and
     match = File.parse('&""', :root => :prefix)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(AndPredicate, match.value)
   end
 
   def test_prefix_not
     match = File.parse('!""', :root => :prefix)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(NotPredicate, match.value)
   end
 
   def test_prefix_but
     match = File.parse('~""', :root => :prefix)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(ButPredicate, match.value)
   end
 
   def test_suffix_plus
     match = File.parse('""+', :root => :suffix)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Repeat, match.value)
   end
 
   def test_suffix_question
-    match = File.parse('""? ', :root => :suffix)
+    match = File.parse('""?', :root => :suffix)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Repeat, match.value)
   end
 
   def test_suffix_star
     match = File.parse('""*', :root => :suffix)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Repeat, match.value)
   end
 
   def test_suffix_n_star
     match = File.parse('""1*', :root => :suffix)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Repeat, match.value)
   end
 
   def test_suffix_star_n
     match = File.parse('""*2', :root => :suffix)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Repeat, match.value)
   end
 
   def test_suffix_n_star_n
     match = File.parse('""1*2', :root => :suffix)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Repeat, match.value)
   end
 
   def test_primary_alias
     match = File.parse('rule_name', :root => :primary)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Alias, match.value)
   end
 
   def test_primary_string_terminal
     match = File.parse('"a"', :root => :primary)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(StringTerminal, match.value)
   end
 
@@ -426,42 +381,36 @@ class CitrusFileTest < Test::Unit::TestCase
   def test_terminal_character_class
     match = File.parse('[a-z]', :root => :terminal)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Terminal, match.value)
   end
 
   def test_terminal_dot
     match = File.parse('.', :root => :terminal)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Terminal, match.value)
   end
 
   def test_terminal_regular_expression
     match = File.parse('/./', :root => :terminal)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(Terminal, match.value)
   end
 
   def test_string_terminal_single_quoted
     match = File.parse("'a'", :root => :string_terminal)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(StringTerminal, match.value)
   end
 
   def test_string_terminal_double_quoted
     match = File.parse('"a"', :root => :string_terminal)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(StringTerminal, match.value)
   end
 
   def test_string_terminal_case_insensitive
     match = File.parse('`a`', :root => :string_terminal)
     assert(match)
-    assert_kind_of(Rule, match.value)
     assert_instance_of(StringTerminal, match.value)
   end
 
@@ -600,13 +549,19 @@ class CitrusFileTest < Test::Unit::TestCase
   def test_predicate_and
     match = File.parse('&', :root => :predicate)
     assert(match)
-    assert_kind_of(Rule, match.value(''))
+    assert_instance_of(AndPredicate, match.value(''))
   end
 
   def test_predicate_not
     match = File.parse('!', :root => :predicate)
     assert(match)
-    assert_kind_of(Rule, match.value(''))
+    assert_instance_of(NotPredicate, match.value(''))
+  end
+
+  def test_predicate_but
+    match = File.parse('~', :root => :predicate)
+    assert(match)
+    assert_instance_of(ButPredicate, match.value(''))
   end
 
   def test_and
@@ -631,6 +586,18 @@ class CitrusFileTest < Test::Unit::TestCase
     match = File.parse('! ', :root => :not)
     assert(match)
     assert_instance_of(NotPredicate, match.value(''))
+  end
+
+  def test_but
+    match = File.parse('~', :root => :but)
+    assert(match)
+    assert_instance_of(ButPredicate, match.value(''))
+  end
+
+  def test_but_space
+    match = File.parse('~ ', :root => :but)
+    assert(match)
+    assert_instance_of(ButPredicate, match.value(''))
   end
 
   def test_label

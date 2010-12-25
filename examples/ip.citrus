@@ -77,10 +77,6 @@ grammar IPAddress
   include IPv6Address
 
   rule IPaddress
-    (IPv4address | IPv6address) {+
-      def version
-        first.version
-      end
-    }
+    IPv4address | IPv6address
   end
 end

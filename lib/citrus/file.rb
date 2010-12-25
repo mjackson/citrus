@@ -134,9 +134,7 @@ module Citrus
     end
 
     rule :primary do
-      any(:grouping, :proxy, :string_terminal, :terminal) {
-        first.value
-      }
+      any(:grouping, :proxy, :string_terminal, :terminal)
     end
 
     rule :grouping do
@@ -178,9 +176,7 @@ module Citrus
     end
 
     rule :proxy do
-      any(:super, :alias) {
-        first.value
-      }
+      any(:super, :alias)
     end
 
     rule :super do
@@ -197,7 +193,7 @@ module Citrus
 
     rule :string_terminal do
       any(:quoted_string, :case_insensitive_string) {
-        StringTerminal.new(first.value, first.flags)
+        StringTerminal.new(super(), flags)
       }
     end
 
@@ -227,7 +223,7 @@ module Citrus
 
     rule :terminal do
       any(:regular_expression, :character_class, :dot) {
-        Terminal.new(first.value)
+        Terminal.new(super())
       }
     end
 
@@ -256,9 +252,7 @@ module Citrus
     end
 
     rule :extension do
-      any(:tag, :mod_block, :block) {
-        first.value
-      }
+      any(:tag, :mod_block, :block)
     end
 
     rule :tag do
@@ -298,9 +292,7 @@ module Citrus
     end
 
     rule :predicate do
-      any(:and, :not, :but) { |rule|
-        first.value(rule)
-      }
+      any(:and, :not, :but)
     end
 
     rule :and do
@@ -323,7 +315,7 @@ module Citrus
 
     rule :repeat do
       any(:question, :plus, :star) { |rule|
-        Repeat.new(rule, first.min, first.max)
+        Repeat.new(rule, min, max)
       }
     end
 

@@ -11,9 +11,7 @@ grammar :Calc do
   ## Hierarchical syntax
 
   rule :term do
-    any(:additive, :factor) {
-      first.value
-    }
+    any(:additive, :factor)
   end
 
   rule :additive do
@@ -23,9 +21,7 @@ grammar :Calc do
   end
 
   rule :factor do
-    any(:multiplicative, :prefix) {
-      first.value
-    }
+    any(:multiplicative, :prefix)
   end
 
   rule :multiplicative do
@@ -35,9 +31,7 @@ grammar :Calc do
   end
 
   rule :prefix do
-    any(:prefixed, :exponent) {
-      first.value
-    }
+    any(:prefixed, :exponent)
   end
 
   rule :prefixed do
@@ -47,9 +41,7 @@ grammar :Calc do
   end
 
   rule :exponent do
-    any(:exponential, :primary) {
-      first.value
-    }
+    any(:exponential, :primary)
   end
 
   rule :exponential do
@@ -59,9 +51,7 @@ grammar :Calc do
   end
 
   rule :primary do
-    any(:group, :number) {
-      first.value
-    }
+    any(:group, :number)
   end
 
   rule :group do
@@ -73,9 +63,7 @@ grammar :Calc do
   ## Lexical syntax
 
   rule :number do
-    any(:float, :integer) {
-      first.value
-    }
+    any(:float, :integer)
   end
 
   rule :float do
