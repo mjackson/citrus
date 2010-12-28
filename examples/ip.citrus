@@ -12,7 +12,7 @@ grammar IPv4Address
   # only the dotted-decimal form of four octets is allowed by this
   # grammar.
   rule IPv4address
-    (dec-octet '.' dec-octet '.' dec-octet '.' dec-octet) {+
+    (dec-octet '.' dec-octet '.' dec-octet '.' dec-octet) {
       def version; 4 end
     }
   end
@@ -52,7 +52,7 @@ grammar IPv6Address
     | (h16 (":" h16)*4)? "::"              ls32
     | (h16 (":" h16)*5)? "::"              h16
     | (h16 (":" h16)*6)? "::"
-    ) {+
+    ) {
       def version; 6 end
     }
   end

@@ -438,7 +438,7 @@ module Citrus
 
     # Specifies a Module that will be used to extend all matches created with
     # the given +rule+. A block may also be given that will be used to create
-    # an anonymous module. See Rule#ext=.
+    # an anonymous module. See Rule#extension=.
     def ext(rule, mod=nil, &block)
       rule = Rule.for(rule)
       mod = block if block
@@ -446,8 +446,8 @@ module Citrus
       rule
     end
 
-    # Make the extension to rule be a module which is extended to the Match
-    # object
+    # Creates a new Module from the given +block+ and sets it to be the
+    # extension of the given +rule+. See Rule#extension=.
     def mod(rule, &block)
       rule.extension = Module.new(&block)
       rule

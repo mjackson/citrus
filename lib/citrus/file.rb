@@ -250,7 +250,7 @@ module Citrus
     end
 
     rule :extension do
-      any(:tag, :mod_block, :block)
+      any(:tag, :block)
     end
 
     rule :tag do
@@ -265,27 +265,15 @@ module Citrus
 
     rule :block do
       all(:lcurly, zero_or_more(any(:block, /[^{}]+/)), :rcurly) {
+        proc = eval("Proc.new #{to_s}", TOPLEVEL_BINDING)
+
         # Attempt to detect if this is a module block using some
-        # extremely simple heiristics
-
-        def_or_inc = matches[1].to_s.split(/\n+/).detect do |l|
-          l.strip!
-          l =~ /^def / or l =~ /^include /
-        end
-
-        proc_str = "Proc.new { #{matches[1].to_s} }"
-        if def_or_inc
-          Module.new(&eval(proc_str, TOPLEVEL_BINDING))
+        # extremely simple heuristics.
+        if to_s =~ /\b(def|include) /
+          Module.new(&proc)
         else
-          eval(proc_str, TOPLEVEL_BINDING)
+          proc
         end
-      }
-    end
-
-    rule :mod_block do
-      all(:mod_lcurly, zero_or_more(any(:block, /[^{}]+/)), :rcurly) {
-        proc_str = "Proc.new { #{matches[1].to_s} }"
-        Module.new(&eval(proc_str, TOPLEVEL_BINDING))
       }
     end
 
@@ -350,7 +338,6 @@ module Citrus
     rule :lparen,           [ '(', :space ]
     rule :rparen,           [ ')', :space ]
     rule :lcurly,           [ '{', :space ]
-    rule :mod_lcurly,       [ '{+', :space ]
     rule :rcurly,           [ '}', :space ]
     rule :bar,              [ '|', :space ]
     rule :lt,               [ '<', :space ]

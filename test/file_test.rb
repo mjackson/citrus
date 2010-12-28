@@ -628,9 +628,21 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_block_def
+    match = File.parse("{def value; 'a' end}", :root => :block)
+    assert(match)
+    assert(match.value)
+    assert_instance_of(Module, match.value)
+    method_names = match.value.instance_methods.map {|m| m.to_sym }
+    assert_equal([:value], method_names)
+  end
+
+  def test_block_def_multiline
     match = File.parse("{\n  def value\n    'a'\n  end\n} ", :root => :block)
     assert(match)
     assert(match.value)
+    assert_instance_of(Module, match.value)
+    method_names = match.value.instance_methods.map {|m| m.to_sym }
+    assert_equal([:value], method_names)
   end
 
   def test_block_with_interpolation
