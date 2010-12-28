@@ -1142,7 +1142,7 @@ module Citrus
 
       if events.length > 0
         if events[-1] != string.length
-          raise ArgumentError "Invalid events for length #{string.length}"
+          raise ArgumentError, "Invalid events for length #{string.length}"
         end
 
         elisions = []
