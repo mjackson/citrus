@@ -8,15 +8,15 @@ integers separated by any amount of white space and a `+` symbol.
       rule additive
         number plus (additive | number)
       end
-
+      
       rule number
         [0-9]+ space
       end
-
+      
       rule plus
         '+' space
       end
-
+      
       rule space
         [ \t]*
       end
@@ -53,20 +53,20 @@ blocks. Let's extend the `Addition` grammar using this technique.
     grammar Addition
       rule additive
         (number plus term:(additive | number)) {
-          number.value + term.first.value
+          number.value + term.value
         }
       end
-
+      
       rule number
         ([0-9]+ space) {
           to_i
         }
       end
-
+      
       rule plus
         '+' space
       end
-
+      
       rule space
         [ \t]*
       end
@@ -123,3 +123,71 @@ Take a look at
 [examples/calc.citrus](http://github.com/mjijackson/citrus/blob/master/examples/calc.citrus)
 for an example of a calculator that is able to parse and evaluate more complex
 mathematical expressions.
+
+## Additional Methods
+
+If you need more than just a `value` method on your match object, you can attach
+additional methods as well. There are two ways to do this. The first lets you
+define additional methods inline in your semantic block. This block will be used
+to create a new Module using [Module#new](http://ruby-doc.org/core/classes/Module.html#M001682). Using the
+`Addition` example above, we might refactor the `additive` rule to look like
+this:
+
+    rule additive
+      (number plus term:(additive | number)) {
+        def lhs
+          number.value
+        end
+        
+        def rhs
+          term.value
+        end
+        
+        def value
+          lhs + rhs
+        end
+      }
+    end
+
+Now, in addition to having a `value` method, matches that result from the
+`additive` rule will have a `lhs` and a `rhs` method as well. Although not
+particularly useful in this example, this technique can be useful when unit
+testing more complex rules. For example, using this method you might make the
+following assertions in a unit test:
+
+    match = Addition.parse('1 + 4')
+    assert_equal(1, match.lhs)
+    assert_equal(4, match.rhs)
+    assert_equal(5, match.value)
+
+If you would like to abstract away the code in a semantic block, simply create
+a separate Ruby module (in another file) that contains the extension methods you
+want and use the angle bracket notation to indicate that a rule should use that
+module when extending matches.
+
+To demonstrate this method with the above example, in a Ruby file you would
+define the following module.
+
+    module Additive
+      def lhs
+        number.value
+      end
+      
+      def rhs
+        term.value
+      end
+      
+      def value
+        lhs + rhs
+      end
+    end
+
+Then, in your Citrus grammar file the rule definition would look like this:
+
+      rule additive
+        (number plus term:(additive | number)) <Additive>
+      end
+
+This method of defining extensions can help keep your grammar files cleaner.
+However, you do need to make sure that your extension modules are already loaded
+before using `Citrus.load` to load your grammar file.

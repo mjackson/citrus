@@ -27,6 +27,9 @@ match in a case-insensitive manner.
 
     `abc`         # match "abc" in any case
 
+Besides case sensitivity, case-insensitive strings have the same behavior as
+double quoted strings.
+
 See [Terminal](api/classes/Citrus/Terminal.html) and
 [StringTerminal](api/classes/Citrus/StringTerminal.html) for more information.
 
@@ -69,6 +72,9 @@ that does not match a given expression.
     ~'a'          # match all characters until an "a"
     ~/xyz/        # match all characters until /xyz/ matches
 
+When using this operator (the tilde), at least one character must be consumed
+for the rule to succeed.
+
 See [AndPredicate](api/classes/Citrus/AndPredicate.html),
 [NotPredicate](api/classes/Citrus/NotPredicate.html), and
 [ButPredicate](api/classes/Citrus/ButPredicate.html) for more information.
@@ -98,6 +104,15 @@ levels of precedence is below.
 
 See [Choice](api/classes/Citrus/Choice.html) for more information.
 
+## Grouping
+
+As is common in many programming languages, parentheses may be used to override
+the normal binding order of operators. In the following example parentheses are
+used to make the vertical bar between `'b'` and `'c'` bind tighter than the
+space between `'a'` and `'b'`.
+
+    'a' ('b' | 'c')   # match "a", then "b" or "c"
+
 ## Labels
 
 Match objects may be referred to by a different name than the rule that
@@ -107,13 +122,6 @@ immediately preceding any expression.
     chars:/[a-z]+/  # the characters matched by the regular expression
                     # may be referred to as "chars" in an extension
                     # method
-
-## Grouping
-
-As is common in many programming languages, parentheses may be used to override
-the normal binding order of operators.
-
-    'a' ('b' | 'c')   # match "a", then "b" or "c"
 
 ## Extensions
 
@@ -142,6 +150,24 @@ in Ruby blocks.
 When including a grammar inside another, all rules in the child that have the
 same name as a rule in the parent also have access to the `super` keyword to
 invoke the parent rule.
+
+    grammar Number
+      def number
+        [0-9]+
+      end
+    end
+    
+    grammar FloatingPoint
+      include Number
+      
+      rule number
+        super ('.' super)?
+      end
+    end
+
+In the example above, the `FloatingPoint` grammar includes `Number`. Both have a
+rule named `number`, so `FloatingPoint#number` has access to `Number#number` by
+means of using `super`.
 
 See [Super](api/classes/Citrus/Super.html) for more information.
 
