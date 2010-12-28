@@ -480,70 +480,84 @@ class CitrusFileTest < Test::Unit::TestCase
     assert_equal('&', match.value)
   end
 
-  def test_character_class
-    match = File.parse('[_]', :root => :character_class)
-    assert(match)
-    assert_equal(/\A[_]/, match.value)
-  end
-
-  def test_character_class_a_z
-    match = File.parse('[a-z]', :root => :character_class)
-    assert(match)
-    assert_equal(/\A[a-z]/, match.value)
-  end
-
-  def test_character_class_a_z_0_9
-    match = File.parse('[a-z0-9]', :root => :character_class)
-    assert(match)
-    assert_equal(/\A[a-z0-9]/, match.value)
-  end
-
-  def test_character_class_nested_square_brackets
-    match = File.parse('[\[-\]]', :root => :character_class)
-    assert(match)
-    assert_equal(/\A[\[-\]]/, match.value)
-  end
-
-  def test_character_class_hex_range
-    match = File.parse('[\\x26-\\x29]', :root => :character_class)
-    assert(match)
-    assert_equal(/\A[\x26-\x29]/, match.value)
-  end
-
-  def test_dot
-    match = File.parse('.', :root => :dot)
-    assert(match)
-    assert_equal(DOT, match.value)
-  end
-
   def test_regular_expression
     match = File.parse('/./', :root => :regular_expression)
     assert(match)
-    assert_equal(/./, match.value)
+    rule = match.value
+    assert_instance_of(Terminal, rule)
+    assert_equal(/./, rule.regexp)
   end
 
   def test_regular_expression_escaped_forward_slash
     match = File.parse('/\\//', :root => :regular_expression)
     assert(match)
-    assert_equal(/\//, match.value)
+    rule = match.value
+    assert_instance_of(Terminal, rule)
+    assert_equal(/\//, rule.regexp)
   end
 
   def test_regular_expression_escaped_backslash
     match = File.parse('/\\\\/', :root => :regular_expression)
     assert(match)
-    assert_equal(/\\/, match.value)
+    rule = match.value
+    assert_instance_of(Terminal, rule)
+    assert_equal(/\\/, rule.regexp)
   end
 
   def test_regular_expression_hex
     match = File.parse('/\\x26/', :root => :regular_expression)
     assert(match)
-    assert_equal(/\x26/, match.value)
+    rule = match.value
+    assert_instance_of(Terminal, rule)
+    assert_equal(/\x26/, rule.regexp)
   end
 
   def test_regular_expression_with_flag
     match = File.parse('/a/i', :root => :regular_expression)
     assert(match)
-    assert_equal(/a/i, match.value)
+    rule = match.value
+    assert_instance_of(Terminal, rule)
+    assert_equal(/a/i, rule.regexp)
+  end
+
+  def test_character_class
+    match = File.parse('[_]', :root => :character_class)
+    assert(match)
+    rule = match.value
+    assert_instance_of(Terminal, rule)
+    assert_equal(/[_]/n, rule.regexp)
+  end
+
+  def test_character_class_a_z
+    match = File.parse('[a-z]', :root => :character_class)
+    assert(match)
+    rule = match.value
+    assert_instance_of(Terminal, rule)
+    assert_equal(/[a-z]/n, rule.regexp)
+  end
+
+  def test_character_class_nested_square_brackets
+    match = File.parse('[\[-\]]', :root => :character_class)
+    assert(match)
+    rule = match.value
+    assert_instance_of(Terminal, rule)
+    assert_equal(/[\[-\]]/n, rule.regexp)
+  end
+
+  def test_character_class_hex_range
+    match = File.parse('[\\x26-\\x29]', :root => :character_class)
+    assert(match)
+    rule = match.value
+    assert_instance_of(Terminal, rule)
+    assert_equal(/[\x26-\x29]/, rule.regexp)
+  end
+
+  def test_dot
+    match = File.parse('.', :root => :dot)
+    assert(match)
+    rule = match.value
+    assert_instance_of(Terminal, rule)
+    assert_equal(DOT, rule.regexp)
   end
 
   def test_label

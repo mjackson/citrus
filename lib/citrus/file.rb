@@ -134,7 +134,7 @@ module Citrus
     end
 
     rule :primary do
-      any(:grouping, :proxy, :string_terminal, :terminal)
+      any(:grouping, :proxy, :terminal)
     end
 
     rule :grouping do
@@ -191,6 +191,10 @@ module Citrus
       }
     end
 
+    rule :terminal do
+      any(:string_terminal, :regular_expression, :character_class, :dot)
+    end
+
     rule :string_terminal do
       any(:quoted_string, :case_insensitive_string) {
         StringTerminal.new(super(), flags)
@@ -221,27 +225,21 @@ module Citrus
       end
     end
 
-    rule :terminal do
-      any(:regular_expression, :character_class, :dot) {
-        Terminal.new(super())
-      }
-    end
-
     rule :regular_expression do
       all(/\/(?:\\?.)*?\/[imxouesn]*/, :space) {
-        eval(first.to_s)
+        Terminal.new(eval(first.to_s))
       }
     end
 
     rule :character_class do
       all(/\[(?:\\?.)*?\]/, :space) {
-        Regexp.new('\A' + first.to_s, nil, 'n')
+        Terminal.new(Regexp.new(first.to_s, nil, 'n'))
       }
     end
 
     rule :dot do
       all('.', :space) {
-        DOT
+        Terminal.new(DOT)
       }
     end
 

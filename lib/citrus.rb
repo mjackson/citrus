@@ -744,16 +744,16 @@ module Citrus
   class Terminal
     include Rule
 
-    def initialize(rule=/^/)
-      @rule = rule
+    def initialize(regexp=/^/)
+      @regexp = regexp
     end
 
     # The actual Regexp object this rule uses to match.
-    attr_reader :rule
+    attr_reader :regexp
 
     # Returns an array of events for this rule on the given +input+.
     def exec(input, events=[])
-      length = input.scan_full(rule, false, false)
+      length = input.scan_full(@regexp, false, false)
 
       if length
         events << self
@@ -766,7 +766,16 @@ module Citrus
 
     # Returns +true+ if this rule is case sensitive.
     def case_sensitive?
-      !rule.casefold?
+      !@regexp.casefold?
+    end
+
+    def ==(other)
+      case other
+      when Regexp
+        @regexp == other
+      else
+        super
+      end
     end
 
     # Returns +true+ if this rule is a Terminal.
@@ -776,7 +785,7 @@ module Citrus
 
     # Returns the Citrus notation of this rule as a string.
     def to_citrus # :nodoc:
-      rule.inspect
+      @regexp.inspect
     end
   end
 
@@ -801,6 +810,15 @@ module Citrus
     def initialize(rule='', flags=0)
       super(Regexp.new(Regexp.escape(rule), flags))
       @string = rule
+    end
+
+    def ==(other)
+      case other
+      when String
+        @string == other
+      else
+        super
+      end
     end
 
     # Returns the Citrus notation of this rule as a string.

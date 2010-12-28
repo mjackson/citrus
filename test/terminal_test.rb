@@ -6,6 +6,11 @@ class TerminalTest < Test::Unit::TestCase
     assert(rule.terminal?)
   end
 
+  def test_eql?
+    rule = Terminal.new(/abc/i)
+    assert_equal(rule, /abc/i)
+  end
+
   def test_exec
     rule = Terminal.new(/\d+/)
     events = rule.exec(Input.new('123'))

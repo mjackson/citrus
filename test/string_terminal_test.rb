@@ -6,6 +6,11 @@ class StringTerminalTest < Test::Unit::TestCase
     assert(rule.terminal?)
   end
 
+  def test_eql?
+    rule = StringTerminal.new('abc')
+    assert_equal('abc', rule)
+  end
+
   def test_exec
     rule = StringTerminal.new('abc')
     events = rule.exec(Input.new('abc'))
