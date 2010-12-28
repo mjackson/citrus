@@ -164,10 +164,9 @@ module Citrus
       start = pos
       index = events.size
 
-      rule.exec(self, events)
-
-      if index < events.size
-        self.pos = start + events[-1]
+      if rule.exec(self, events).size > index
+        pos = start + events[-1]
+        self.pos = pos
         @max_offset = pos if pos > @max_offset
       else
         self.pos = start
