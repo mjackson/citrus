@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>: Citrus::MemoizingInput [Citrus API Documentation]</title>
+    <meta content='text/html; charset=utf8' http-equiv='Content-Type'>
+    <link href='../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>Class</span>
+          Citrus::MemoizingInput
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../files/lib/citrus_rb.html">lib/citrus.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a href="Input.html">Citrus::Input</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <p>
+            A <a href="MemoizingInput.html">MemoizingInput</a> is an <a
+            href="Input.html">Input</a> that caches segments of the event stream for
+            particular rules in a parse. This technique (also known as
+            &#8220;Packrat&#8221; parsing) guarantees parsers will operate in linear
+            time but costs significantly more in terms of time and memory required to
+            perform a parse. For more information, please read the paper on Packrat
+            parsing at <a
+            href="http://pdos.csail.mit.edu/~baford/packrat/icfp02/.">pdos.csail.mit.edu/~baford/packrat/icfp02/.</a>
+            </p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>public class</h3>
+            <ol>
+              <li><a href="#M000062">new</a></li>
+            </ol>
+            <h3>public instance</h3>
+            <ol>
+              <li><a href="#M000063">memoized?</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>cache</td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      A nested hash of rules to offsets and their respective matches.
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>cache_hits</td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      The number of times the cache was hit.
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public class methods</h2>
+              <div class='method public-class' id='method-M000062'>
+                <a name='M000062'></a>
+                <div class='synopsis'>
+                  <span class='name'>new</span>
+                  <span class='arguments'>(string)</span>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000062-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000062-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 200</span>&#x000A;200:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">string</span>)&#x000A;201:       <span class="ruby-keyword kw">super</span>(<span class="ruby-identifier">string</span>)&#x000A;202:       <span class="ruby-ivar">@cache</span> = {}&#x000A;203:       <span class="ruby-ivar">@cache_hits</span> = <span class="ruby-value">0</span>&#x000A;204:     <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <h2>Public instance methods</h2>
+              <div class='method public-instance' id='method-M000063'>
+                <a name='M000063'></a>
+                <div class='synopsis'>
+                  <span class='name'>memoized?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Returns <tt>true</tt> when using memoization to cache match results.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000063-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000063-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 232</span>&#x000A;232:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">memoized?</span>&#x000A;233:       <span class="ruby-keyword kw">true</span>&#x000A;234:     <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

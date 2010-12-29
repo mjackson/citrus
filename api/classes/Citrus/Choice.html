@@ -43,9 +43,10 @@
         <div id='text'>
           <div id='description'>
             <p>
-            A <a href="Choice.html">Choice</a> is a <a href="List.html">List</a> where
-            only one rule must match. The <a href="../Citrus.html">Citrus</a> notation
-            is two or more expressions separated by a vertical bar, e.g.:
+            A <a href="Choice.html">Choice</a> is a <a
+            href="Nonterminal.html">Nonterminal</a> where only one rule must match. The
+            <a href="../Citrus.html">Citrus</a> notation is two or more expressions
+            separated by a vertical bar, e.g.:
             </p>
             <pre>expr | expr</pre>
           </div>
@@ -53,23 +54,22 @@
             <h2>Methods</h2>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000092">exec</a></li>
-              <li><a href="#M000093">to_s</a></li>
+              <li><a href="#M000086">exec</a></li>
             </ol>
           </div>
           <div id='context'>
             <div id='includes'>
               <h2>Included modules</h2>
               <ol>
-                <li><a href="List.html">List</a></li>
+                <li><a href="Nonterminal.html">Nonterminal</a></li>
               </ol>
             </div>
           </div>
           <div id='section'>
             <div id='methods'>
               <h2>Public instance methods</h2>
-              <div class='method public-instance' id='method-M000092'>
-                <a name='M000092'></a>
+              <div class='method public-instance' id='method-M000086'>
+                <a name='M000086'></a>
                 <div class='synopsis'>
                   <span class='name'>exec</span>
                   <span class='arguments'>(input, events=[])</span>
@@ -80,29 +80,10 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000092-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000086-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000092-source'>      <span class="ruby-comment cmt"># File lib/citrus.rb, line 1027</span>&#x000A;1027:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">exec</span>(<span class="ruby-identifier">input</span>, <span class="ruby-identifier">events</span>=[])&#x000A;1028:       <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">id</span>&#x000A;1029: &#x000A;1030:       <span class="ruby-identifier">index</span> = <span class="ruby-identifier">events</span>.<span class="ruby-identifier">size</span>&#x000A;1031:       <span class="ruby-identifier">start</span> = <span class="ruby-identifier">index</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>&#x000A;1032:       <span class="ruby-identifier">n</span> = <span class="ruby-value">0</span>&#x000A;1033:       <span class="ruby-keyword kw">while</span> <span class="ruby-identifier">n</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">rules</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">input</span>.<span class="ruby-identifier">exec</span>(<span class="ruby-identifier">rules</span>[<span class="ruby-identifier">n</span>], <span class="ruby-identifier">events</span>).<span class="ruby-identifier">size</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">index</span>&#x000A;1034:         <span class="ruby-identifier">n</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>&#x000A;1035:       <span class="ruby-keyword kw">end</span>&#x000A;1036: &#x000A;1037:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">index</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">events</span>.<span class="ruby-identifier">size</span>&#x000A;1038:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">CLOSE</span>&#x000A;1039:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">events</span>[<span class="ruby-value">-2</span>]&#x000A;1040:       <span class="ruby-keyword kw">else</span>&#x000A;1041:         <span class="ruby-identifier">events</span>.<span class="ruby-identifier">slice!</span>(<span class="ruby-identifier">start</span>, <span class="ruby-identifier">events</span>.<span class="ruby-identifier">size</span>)&#x000A;1042:       <span class="ruby-keyword kw">end</span>&#x000A;1043: &#x000A;1044:       <span class="ruby-identifier">events</span>&#x000A;1045:     <span class="ruby-keyword kw">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-M000093'>
-                <a name='M000093'></a>
-                <div class='synopsis'>
-                  <span class='name'>to_s</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  <p>
-                  Returns the <a href="../Citrus.html">Citrus</a> notation of this rule as a
-                  string.
-                  </p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000093-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='M000093-source'>      <span class="ruby-comment cmt"># File lib/citrus.rb, line 1048</span>&#x000A;1048:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">to_s</span>&#x000A;1049:       <span class="ruby-identifier">rules</span>.<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">embed</span> }.<span class="ruby-identifier">join</span>(<span class="ruby-value str">' | '</span>)&#x000A;1050:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000086-source'>      <span class="ruby-comment cmt"># File lib/citrus.rb, line 1105</span>&#x000A;1105:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">exec</span>(<span class="ruby-identifier">input</span>, <span class="ruby-identifier">events</span>=[])&#x000A;1106:       <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword kw">self</span>&#x000A;1107: &#x000A;1108:       <span class="ruby-identifier">index</span> = <span class="ruby-identifier">events</span>.<span class="ruby-identifier">size</span>&#x000A;1109:       <span class="ruby-identifier">n</span> = <span class="ruby-value">0</span>&#x000A;1110:       <span class="ruby-identifier">m</span> = <span class="ruby-identifier">rules</span>.<span class="ruby-identifier">length</span>&#x000A;1111: &#x000A;1112:       <span class="ruby-keyword kw">while</span> <span class="ruby-identifier">n</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">m</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">input</span>.<span class="ruby-identifier">exec</span>(<span class="ruby-identifier">rules</span>[<span class="ruby-identifier">n</span>], <span class="ruby-identifier">events</span>).<span class="ruby-identifier">size</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">index</span>&#x000A;1113:         <span class="ruby-identifier">n</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>&#x000A;1114:       <span class="ruby-keyword kw">end</span>&#x000A;1115: &#x000A;1116:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">index</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">events</span>.<span class="ruby-identifier">size</span>&#x000A;1117:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">CLOSE</span>&#x000A;1118:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">events</span>[<span class="ruby-value">-2</span>]&#x000A;1119:       <span class="ruby-keyword kw">else</span>&#x000A;1120:         <span class="ruby-identifier">events</span>.<span class="ruby-identifier">pop</span>&#x000A;1121:       <span class="ruby-keyword kw">end</span>&#x000A;1122: &#x000A;1123:       <span class="ruby-identifier">events</span>&#x000A;1124:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

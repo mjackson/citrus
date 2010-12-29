@@ -44,26 +44,30 @@
           <div id='description'>
             <p>
             A <a href="ButPredicate.html">ButPredicate</a> is a <a
-            href="Predicate.html">Predicate</a> that consumes all characters until its
-            rule matches. It must match at least one character in order to succeed. The
-            <a href="../Citrus.html">Citrus</a> notation is any expression preceded by
-            a tilde, e.g.:
+            href="Nonterminal.html">Nonterminal</a> that consumes all characters until
+            its rule matches. It must match at least one character in order to succeed.
+            The <a href="../Citrus.html">Citrus</a> notation is any expression preceded
+            by a tilde, e.g.:
             </p>
             <pre>~expr</pre>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
+            <h3>public class</h3>
+            <ol>
+              <li><a href="#M000076">new</a></li>
+            </ol>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000080">exec</a></li>
-              <li><a href="#M000081">to_s</a></li>
+              <li><a href="#M000078">exec</a></li>
+              <li><a href="#M000077">rule</a></li>
             </ol>
           </div>
           <div id='context'>
             <div id='includes'>
               <h2>Included modules</h2>
               <ol>
-                <li><a href="Predicate.html">Predicate</a></li>
+                <li><a href="Nonterminal.html">Nonterminal</a></li>
               </ol>
             </div>
           </div>
@@ -75,15 +79,29 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>DOT_RULE</td>
                     <td>=</td>
-                    <td class='context-item-value'>Rule.new(DOT)</td>
+                    <td class='context-item-value'>Rule.for(DOT)</td>
                   </tr>
                 </table>
               </div>
             </div>
             <div id='methods'>
+              <h2>Public class methods</h2>
+              <div class='method public-class' id='method-M000076'>
+                <a name='M000076'></a>
+                <div class='synopsis'>
+                  <span class='name'>new</span>
+                  <span class='arguments'>(rule='')</span>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000076-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000076-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 937</span>&#x000A;937:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">rule</span>=<span class="ruby-value str">''</span>)&#x000A;938:       <span class="ruby-keyword kw">super</span>([<span class="ruby-identifier">rule</span>])&#x000A;939:     <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
               <h2>Public instance methods</h2>
-              <div class='method public-instance' id='method-M000080'>
-                <a name='M000080'></a>
+              <div class='method public-instance' id='method-M000078'>
+                <a name='M000078'></a>
                 <div class='synopsis'>
                   <span class='name'>exec</span>
                   <span class='arguments'>(input, events=[])</span>
@@ -94,29 +112,28 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000080-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000078-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000080-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 873</span>&#x000A;873:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">exec</span>(<span class="ruby-identifier">input</span>, <span class="ruby-identifier">events</span>=[])&#x000A;874:       <span class="ruby-identifier">length</span> = <span class="ruby-value">0</span>&#x000A;875:       <span class="ruby-keyword kw">until</span> <span class="ruby-identifier">input</span>.<span class="ruby-identifier">test</span>(<span class="ruby-identifier">rule</span>)&#x000A;876:         <span class="ruby-identifier">len</span> = <span class="ruby-identifier">input</span>.<span class="ruby-identifier">exec</span>(<span class="ruby-constant">DOT_RULE</span>)[<span class="ruby-value">-1</span>]&#x000A;877:         <span class="ruby-keyword kw">break</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">len</span>&#x000A;878:         <span class="ruby-identifier">length</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">len</span>&#x000A;879:       <span class="ruby-keyword kw">end</span>&#x000A;880:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>&#x000A;881:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">id</span>&#x000A;882:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">CLOSE</span>&#x000A;883:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">length</span>&#x000A;884:       <span class="ruby-keyword kw">end</span>&#x000A;885:       <span class="ruby-identifier">events</span>&#x000A;886:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000078-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 947</span>&#x000A;947:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">exec</span>(<span class="ruby-identifier">input</span>, <span class="ruby-identifier">events</span>=[])&#x000A;948:       <span class="ruby-identifier">length</span> = <span class="ruby-value">0</span>&#x000A;949: &#x000A;950:       <span class="ruby-keyword kw">until</span> <span class="ruby-identifier">input</span>.<span class="ruby-identifier">test</span>(<span class="ruby-identifier">rule</span>)&#x000A;951:         <span class="ruby-identifier">len</span> = <span class="ruby-identifier">input</span>.<span class="ruby-identifier">exec</span>(<span class="ruby-constant">DOT_RULE</span>)[<span class="ruby-value">-1</span>]&#x000A;952:         <span class="ruby-keyword kw">break</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">len</span>&#x000A;953:         <span class="ruby-identifier">length</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">len</span>&#x000A;954:       <span class="ruby-keyword kw">end</span>&#x000A;955: &#x000A;956:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>&#x000A;957:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword kw">self</span>&#x000A;958:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">CLOSE</span>&#x000A;959:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">length</span>&#x000A;960:       <span class="ruby-keyword kw">end</span>&#x000A;961: &#x000A;962:       <span class="ruby-identifier">events</span>&#x000A;963:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='method public-instance' id='method-M000081'>
-                <a name='M000081'></a>
+              <div class='method public-instance' id='method-M000077'>
+                <a name='M000077'></a>
                 <div class='synopsis'>
-                  <span class='name'>to_s</span>
+                  <span class='name'>rule</span>
                   <span class='arguments'>()</span>
                 </div>
                 <div class='description'>
                   <p>
-                  Returns the <a href="../Citrus.html">Citrus</a> notation of this rule as a
-                  string.
+                  Returns the <a href="Rule.html">Rule</a> object this rule uses to match.
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000081-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000077-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000081-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 889</span>&#x000A;889:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">to_s</span>&#x000A;890:       <span class="ruby-value str">'~'</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">rule</span>.<span class="ruby-identifier">embed</span>&#x000A;891:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000077-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 942</span>&#x000A;942:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">rule</span>&#x000A;943:       <span class="ruby-identifier">rules</span>[<span class="ruby-value">0</span>]&#x000A;944:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

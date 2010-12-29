@@ -72,31 +72,30 @@ of Ruby modules. Rules use these modules to extend the matches they create.</p>
 
 <h2>Grammars</h2>
 
-<p>A grammar is a container for rules. Usually the rules in a grammar collectively
-form a complete specification for some language, or a well-defined subset
-thereof.</p>
+<p>A <a href="api/classes/Citrus/Grammar.html">Grammar</a> is a container for rules. Usually
+the rules in a grammar collectively form a complete specification for some
+language, or a well-defined subset thereof.</p>
 
 <p>A Citrus grammar is really just a souped-up Ruby
 <a href="http://ruby-doc.org/core/classes/Module.html">module</a>. These modules may be
 included in other grammar modules in the same way that Ruby modules are normally
 used. This property allows you to divide a complex grammar into more manageable,
-reusable pieces that may be combined at runtime. Any grammar rule with the same
-name as a rule in an included grammar may access that rule with a mechanism
-similar to Ruby&rsquo;s super keyword.</p>
+reusable pieces that may be combined at runtime. Any rule with the same name as
+a rule in an included grammar may access that rule with a mechanism similar to
+Ruby&rsquo;s <code>super</code> keyword.</p>
 
 <h2>Matches</h2>
 
-<p>Matches are created by rule objects when they match on the input. A
-<a href="api/classes/Citrus/Match.html">Match</a> is actually a
-<a href="http://ruby-doc.org/core/classes/String.html">String</a> object with some extra
-information attached such as the name(s) of the rule(s) from which it was
-generated and any submatches it may contain.</p>
+<p>A <a href="api/classes/Citrus/Match.html">Match</a> object represents a successful
+recognition of some piece of the input. Matches are created by rule objects during a parse.</p>
 
-<p>During a parse, matches are arranged in a tree structure where any match may
-contain any number of other matches. This structure is determined by the way in
-which the rule that generated each match is used in the grammar. For example, a
-match that is created from a non-terminal rule that contains several other
-terminals will likewise contain several matches, one for each terminal.</p>
+<p>Matches are arranged in a tree structure where any match may contain any number
+of other matches. Each match contains information about its own subtree. The
+structure of the tree is determined by the way in which the rule that generated
+each match is used in the grammar. For example, a match that is created from a
+nonterminal rule that contains several other terminals will likewise contain
+several matches, one for each terminal. However, this is an implementation
+detail and should be relatively transparent to the user.</p>
 
 <p>Match objects may be extended with semantic information in the form of methods.
 These methods should provide various interpretations for the semantic value of a

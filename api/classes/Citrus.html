@@ -52,8 +52,9 @@
             <h3>public class</h3>
             <ol>
               <li><a href="#M000004">eval</a></li>
-              <li><a href="#M000003">load</a></li>
-              <li><a href="#M000005">parse</a></li>
+              <li><a href="#M000006">load</a></li>
+              <li><a href="#M000003">parse</a></li>
+              <li><a href="#M000005">rule</a></li>
               <li><a href="#M000002">version</a></li>
             </ol>
           </div>
@@ -62,9 +63,7 @@
               <h2>Classes and Modules</h2>
               Module <a href="Citrus/Grammar.html" class="link">Citrus::Grammar</a><br />
               Module <a href="Citrus/GrammarMethods.html" class="link">Citrus::GrammarMethods</a><br />
-              Module <a href="Citrus/List.html" class="link">Citrus::List</a><br />
               Module <a href="Citrus/Nonterminal.html" class="link">Citrus::Nonterminal</a><br />
-              Module <a href="Citrus/Predicate.html" class="link">Citrus::Predicate</a><br />
               Module <a href="Citrus/Proxy.html" class="link">Citrus::Proxy</a><br />
               Module <a href="Citrus/Rule.html" class="link">Citrus::Rule</a><br />
               Class <a href="Citrus/Alias.html" class="link">Citrus::Alias</a><br />
@@ -73,9 +72,8 @@
               Class <a href="Citrus/Choice.html" class="link">Citrus::Choice</a><br />
               Class <a href="Citrus/Error.html" class="link">Citrus::Error</a><br />
               Class <a href="Citrus/Input.html" class="link">Citrus::Input</a><br />
-              Class <a href="Citrus/Label.html" class="link">Citrus::Label</a><br />
               Class <a href="Citrus/Match.html" class="link">Citrus::Match</a><br />
-              Class <a href="Citrus/NoMatchError.html" class="link">Citrus::NoMatchError</a><br />
+              Class <a href="Citrus/MemoizingInput.html" class="link">Citrus::MemoizingInput</a><br />
               Class <a href="Citrus/NotPredicate.html" class="link">Citrus::NotPredicate</a><br />
               Class <a href="Citrus/ParseError.html" class="link">Citrus::ParseError</a><br />
               Class <a href="Citrus/Repeat.html" class="link">Citrus::Repeat</a><br />
@@ -91,7 +89,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>VERSION</td>
                     <td>=</td>
-                    <td class='context-item-value'>[2, 2, 0]</td>
+                    <td class='context-item-value'>[2, 3, 0]</td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>DOT</td>
@@ -107,11 +105,6 @@
                     <td class='context-item-name'>Infinity</td>
                     <td>=</td>
                     <td class='context-item-value'>1.0 / 0</td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>F</td>
-                    <td>=</td>
-                    <td class='context-item-value'>::File</td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>CLOSE</td>
@@ -133,19 +126,19 @@
                   <p>
                   Evaluates the given <a href="Citrus.html">Citrus</a> parsing expression
                   grammar <tt>code</tt> in the global scope. Returns an array of any grammar
-                  modules that are created. Implicitly raises <tt>SyntaxError</tt> on a
-                  failed parse.
+                  modules that are created.
                   </p>
+                  <pre>Citrus.eval(&lt;&lt;CITRUS)&#x000A;grammar MyGrammar&#x000A;  rule abc&#x000A;    &quot;abc&quot;&#x000A;  end&#x000A;end&#x000A;CITRUS</pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('M000004-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000004-source'>    <span class="ruby-comment cmt"># File lib/citrus.rb, line 38</span>&#x000A;38:   <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">eval</span>(<span class="ruby-identifier">code</span>)&#x000A;39:     <span class="ruby-identifier">parse</span>(<span class="ruby-identifier">code</span>, <span class="ruby-identifier">:consume</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">true</span>).<span class="ruby-identifier">value</span>&#x000A;40:   <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000004-source'>    <span class="ruby-comment cmt"># File lib/citrus.rb, line 41</span>&#x000A;41:   <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">eval</span>(<span class="ruby-identifier">code</span>)&#x000A;42:     <span class="ruby-identifier">parse</span>(<span class="ruby-identifier">code</span>).<span class="ruby-identifier">value</span>&#x000A;43:   <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='method public-class' id='method-M000003'>
-                <a name='M000003'></a>
+              <div class='method public-class' id='method-M000006'>
+                <a name='M000006'></a>
                 <div class='synopsis'>
                   <span class='name'>load</span>
                   <span class='arguments'>(file)</span>
@@ -157,30 +150,49 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000003-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000006-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000003-source'>    <span class="ruby-comment cmt"># File lib/citrus.rb, line 28</span>&#x000A;28:   <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">load</span>(<span class="ruby-identifier">file</span>)&#x000A;29:     <span class="ruby-identifier">file</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">'.citrus'</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">F</span>.<span class="ruby-identifier">file?</span>(<span class="ruby-identifier">file</span>)&#x000A;30:     <span class="ruby-identifier">raise</span> <span class="ruby-node">&quot;Cannot find file #{file}&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">F</span>.<span class="ruby-identifier">file?</span>(<span class="ruby-identifier">file</span>)&#x000A;31:     <span class="ruby-identifier">raise</span> <span class="ruby-node">&quot;Cannot read file #{file}&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">F</span>.<span class="ruby-identifier">readable?</span>(<span class="ruby-identifier">file</span>)&#x000A;32:     <span class="ruby-identifier">eval</span>(<span class="ruby-constant">F</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">file</span>))&#x000A;33:   <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000006-source'>    <span class="ruby-comment cmt"># File lib/citrus.rb, line 54</span>&#x000A;54:   <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">load</span>(<span class="ruby-identifier">file</span>)&#x000A;55:     <span class="ruby-identifier">file</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">'.citrus'</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-operator">::</span><span class="ruby-constant">File</span>.<span class="ruby-identifier">file?</span>(<span class="ruby-identifier">file</span>)&#x000A;56:     <span class="ruby-identifier">raise</span> <span class="ruby-node">&quot;Cannot find file #{file}&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-operator">::</span><span class="ruby-constant">File</span>.<span class="ruby-identifier">file?</span>(<span class="ruby-identifier">file</span>)&#x000A;57:     <span class="ruby-identifier">raise</span> <span class="ruby-node">&quot;Cannot read file #{file}&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-operator">::</span><span class="ruby-constant">File</span>.<span class="ruby-identifier">readable?</span>(<span class="ruby-identifier">file</span>)&#x000A;58:     <span class="ruby-identifier">eval</span>(<span class="ruby-operator">::</span><span class="ruby-constant">File</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">file</span>))&#x000A;59:   <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='method public-class' id='method-M000005'>
-                <a name='M000005'></a>
+              <div class='method public-class' id='method-M000003'>
+                <a name='M000003'></a>
                 <div class='synopsis'>
                   <span class='name'>parse</span>
                   <span class='arguments'>(code, options={})</span>
                 </div>
                 <div class='description'>
                   <p>
-                  Parses the given <a href="Citrus.html">Citrus</a> <tt>code</tt> using the
-                  given <tt>options</tt>. Returns the generated match tree. Raises a
-                  <tt>SyntaxError</tt> if the parse fails.
+                  Parses the given <a href="Citrus.html">Citrus</a> <tt>code</tt> using
+                  <tt>options</tt>.
                   </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000003-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000003-source'>    <span class="ruby-comment cmt"># File lib/citrus.rb, line 26</span>&#x000A;26:   <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">code</span>, <span class="ruby-identifier">options</span>={})&#x000A;27:     <span class="ruby-constant">File</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">code</span>, <span class="ruby-identifier">options</span>)&#x000A;28:   <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-M000005'>
+                <a name='M000005'></a>
+                <div class='synopsis'>
+                  <span class='name'>rule</span>
+                  <span class='arguments'>(expr)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Evaluates the given expression and creates a new <a
+                  href="Citrus/Rule.html">Rule</a> object from it.
+                  </p>
+                  <pre>Citrus.rule('&quot;a&quot; | &quot;b&quot;')</pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('M000005-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000005-source'>    <span class="ruby-comment cmt"># File lib/citrus.rb, line 44</span>&#x000A;44:   <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">code</span>, <span class="ruby-identifier">options</span>={})&#x000A;45:     <span class="ruby-constant">File</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">code</span>, <span class="ruby-identifier">options</span>)&#x000A;46:   <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000005-source'>    <span class="ruby-comment cmt"># File lib/citrus.rb, line 49</span>&#x000A;49:   <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">rule</span>(<span class="ruby-identifier">expr</span>)&#x000A;50:     <span class="ruby-identifier">parse</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">:root</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">:rule_body</span>).<span class="ruby-identifier">value</span>&#x000A;51:   <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-M000002'>

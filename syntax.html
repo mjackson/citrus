@@ -59,6 +59,9 @@ match in a case-insensitive manner.</p>
 <pre><code>`abc`         # match "abc" in any case
 </code></pre>
 
+<p>Besides case sensitivity, case-insensitive strings have the same behavior as
+double quoted strings.</p>
+
 <p>See <a href="api/classes/Citrus/Terminal.html">Terminal</a> and
 <a href="api/classes/Citrus/StringTerminal.html">StringTerminal</a> for more information.</p>
 
@@ -106,6 +109,9 @@ that does not match a given expression.</p>
 ~/xyz/        # match all characters until /xyz/ matches
 </code></pre>
 
+<p>When using this operator (the tilde), at least one character must be consumed
+for the rule to succeed.</p>
+
 <p>See <a href="api/classes/Citrus/AndPredicate.html">AndPredicate</a>,
 <a href="api/classes/Citrus/NotPredicate.html">NotPredicate</a>, and
 <a href="api/classes/Citrus/ButPredicate.html">ButPredicate</a> for more information.</p>
@@ -137,25 +143,25 @@ levels of precedence is below.</p>
 
 <p>See <a href="api/classes/Citrus/Choice.html">Choice</a> for more information.</p>
 
+<h2>Grouping</h2>
+
+<p>As is common in many programming languages, parentheses may be used to override
+the normal binding order of operators. In the following example parentheses are
+used to make the vertical bar between <code>'b'</code> and <code>'c'</code> bind tighter than the
+space between <code>'a'</code> and <code>'b'</code>.</p>
+
+<pre><code>'a' ('b' | 'c')   # match "a", then "b" or "c"
+</code></pre>
+
 <h2>Labels</h2>
 
 <p>Match objects may be referred to by a different name than the rule that
-originally generated them. Labels are created by placing the label and a colon
+originally generated them. Labels are added by placing the label and a colon
 immediately preceding any expression.</p>
 
 <pre><code>chars:/[a-z]+/  # the characters matched by the regular expression
                 # may be referred to as "chars" in an extension
                 # method
-</code></pre>
-
-<p>See <a href="api/classes/Citrus/Label.html">Label</a> for more information.</p>
-
-<h2>Grouping</h2>
-
-<p>As is common in many programming languages, parentheses may be used to override
-the normal binding order of operators.</p>
-
-<pre><code>'a' ('b' | 'c')   # match "a", then "b" or "c"
 </code></pre>
 
 <h2>Extensions</h2>
@@ -170,24 +176,42 @@ in between less than and greater than symbols.</p>
                           # CouponCode module
 </code></pre>
 
-<p>Additionally, extensions may be specified inline using curly braces. Inside the
-curly braces you may embed method definitions that will be used to extend match
-objects.</p>
+<p>Additionally, extensions may be specified inline using curly braces. When using
+this method, the code inside the curly braces may be invoked by calling the
+<code>value</code> method on the match object.</p>
 
-<pre><code># match any digit and return its integer value when calling the
-# #value method on the match object
-[0-9] {
-  def value
-    to_i
-  end
-}
+<pre><code>[0-9] { to_i }        # match any digit and return its integer value when
+                      # calling the #value method on the match object
 </code></pre>
+
+<p>Note that when using the inline block method you may also specify arguments in
+between vertical bars immediately following the opening curly brace, just like
+in Ruby blocks.</p>
 
 <h2>Super</h2>
 
 <p>When including a grammar inside another, all rules in the child that have the
 same name as a rule in the parent also have access to the <code>super</code> keyword to
 invoke the parent rule.</p>
+
+<pre><code>grammar Number
+  def number
+    [0-9]+
+  end
+end
+
+grammar FloatingPoint
+  include Number
+
+  rule number
+    super ('.' super)?
+  end
+end
+</code></pre>
+
+<p>In the example above, the <code>FloatingPoint</code> grammar includes <code>Number</code>. Both have a
+rule named <code>number</code>, so <code>FloatingPoint#number</code> has access to <code>Number#number</code> by
+means of using <code>super</code>.</p>
 
 <p>See <a href="api/classes/Citrus/Super.html">Super</a> for more information.</p>
 
@@ -208,81 +232,81 @@ their precedence. A higher precedence indicates tighter binding.</p>
 <tr>
 <td><code>''</code>                      </td>
 <td> String (single quoted)    </td>
-<td> 6</td>
+<td> 7</td>
 </tr>
 <tr>
 <td><code>""</code>                      </td>
 <td> String (double quoted)    </td>
-<td> 6</td>
+<td> 7</td>
 </tr>
 <tr>
 <td><code>``</code>           </td>
 <td> String (case insensitive) </td>
-<td> 6</td>
+<td> 7</td>
 </tr>
 <tr>
 <td><code>[]</code>                      </td>
 <td> Character class           </td>
-<td> 6</td>
+<td> 7</td>
 </tr>
 <tr>
 <td><code>.</code>                       </td>
 <td> Dot (any character)       </td>
-<td> 6</td>
+<td> 7</td>
 </tr>
 <tr>
 <td><code>//</code>                      </td>
 <td> Regular expression        </td>
-<td> 6</td>
+<td> 7</td>
 </tr>
 <tr>
 <td><code>()</code>                      </td>
 <td> Grouping                  </td>
-<td> 6</td>
+<td> 7</td>
 </tr>
 <tr>
 <td><code>*</code>                       </td>
 <td> Repetition (arbitrary)    </td>
-<td> 5</td>
+<td> 6</td>
 </tr>
 <tr>
 <td><code>+</code>                       </td>
 <td> Repetition (one or more)  </td>
-<td> 5</td>
+<td> 6</td>
 </tr>
 <tr>
 <td><code>?</code>                       </td>
 <td> Repetition (zero or one)  </td>
-<td> 5</td>
+<td> 6</td>
 </tr>
 <tr>
 <td><code>&amp;</code>                       </td>
 <td> And predicate             </td>
-<td> 4</td>
+<td> 5</td>
 </tr>
 <tr>
 <td><code>!</code>                       </td>
 <td> Not predicate             </td>
-<td> 4</td>
+<td> 5</td>
 </tr>
 <tr>
 <td><code>~</code>                       </td>
 <td> But predicate             </td>
+<td> 5</td>
+</tr>
+<tr>
+<td><code>&lt;&gt;</code>                      </td>
+<td> Extension (module name)   </td>
+<td> 4</td>
+</tr>
+<tr>
+<td><code>{}</code>                      </td>
+<td> Extension (literal)       </td>
 <td> 4</td>
 </tr>
 <tr>
 <td><code>:</code>                       </td>
 <td> Label                     </td>
-<td> 4</td>
-</tr>
-<tr>
-<td><code>&lt;&gt;</code>                      </td>
-<td> Extension (module name)   </td>
-<td> 3</td>
-</tr>
-<tr>
-<td><code>{}</code>                      </td>
-<td> Extension (literal)       </td>
 <td> 3</td>
 </tr>
 <tr>
