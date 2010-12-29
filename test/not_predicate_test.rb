@@ -19,7 +19,12 @@ class NotPredicateTest < Test::Unit::TestCase
   end
 
   def test_consumption
-    rule = NotPredicate.new('abc')
+    rule = NotPredicate.new(Sequence.new(['a', 'b', 'c']))
+
+    input = Input.new('abc')
+    events = rule.exec(input)
+    assert_equal(0, input.pos)
+
     input = Input.new('def')
     events = rule.exec(input)
     assert_equal(0, input.pos)

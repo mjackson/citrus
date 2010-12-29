@@ -166,8 +166,8 @@ module Citrus
 
       if rule.exec(self, events).size > index
         pos = start + events[-1]
-        self.pos = pos
         @max_offset = pos if pos > @max_offset
+        self.pos = pos
       else
         self.pos = start
       end
@@ -178,7 +178,10 @@ module Citrus
     # Returns the length of a match for the given +rule+ at the current pointer
     # position, +nil+ if none can be made.
     def test(rule)
-      rule.exec(self)[-1]
+      start = pos
+      events = rule.exec(self)
+      self.pos = start
+      events[-1]
     end
 
     # Returns +true+ when using memoization to cache match results.

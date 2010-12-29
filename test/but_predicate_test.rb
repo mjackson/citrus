@@ -23,7 +23,7 @@ class ButPredicateTest < Test::Unit::TestCase
   end
 
   def test_consumption
-    rule = ButPredicate.new('abc')
+    rule = ButPredicate.new(Sequence.new(['a', 'b', 'c']))
 
     input = Input.new('def')
     events = rule.exec(input)
