@@ -67,4 +67,53 @@ class MatchTest < Test::Unit::TestCase
       assert_equal(3, m.matches.length)
     end
   end
+
+  grammar :Addition do
+    rule :additive do
+      all(:number, :plus, label(any(:additive, :number), 'term')) {
+        number.value + term.value
+      }
+    end
+
+    rule :number do
+      all(/[0-9]+/, :space) {
+        strip.to_i
+      }
+    end
+
+    rule :plus do
+      all('+', :space)
+    end
+
+    rule :space do
+      /[ \t]*/
+    end
+  end
+
+  def test_matches2
+    match = Addition.parse('+', :root => :plus)
+    assert(match)
+    assert(match.matches)
+    assert_equal(2, match.matches.length)
+
+    match = Addition.parse('+ ', :root => :plus)
+    assert(match)
+    assert(match.matches)
+    assert_equal(2, match.matches.length)
+
+    match = Addition.parse('99', :root => :number)
+    assert(match)
+    assert(match.matches)
+    assert_equal(2, match.matches.length)
+
+    match = Addition.parse('99 ', :root => :number)
+    assert(match)
+    assert(match.matches)
+    assert_equal(2, match.matches.length)
+
+    match = Addition.parse('1+2')
+    assert(match)
+    assert(match.matches)
+    assert_equal(3, match.matches.length)
+  end
 end

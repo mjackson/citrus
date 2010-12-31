@@ -2,8 +2,7 @@ require File.expand_path('../helper', __FILE__)
 
 class InputTest < Test::Unit::TestCase
   def test_memoized?
-    assert !Input.new('').memoized?
-    assert MemoizingInput.new('').memoized?
+    assert_equal(false, Input.new('').memoized?)
   end
 
   def test_offsets_new
@@ -23,7 +22,7 @@ class InputTest < Test::Unit::TestCase
     assert_equal("def\n", input.line)
   end
 
-  def test_events
+  def test_exec
     a = Rule.for('a')
     b = Rule.for('b')
     c = Rule.for('c')
@@ -56,7 +55,7 @@ class InputTest < Test::Unit::TestCase
     assert_equal(expected_events, events)
   end
 
-  def test_events2
+  def test_exec2
     a = Rule.for('a')
     b = Rule.for('b')
     c = Choice.new([ a, b ])
@@ -99,90 +98,5 @@ class InputTest < Test::Unit::TestCase
     ]
 
     assert_equal(expected_events, events)
-  end
-
-  grammar :LetterA do
-    rule :top do
-      any(:three_as, :two_as, :one_a)
-    end
-
-    rule :three_as do
-      rep(:one_a, 3, 3)
-    end
-
-    rule :two_as do
-      rep(:one_a, 2, 2)
-    end
-
-    rule :one_a do
-      "a"
-    end
-  end
-
-  def test_cache_hits1
-    input = MemoizingInput.new('a')
-    input.exec(LetterA.rule(:top))
-    assert_equal(3, input.cache_hits)
-  end
-
-  def test_cache_hits2
-    input = MemoizingInput.new('aa')
-    input.exec(LetterA.rule(:top))
-    assert_equal(2, input.cache_hits)
-  end
-
-  def test_cache_hits3
-    input = MemoizingInput.new('aaa')
-    input.exec(LetterA.rule(:top))
-    assert_equal(0, input.cache_hits)
-  end
-
-  grammar :Addition do
-    rule :additive do
-      all(:number, :plus, label(any(:additive, :number), 'term')) {
-        number.value + term.value
-      }
-    end
-
-    rule :number do
-      all(/[0-9]+/, :space) {
-        strip.to_i
-      }
-    end
-
-    rule :plus do
-      all('+', :space)
-    end
-
-    rule :space do
-      /[ \t]*/
-    end
-  end
-
-  def test_match
-    match = Addition.parse('+', :root => :plus)
-    assert(match)
-    assert(match.matches)
-    assert_equal(2, match.matches.length)
-
-    match = Addition.parse('+ ', :root => :plus)
-    assert(match)
-    assert(match.matches)
-    assert_equal(2, match.matches.length)
-
-    match = Addition.parse('99', :root => :number)
-    assert(match)
-    assert(match.matches)
-    assert_equal(2, match.matches.length)
-
-    match = Addition.parse('99 ', :root => :number)
-    assert(match)
-    assert(match.matches)
-    assert_equal(2, match.matches.length)
-
-    match = Addition.parse('1+2')
-    assert(match)
-    assert(match.matches)
-    assert_equal(3, match.matches.length)
   end
 end

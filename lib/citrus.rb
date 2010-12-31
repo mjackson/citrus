@@ -196,13 +196,13 @@ module Citrus
     end
   end
 
-  # A MemoizingInput is an Input that caches segments of the event stream for
+  # A MemoizedInput is an Input that caches segments of the event stream for
   # particular rules in a parse. This technique (also known as "Packrat"
   # parsing) guarantees parsers will operate in linear time but costs
   # significantly more in terms of time and memory required to perform a parse.
   # For more information, please read the paper on Packrat parsing at
   # http://pdos.csail.mit.edu/~baford/packrat/icfp02/.
-  class MemoizingInput < Input
+  class MemoizedInput < Input
     def initialize(string)
       super(string)
       @cache = {}
@@ -539,7 +539,7 @@ module Citrus
     # consume::   If this is +true+ a ParseError will be raised unless the
     #             entire input string is consumed. Defaults to +true+.
     # memoize::   If this is +true+ the matches generated during a parse are
-    #             memoized. See MemoizingInput for more information. Defaults to
+    #             memoized. See MemoizedInput for more information. Defaults to
     #             +false+.
     # offset::    The offset in +string+ at which to start parsing. Defaults
     #             to 0.
@@ -547,7 +547,7 @@ module Citrus
       opts = default_options.merge(options)
 
       input = if opts[:memoize]
-        MemoizingInput.new(string)
+        MemoizedInput.new(string)
       else
         Input.new(string)
       end
