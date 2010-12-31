@@ -1,21 +1,19 @@
 require File.expand_path('../helper', __FILE__)
 
 class MultibyteTest < Test::Unit::TestCase
-  Citrus.eval(<<-'CODE')
-  grammar MultibyteTest::Multibyte
-    rule string
+  grammar :Multibyte do
+    rule :string do
       "\xFF"
     end
 
-    rule regexp
+    rule :regexp do
       /\xFF/
     end
 
-    rule character_class
-      [\xFF]
+    rule :character_class do
+      /[\xFF]/
     end
   end
-  CODE
 
   def test_multibyte_string
     m = Multibyte.parse("\xFF", :root => :string)

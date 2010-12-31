@@ -161,16 +161,15 @@ module Citrus
     # position. Objects in this array may be one of three types: a Rule,
     # Citrus::CLOSE, or a length (integer).
     def exec(rule, events=[])
-      start = pos
       index = events.size
+      position = pos
 
       if rule.exec(self, events).size > index
-        pos = start + events[-1]
-        @max_offset = pos if pos > @max_offset
-        self.pos = pos
-      else
-        self.pos = start
+        position += events[-1]
+        @max_offset = position if position > @max_offset
       end
+
+      self.pos = position
 
       events
     end
@@ -216,16 +215,24 @@ module Citrus
     end
 
     def exec(rule, events=[]) # :nodoc:
-      c = @cache[rule] ||= {}
+      position = pos
+      memo = @cache[rule] ||= {}
 
-      e = if c[pos]
+      if memo[position]
         @cache_hits += 1
-        c[pos]
       else
-        c[pos] = super(rule)
+        memo[position] = rule.exec(self)
       end
 
-      events.concat(e)
+      if memo[position].size > 0
+        events.concat(memo[position])
+        position += events[-1]
+        @max_offset = position if position > @max_offset
+      end
+
+      self.pos = position
+
+      events
     end
 
     # Returns +true+ when using memoization to cache match results.
@@ -1011,8 +1018,8 @@ module Citrus
       m = max
 
       while n < m && input.exec(rule, events).size > index
-        index = events.size
         length += events[-1]
+        index = events.size
         n += 1
       end
 
@@ -1072,12 +1079,12 @@ module Citrus
       m = rules.length
 
       while n < m && input.exec(rules[n], events).size > index
-        index = events.size
         length += events[-1]
+        index = events.size
         n += 1
       end
 
-      if n == rules.length
+      if n == m
         events << CLOSE
         events << length
       else
