@@ -525,19 +525,26 @@ module Citrus
     # The module this rule uses to extend new matches.
     attr_reader :extension
 
+    # The default set of options to use when calling #parse or #test.
+    def default_options # :nodoc:
+      { :consume  => true,
+        :memoize  => false,
+        :offset   => 0
+      }
+    end
+
     # Attempts to parse the given +string+ and return a Match if any can be
-    # made. The +options+ may contain any of the following keys:
+    # made. +options+ may contain any of the following keys:
     #
-    # offset::    The offset in +string+ at which to start the parse. Defaults
-    #             to 0.
+    # consume::   If this is +true+ a ParseError will be raised unless the
+    #             entire input string is consumed. Defaults to +true+.
     # memoize::   If this is +true+ the matches generated during a parse are
-    #             memoized. See Input#memoize! for more information. Defaults to
+    #             memoized. See MemoizingInput for more information. Defaults to
     #             +false+.
-    # consume::   If this is +true+ a ParseError will be raised during a parse
-    #             unless the entire input string is consumed. Defaults to
-    #             +true+.
+    # offset::    The offset in +string+ at which to start parsing. Defaults
+    #             to 0.
     def parse(string, options={})
-      opts = default_parse_options.merge(options)
+      opts = default_options.merge(options)
 
       input = if opts[:memoize]
         MemoizingInput.new(string)
@@ -557,18 +564,13 @@ module Citrus
       Match.new(string.slice(opts[:offset], length), events)
     end
 
-    # The default set of options to use when parsing.
-    def default_parse_options # :nodoc:
-      { :offset   => 0,
-        :memoize  => false,
-        :consume  => true
-      }
-    end
-
     # Tests whether or not this rule matches on the given +string+. Returns the
-    # length of the match if any can be made, +nil+ otherwise.
-    def test(string)
-      Input.new(string).test(self)
+    # length of the match if any can be made, +nil+ otherwise. Accepts the same
+    # +options+ as #parse.
+    def test(string, options={})
+      parse(string, options).length
+    rescue ParseError
+      nil
     end
 
     # Returns +true+ if this rule is a Terminal.
