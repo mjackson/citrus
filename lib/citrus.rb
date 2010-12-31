@@ -157,14 +157,19 @@ module Citrus
       lines[line_index(pos)]
     end
 
+    # Returns +true+ when using memoization to cache match results.
+    def memoized?
+      false
+    end
+
     # Returns an array of events for the given +rule+ at the current pointer
     # position. Objects in this array may be one of three types: a Rule,
     # Citrus::CLOSE, or a length (integer).
     def exec(rule, events=[])
-      index = events.size
       position = pos
+      index = events.size
 
-      if rule.exec(self, events).size > index
+      if apply_rule(rule, position, events).size > index
         position += events[-1]
         @max_offset = position if position > @max_offset
       end
@@ -177,15 +182,17 @@ module Citrus
     # Returns the length of a match for the given +rule+ at the current pointer
     # position, +nil+ if none can be made.
     def test(rule)
-      start = pos
-      events = rule.exec(self)
-      self.pos = start
+      position = pos
+      events = apply_rule(rule, position, [])
+      self.pos = position
       events[-1]
     end
 
-    # Returns +true+ when using memoization to cache match results.
-    def memoized?
-      false
+  private
+
+    # Appends all events for +rule+ at the given +position+ to +events+.
+    def apply_rule(rule, position, events)
+      rule.exec(self, events)
     end
   end
 
@@ -214,30 +221,29 @@ module Citrus
       super
     end
 
-    def exec(rule, events=[]) # :nodoc:
-      position = pos
+    # Returns +true+ when using memoization to cache match results.
+    def memoized?
+      true
+    end
+
+  private
+
+    def apply_rule(rule, position, events) # :nodoc:
       memo = @cache[rule] ||= {}
 
       if memo[position]
         @cache_hits += 1
-      else
-        memo[position] = rule.exec(self)
-      end
-
-      if memo[position].size > 0
         events.concat(memo[position])
-        position += events[-1]
-        @max_offset = position if position > @max_offset
-      end
+      else
+        index = events.size
+        rule.exec(self, events)
 
-      self.pos = position
+        # Memoize the result so we can use it next time this same rule is
+        # executed at this position.
+        memo[position] = events.slice(index, events.size)
+      end
 
       events
-    end
-
-    # Returns +true+ when using memoization to cache match results.
-    def memoized?
-      true
     end
   end
 
