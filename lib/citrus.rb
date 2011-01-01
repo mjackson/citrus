@@ -53,8 +53,8 @@ module Citrus
   # Loads the grammar from the given +file+ into the global scope using #eval.
   def self.load(file)
     file << '.citrus' unless ::File.file?(file)
-    raise "Cannot find file #{file}" unless ::File.file?(file)
-    raise "Cannot read file #{file}" unless ::File.readable?(file)
+    raise ArgumentError, "Cannot find file #{file}" unless ::File.file?(file)
+    raise ArgumentError, "Cannot read file #{file}" unless ::File.readable?(file)
     eval(::File.read(file))
   end
 
@@ -287,8 +287,9 @@ module Citrus
     # option. Otherwise, all options are the same as in Rule#parse.
     def parse(string, options={})
       rule_name = options.delete(:root) || root
+      raise Error, "No root rule specified" unless rule_name
       rule = rule(rule_name)
-      raise 'No rule named "%s"' % rule_name unless rule
+      raise Error, "No rule named \"#{rule_name}\"" unless rule
       rule.parse(string, options)
     end
 
@@ -517,7 +518,7 @@ module Citrus
         mod = Module.new { define_method(:value, &mod) }
       end
 
-      raise ArgumentError unless Module === mod
+      raise ArgumentError, "Extension must be a Module" unless Module === mod
 
       @extension = mod
     end
@@ -1035,7 +1036,7 @@ module Citrus
         events << CLOSE
         events << length
       else
-        events.slice!(start, events.size)
+        events.slice!(start, index)
       end
 
       events
@@ -1096,7 +1097,7 @@ module Citrus
         events << CLOSE
         events << length
       else
-        events.slice!(start, events.size)
+        events.slice!(start, index)
       end
 
       events
@@ -1388,6 +1389,6 @@ class Object
     namespace = respond_to?(:const_set) ? self : Object
     namespace.const_set(name, Citrus::Grammar.new(&block))
   rescue NameError
-    raise ArgumentError, 'Invalid grammar name: %s' % name
+    raise ArgumentError, "Invalid grammar name: #{name}"
   end
 end
