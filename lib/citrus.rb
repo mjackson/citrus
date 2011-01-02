@@ -8,23 +8,19 @@ require 'strscan'
 module Citrus
   autoload :File, 'citrus/file'
 
+  # The current version of Citrus as [major, minor, patch].
   VERSION = [2, 3, 1]
 
-  # Returns the current version of Citrus as a string.
-  def self.version
-    VERSION.join('.')
-  end
-
-  # A pattern to match any character, including \\n.
+  # A pattern to match any character, including newline.
   DOT = /./m
 
   Infinity = 1.0 / 0
 
   CLOSE = -1
 
-  # Parses the given Citrus +code+ using +options+.
-  def self.parse(code, options={})
-    File.parse(code, options)
+  # Returns the current version of Citrus as a string.
+  def self.version
+    VERSION.join('.')
   end
 
   # Evaluates the given Citrus parsing expression grammar +code+ in the global
@@ -37,25 +33,31 @@ module Citrus
   #       end
   #     end
   #     CITRUS
+  #     # => [MyGrammar]
   #
-  def self.eval(code)
-    parse(code).value
+  def self.eval(code, options={})
+    File.parse(code, options).value
   end
 
   # Evaluates the given expression and creates a new Rule object from it.
   #
   #     Citrus.rule('"a" | "b"')
+  #     # => #<Citrus::Rule: ... >
   #
-  def self.rule(expr)
-    parse(expr, :root => :rule_body).value
+  def self.rule(expr, options={})
+    File.parse(expr, options.merge(:root => :rule_body)).value
   end
 
   # Loads the grammar from the given +file+ into the global scope using #eval.
-  def self.load(file)
+  #
+  #     Citrus.load('mygrammar')
+  #     # => [MyGrammar]
+  #
+  def self.load(file, options={})
     file << '.citrus' unless ::File.file?(file)
     raise ArgumentError, "Cannot find file #{file}" unless ::File.file?(file)
     raise ArgumentError, "Cannot read file #{file}" unless ::File.readable?(file)
-    eval(::File.read(file))
+    eval(::File.read(file), options)
   end
 
   # A standard error class that all Citrus errors extend.
