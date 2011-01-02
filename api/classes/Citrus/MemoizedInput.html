@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
   <head>
-    <title>: Citrus::MemoizingInput [Citrus API Documentation]</title>
+    <title>: Citrus::MemoizedInput [Citrus API Documentation]</title>
     <meta content='text/html; charset=utf8' http-equiv='Content-Type'>
     <link href='../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
@@ -27,7 +27,7 @@
       <div class='header'>
         <h1 class='name'>
           <span class='type'>Class</span>
-          Citrus::MemoizingInput
+          Citrus::MemoizedInput
         </h1>
         <ol class='paths'>
           <li>
@@ -43,7 +43,7 @@
         <div id='text'>
           <div id='description'>
             <p>
-            A <a href="MemoizingInput.html">MemoizingInput</a> is an <a
+            A <a href="MemoizedInput.html">MemoizedInput</a> is an <a
             href="Input.html">Input</a> that caches segments of the event stream for
             particular rules in a parse. This technique (also known as
             &#8220;Packrat&#8221; parsing) guarantees parsers will operate in linear
@@ -57,11 +57,11 @@
             <h2>Methods</h2>
             <h3>public class</h3>
             <ol>
-              <li><a href="#M000062">new</a></li>
+              <li><a href="#M000061">new</a></li>
             </ol>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000063">memoized?</a></li>
+              <li><a href="#M000062">memoized?</a></li>
             </ol>
           </div>
           <div id='section'>
@@ -90,22 +90,22 @@
             </div>
             <div id='methods'>
               <h2>Public class methods</h2>
-              <div class='method public-class' id='method-M000062'>
-                <a name='M000062'></a>
+              <div class='method public-class' id='method-M000061'>
+                <a name='M000061'></a>
                 <div class='synopsis'>
                   <span class='name'>new</span>
                   <span class='arguments'>(string)</span>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000062-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000061-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000062-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 200</span>&#x000A;200:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">string</span>)&#x000A;201:       <span class="ruby-keyword kw">super</span>(<span class="ruby-identifier">string</span>)&#x000A;202:       <span class="ruby-ivar">@cache</span> = {}&#x000A;203:       <span class="ruby-ivar">@cache_hits</span> = <span class="ruby-value">0</span>&#x000A;204:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000061-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 208</span>&#x000A;208:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">string</span>)&#x000A;209:       <span class="ruby-keyword kw">super</span>(<span class="ruby-identifier">string</span>)&#x000A;210:       <span class="ruby-ivar">@cache</span> = {}&#x000A;211:       <span class="ruby-ivar">@cache_hits</span> = <span class="ruby-value">0</span>&#x000A;212:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <h2>Public instance methods</h2>
-              <div class='method public-instance' id='method-M000063'>
-                <a name='M000063'></a>
+              <div class='method public-instance' id='method-M000062'>
+                <a name='M000062'></a>
                 <div class='synopsis'>
                   <span class='name'>memoized?</span>
                   <span class='arguments'>()</span>
@@ -116,10 +116,10 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000063-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000062-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000063-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 232</span>&#x000A;232:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">memoized?</span>&#x000A;233:       <span class="ruby-keyword kw">true</span>&#x000A;234:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000062-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 227</span>&#x000A;227:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">memoized?</span>&#x000A;228:       <span class="ruby-keyword kw">true</span>&#x000A;229:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>
