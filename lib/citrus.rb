@@ -9,7 +9,7 @@ module Citrus
   autoload :File, 'citrus/file'
 
   # The current version of Citrus as [major, minor, patch].
-  VERSION = [2, 3, 1]
+  VERSION = [2, 3, 2]
 
   # A pattern to match any character, including newline.
   DOT = /./m
