@@ -1,6 +1,6 @@
 $LOAD_PATH.unshift(File.expand_path('../lib', __FILE__))
 
-require 'citrus'
+require 'citrus/version'
 
 Gem::Specification.new do |s|
   s.name = 'citrus'

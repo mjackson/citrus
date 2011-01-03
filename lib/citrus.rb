@@ -1,4 +1,5 @@
 require 'strscan'
+require 'citrus/version'
 
 # Citrus is a compact and powerful parsing library for Ruby that combines the
 # elegance and expressiveness of the language with the simplicity and power of
@@ -8,20 +9,12 @@ require 'strscan'
 module Citrus
   autoload :File, 'citrus/file'
 
-  # The current version of Citrus as [major, minor, patch].
-  VERSION = [2, 3, 2]
-
   # A pattern to match any character, including newline.
   DOT = /./m
 
   Infinity = 1.0 / 0
 
   CLOSE = -1
-
-  # Returns the current version of Citrus as a string.
-  def self.version
-    VERSION.join('.')
-  end
 
   # Evaluates the given Citrus parsing expression grammar +code+ in the global
   # scope. Returns an array of any grammar modules that are created.
