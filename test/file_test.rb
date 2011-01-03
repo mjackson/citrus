@@ -361,7 +361,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_root_invalid
-    assert_raise ParseError do
+    assert_raise SyntaxError do
       File.parse('root :a_root', :root => :root)
     end
   end
@@ -847,7 +847,7 @@ class CitrusFileTest < Test::Unit::TestCase
   end
 
   def test_constant_invalid
-    assert_raise ParseError do
+    assert_raise SyntaxError do
       File.parse('math', :root => :constant)
     end
   end

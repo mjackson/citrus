@@ -55,9 +55,12 @@ module Citrus
   #
   def self.load(file, options={})
     file << '.citrus' unless ::File.file?(file)
-    raise ArgumentError, "Cannot find file #{file}" unless ::File.file?(file)
-    raise ArgumentError, "Cannot read file #{file}" unless ::File.readable?(file)
+    raise LoadError, "Cannot find file #{file}" unless ::File.file?(file)
+    raise LoadError, "Cannot read file #{file}" unless ::File.readable?(file)
     eval(::File.read(file), options)
+  rescue SyntaxError => e
+    e.message.replace("#{::File.expand_path(file)}: #{e.message}")
+    raise e
   end
 
   # A standard error class that all Citrus errors extend.
@@ -71,7 +74,11 @@ module Citrus
       @line_offset = input.line_offset(offset)
       @line_number = input.line_number(offset)
       @line = input.line(offset)
-      super("Failed to parse input on line #{line_number} at offset #{line_offset}\n#{detail}")
+
+      message = "Failed to parse input on line #{line_number}"
+      message << " at offset #{line_offset}\n#{detail}"
+
+      super(message)
     end
 
     # The 0-based offset at which the error occurred in the input, i.e. the
@@ -93,6 +100,20 @@ module Citrus
     # exactly where the error occurred on its line in the input.
     def detail
       "#{line}\n#{' ' * line_offset}^"
+    end
+  end
+
+  # Raised when Citrus.load fails to load a file.
+  class LoadError < Error; end
+
+  # Raised when Citrus::File.parse fails.
+  class SyntaxError < Error
+    # The +error+ given here is an instance of Citrus::ParseError.
+    def initialize(error)
+      message = "Malformed Citrus syntax on line #{error.line_number}"
+      message << " at offset #{error.line_offset}\n#{error.detail}"
+
+      super(message)
     end
   end
 
@@ -370,7 +391,6 @@ module Citrus
 
       rules[sym] || super_rule(sym)
     rescue => e
-      # This preserves the backtrace.
       e.message.replace("Cannot create rule \"#{name}\": #{e.message}")
       raise e
     end
@@ -561,7 +581,7 @@ module Citrus
       length = events[-1]
 
       if !length || (opts[:consume] && length < (string.length - opts[:offset]))
-        raise ParseError.new(input)
+        raise ParseError, input
       end
 
       Match.new(string.slice(opts[:offset], length), events)

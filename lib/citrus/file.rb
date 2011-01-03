@@ -19,6 +19,15 @@ module Citrus
     end
   end
 
+  module FileClassMethods # :nodoc:
+    # Raises SyntaxError when File.parse fails.
+    def parse(*args)
+      super
+    rescue ParseError => e
+      raise SyntaxError, e
+    end
+  end
+
   # A grammar for Citrus grammar files. This grammar is used in Citrus#eval to
   # parse and evaluate Citrus grammars and serves as a prime example of how to
   # create a complex grammar complete with semantic interpretation in pure Ruby.
@@ -29,7 +38,9 @@ module Citrus
     rule :file do
       all(:space, zero_or_more(any(:require, :grammar))) {
         if captures[:require]
-          captures[:require].each {|r| require r.value }
+          captures[:require].each do |req|
+            require req.value
+          end
         end
 
         (captures[:grammar] || []).map {|g| g.value }
@@ -348,4 +359,6 @@ module Citrus
     rule :comment,          /#.*/
     rule :space,            zero_or_more(any(:white, :comment))
   end
+
+  File.extend(FileClassMethods)
 end
