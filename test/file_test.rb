@@ -21,192 +21,187 @@ class CitrusFileTest < Test::Unit::TestCase
 
   ## Hierarchical syntax
 
-  def test_rule_body_alias
-    match = File.parse('rule_name', :root => :rule_body)
+  def test_expression_empty
+    assert_raise SyntaxError do
+      File.parse('', :root => :expression)
+    end
+  end
+
+  def test_expression_alias
+    match = File.parse('rule_name', :root => :expression)
     assert(match)
     assert_instance_of(Alias, match.value)
   end
 
-  def test_rule_body_dot
-    match = File.parse('.', :root => :rule_body)
+  def test_expression_dot
+    match = File.parse('.', :root => :expression)
     assert(match)
     assert_instance_of(Terminal, match.value)
   end
 
-  def test_rule_body_character_range
-    match = File.parse('[a-z]', :root => :rule_body)
+  def test_expression_character_range
+    match = File.parse('[a-z]', :root => :expression)
     assert(match)
     assert_instance_of(Terminal, match.value)
   end
 
-  def test_rule_body_terminal
-    match = File.parse('/./', :root => :rule_body)
+  def test_expression_terminal
+    match = File.parse('/./', :root => :expression)
     assert(match)
     assert_instance_of(Terminal, match.value)
   end
 
-  def test_rule_body_string_terminal_empty
-    match = File.parse('""', :root => :rule_body)
+  def test_expression_string_terminal_empty
+    match = File.parse('""', :root => :expression)
     assert(match)
     assert_instance_of(StringTerminal, match.value)
   end
 
-  def test_rule_body_string_terminal
-    match = File.parse('"a"', :root => :rule_body)
+  def test_expression_string_terminal
+    match = File.parse('"a"', :root => :expression)
     assert(match)
     assert_instance_of(StringTerminal, match.value)
   end
 
-  def test_rule_body_string_terminal_empty_block
-    match = File.parse('"" {}', :root => :rule_body)
+  def test_expression_string_terminal_empty_block
+    match = File.parse('"" {}', :root => :expression)
     assert(match)
     assert_instance_of(StringTerminal, match.value)
   end
 
-  def test_rule_body_repeat_string_terminal
-    match = File.parse('"a"*', :root => :rule_body)
+  def test_expression_repeat_string_terminal
+    match = File.parse('"a"*', :root => :expression)
     assert(match)
     assert_instance_of(Repeat, match.value)
   end
 
-  def test_rule_body_repeat_empty_string_terminal_block
-    match = File.parse('""* {}', :root => :rule_body)
+  def test_expression_repeat_empty_string_terminal_block
+    match = File.parse('""* {}', :root => :expression)
     assert(match)
     assert_instance_of(Repeat, match.value)
   end
 
-  def test_rule_body_repeat_sequence
-    match = File.parse('("a" "b")*', :root => :rule_body)
+  def test_expression_repeat_sequence
+    match = File.parse('("a" "b")*', :root => :expression)
     assert(match)
     assert_instance_of(Repeat, match.value)
   end
 
-  def test_rule_body_repeat_choice
-    match = File.parse('("a" | "b")*', :root => :rule_body)
+  def test_expression_repeat_choice
+    match = File.parse('("a" | "b")*', :root => :expression)
     assert(match)
     assert_instance_of(Repeat, match.value)
   end
 
-  def test_rule_body_repeat_sequence_block
-    match = File.parse('("a" "b")* {}', :root => :rule_body)
+  def test_expression_repeat_sequence_block
+    match = File.parse('("a" "b")* {}', :root => :expression)
     assert(match)
     assert_instance_of(Repeat, match.value)
   end
 
-  def test_rule_body_repeat_choice_block
-    match = File.parse('("a" | "b")* {}', :root => :rule_body)
+  def test_expression_repeat_choice_block
+    match = File.parse('("a" | "b")* {}', :root => :expression)
     assert(match)
     assert_instance_of(Repeat, match.value)
   end
 
-  def test_rule_body_repeat_sequence_extension
-    match = File.parse('("a" "b")* <Module>', :root => :rule_body)
+  def test_expression_repeat_sequence_extension
+    match = File.parse('("a" "b")* <Module>', :root => :expression)
     assert(match)
     assert_instance_of(Repeat, match.value)
   end
 
-  def test_rule_body_repeat_sequence_extension_spaced
-    match = File.parse('( "a" "b" )* <Module>', :root => :rule_body)
+  def test_expression_repeat_sequence_extension_spaced
+    match = File.parse('( "a" "b" )* <Module>', :root => :expression)
     assert(match)
     assert_instance_of(Repeat, match.value)
   end
 
-  def test_rule_body_repeat_choice_extension
-    match = File.parse('("a" | "b")* <Module>', :root => :rule_body)
+  def test_expression_repeat_choice_extension
+    match = File.parse('("a" | "b")* <Module>', :root => :expression)
     assert(match)
     assert_instance_of(Repeat, match.value)
   end
 
-  def test_rule_body_choice_terminal
-    match = File.parse('/./ | /./', :root => :rule_body)
+  def test_expression_choice_terminal
+    match = File.parse('/./ | /./', :root => :expression)
     assert(match)
     assert_instance_of(Choice, match.value)
   end
 
-  def test_rule_body_choice_string_terminal
-    match = File.parse('"a" | "b"', :root => :rule_body)
+  def test_expression_choice_string_terminal
+    match = File.parse('"a" | "b"', :root => :expression)
     assert(match)
     assert_instance_of(Choice, match.value)
   end
 
-  def test_rule_body_choice_mixed
-    match = File.parse('("a" | /./)', :root => :rule_body)
+  def test_expression_choice_embedded_sequence
+    match = File.parse('"a" | ("b" "c")', :root => :expression)
     assert(match)
     assert_instance_of(Choice, match.value)
   end
 
-  def test_rule_body_choice_extended
-    match = File.parse('("a" | "b") <Module>', :root => :rule_body)
+  def test_expression_choice_mixed
+    match = File.parse('("a" | /./)', :root => :expression)
     assert(match)
     assert_instance_of(Choice, match.value)
   end
 
-  def test_rule_body_sequence_terminal
-    match = File.parse('/./ /./', :root => :rule_body)
+  def test_expression_choice_extended
+    match = File.parse('("a" | "b") <Module>', :root => :expression)
+    assert(match)
+    assert_instance_of(Choice, match.value)
+  end
+
+  def test_expression_sequence_terminal
+    match = File.parse('/./ /./', :root => :expression)
     assert(match)
     assert_instance_of(Sequence, match.value)
   end
 
-  def test_rule_body_sequence_string_terminal
-    match = File.parse('"a" "b"', :root => :rule_body)
+  def test_expression_sequence_string_terminal
+    match = File.parse('"a" "b"', :root => :expression)
     assert(match)
     assert_instance_of(Sequence, match.value)
   end
 
-  def test_rule_body_sequence_extension
-    match = File.parse('( "a" "b" ) <Module>', :root => :rule_body)
+  def test_expression_sequence_extension
+    match = File.parse('( "a" "b" ) <Module>', :root => :expression)
     assert(match)
     assert_instance_of(Sequence, match.value)
   end
 
-  def test_rule_body_sequence_mixed
-    match = File.parse('"a" ("b" | /./)* <Module>', :root => :rule_body)
+  def test_expression_sequence_mixed
+    match = File.parse('"a" ("b" | /./)* <Module>', :root => :expression)
     assert(match)
     assert_instance_of(Sequence, match.value)
   end
 
-  def test_rule_body_sequence_block
-    match = File.parse('"a" ("b" | /./)* {}', :root => :rule_body)
+  def test_expression_sequence_block
+    match = File.parse('"a" ("b" | /./)* {}', :root => :expression)
     assert(match)
     assert_instance_of(Sequence, match.value)
   end
 
   def test_precedence_sequence_before_choice
     # Sequence should bind more tightly than Choice.
-    match = File.parse('"a" "b" | "c"', :root => :rule_body)
+    match = File.parse('"a" "b" | "c"', :root => :expression)
     assert(match)
     assert_instance_of(Choice, match.value)
   end
 
   def test_precedence_parentheses
     # Parentheses should change binding precedence.
-    match = File.parse('"a" ("b" | "c")', :root => :rule_body)
+    match = File.parse('"a" ("b" | "c")', :root => :expression)
     assert(match)
     assert_instance_of(Sequence, match.value)
   end
 
   def test_precedence_repeat_before_predicate
     # Repeat should bind more tightly than AndPredicate.
-    match = File.parse("&'a'+", :root => :rule_body)
+    match = File.parse("&'a'+", :root => :expression)
     assert(match)
     assert_instance_of(AndPredicate, match.value)
-  end
-
-  def test_rule_body_empty
-    match = File.parse('', :root => :rule_body)
-    assert(match)
-  end
-
-  def test_choice
-    match = File.parse('"a" | "b"', :root => :choice)
-    assert(match)
-    assert_instance_of(Choice, match.value)
-  end
-
-  def test_choice_embedded_sequence
-    match = File.parse('"a" | ("b" "c")', :root => :choice)
-    assert(match)
-    assert_instance_of(Choice, match.value)
   end
 
   def test_sequence
@@ -221,34 +216,21 @@ class CitrusFileTest < Test::Unit::TestCase
     assert_instance_of(Sequence, match.value)
   end
 
-  def test_label_expression
-    match = File.parse('label:""', :root => :label_expression)
+  def test_labelled
+    match = File.parse('label:""', :root => :labelled)
     assert(match)
     assert_instance_of(StringTerminal, match.value)
   end
 
-  def test_label_expression_space
-    match = File.parse('label :"" ', :root => :label_expression)
-    assert(match)
-    assert_instance_of(StringTerminal, match.value)
-  end
-
-  def test_expression_tag
-    match = File.parse('"" <Module>', :root => :expression)
+  def test_extended_tag
+    match = File.parse('"" <Module>', :root => :extended)
     assert(match)
     assert_kind_of(Rule, match.value)
     assert_kind_of(Module, match.value.extension)
   end
 
-  def test_expression_block
-    match = File.parse('"" {}', :root => :expression)
-    assert(match)
-    assert_kind_of(Rule, match.value)
-    assert_kind_of(Module, match.value.extension)
-  end
-
-  def test_expression_block_space
-    match = File.parse('"" {} ', :root => :expression)
+  def test_extended_block
+    match = File.parse('"" {}', :root => :extended)
     assert(match)
     assert_kind_of(Rule, match.value)
     assert_kind_of(Module, match.value.extension)

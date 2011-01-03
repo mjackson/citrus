@@ -38,7 +38,7 @@ module Citrus
   #     # => #<Citrus::Rule: ... >
   #
   def self.rule(expr, options={})
-    File.parse(expr, options.merge(:root => :rule_body)).value
+    File.parse(expr, options.merge(:root => :expression)).value
   end
 
   # Loads the grammar from the given +file+ into the global scope using #eval.

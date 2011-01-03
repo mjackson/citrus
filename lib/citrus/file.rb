@@ -48,79 +48,57 @@ module Citrus
     end
 
     rule :grammar do
-      mod all(:grammar_keyword, :module_name, :grammar_body, :end_keyword) do
+      mod all(:grammar_keyword, :module_name, zero_or_more(any(:include, :root, :rule)), :end_keyword) do
         include ModuleNameHelpers
 
         def value
-          module_namespace.const_set(module_basename, grammar_body.value)
+          grammar = module_namespace.const_set(module_basename, Grammar.new)
+
+          if captures[:include]
+            captures[:include].each {|inc| grammar.include(inc.value) }
+          end
+
+          grammar.root(root.value) if root
+
+          if captures[:rule]
+            captures[:rule].each {|r| grammar.rule(r.rule_name.value, r.value) }
+          end
+
+          grammar
         end
       end
-    end
-
-    rule :grammar_body do
-      zero_or_more(any(:include, :root, :rule)) {
-        grammar = Grammar.new
-
-        if captures[:include]
-          captures[:include].each {|inc| grammar.include(inc.value) }
-        end
-
-        grammar.root(root.value) if root
-
-        if captures[:rule]
-          captures[:rule].each {|r| grammar.rule(r.rule_name.value, r.value) }
-        end
-
-        grammar
-      }
     end
 
     rule :rule do
-      all(:rule_keyword, :rule_name, :rule_body, :end_keyword) {
-        rule_body.value
-      }
-    end
-
-    rule :rule_body do
-      zero_or_one(:choice) {
+      all(:rule_keyword, :rule_name, zero_or_one(:expression), :end_keyword) {
         # An empty rule definition matches the empty string.
-        choice ? choice.value : Rule.for('')
+        expression ? expression.value : Rule.for('')
       }
     end
 
-    rule :choice do
-      mod all(:sequence, zero_or_more([ :bar, :sequence ])) do
-        def rules
-          @rules ||= captures[:sequence].map {|s| s.value }
-        end
-
-        def value
-          rules.length > 1 ? Choice.new(rules) : rules.first
-        end
-      end
+    rule :expression do
+      all(:sequence, zero_or_more([ :bar, :sequence ])) {
+        rules = captures[:sequence].map {|s| s.value }
+        rules.length > 1 ? Choice.new(rules) : rules.first
+      }
     end
 
     rule :sequence do
-      mod one_or_more(:label_expression) do
-        def rules
-          @rules ||= captures[:label_expression].map {|e| e.value }
-        end
-
-        def value
-          rules.length > 1 ? Sequence.new(rules) : rules.first
-        end
-      end
+      one_or_more(:labelled) {
+        rules = captures[:labelled].map {|l| l.value }
+        rules.length > 1 ? Sequence.new(rules) : rules.first
+      }
     end
 
-    rule :label_expression do
-      all(zero_or_one(:label), :expression) {
-        rule = expression.value
+    rule :labelled do
+      all(zero_or_one(:label), :extended) {
+        rule = extended.value
         rule.label = label.value if label
         rule
       }
     end
 
-    rule :expression do
+    rule :extended do
       all(:prefix, zero_or_one(:extension)) {
         rule = prefix.value
         rule.extension = extension.value if extension
@@ -149,8 +127,8 @@ module Citrus
     end
 
     rule :grouping do
-      all(:lparen, :rule_body, :rparen) {
-        rule_body.value
+      all(:lparen, :expression, :rparen) {
+        expression.value
       }
     end
 
