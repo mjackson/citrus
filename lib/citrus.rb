@@ -45,13 +45,13 @@ module Citrus
   end
 
   # Evaluates the given expression and creates a new Rule object from it.
-  # Accepts the same +options+ as GrammarMethods#parse.
+  # Accepts the same +options+ as Citrus.eval.
   #
   #     Citrus.rule('"a" | "b"')
   #     # => #<Citrus::Rule: ... >
   #
   def self.rule(expr, options={})
-    File.parse(expr, options.merge(:root => :expression)).value
+    eval(expr, options.merge(:root => :expression))
   end
 
   # Loads the grammar(s) from the given +file+. Accepts the same +options+ as
@@ -351,9 +351,11 @@ module Citrus
       super
     end
 
-    # Parses the given +string+ using this grammar's root rule. Optionally, the
-    # name of a different rule may be given here as the value of the +:root+
-    # option. Otherwise, all options are the same as in Rule#parse.
+    # Parses the given +string+ using this grammar's root rule. Accepts the same
+    # +options+ as Rule#parse, plus the following:
+    #
+    # root::    The name of the root rule to start parsing at. Defaults to this
+    #           grammar's #root.
     def parse(string, options={})
       rule_name = options.delete(:root) || root
       raise Error, "No root rule specified" unless rule_name
