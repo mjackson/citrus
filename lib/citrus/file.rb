@@ -37,13 +37,11 @@ module Citrus
 
     rule :file do
       all(:space, zero_or_more(any(:require, :grammar))) {
-        if captures[:require]
-          captures[:require].each do |req|
-            require req.value
-          end
+        captures[:require].each do |req|
+          require req.value
         end
 
-        (captures[:grammar] || []).map {|g| g.value }
+        captures[:grammar].map {|g| g.value }
       }
     end
 
@@ -54,15 +52,10 @@ module Citrus
         def value
           grammar = module_namespace.const_set(module_basename, Grammar.new)
 
-          if captures[:include]
-            captures[:include].each {|inc| grammar.include(inc.value) }
-          end
+          captures[:include].each {|inc| grammar.include(inc.value) }
+          captures[:rule].each {|r| grammar.rule(r.rule_name.value, r.value) }
 
           grammar.root(root.value) if root
-
-          if captures[:rule]
-            captures[:rule].each {|r| grammar.rule(r.rule_name.value, r.value) }
-          end
 
           grammar
         end

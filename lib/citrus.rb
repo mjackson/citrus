@@ -1208,7 +1208,7 @@ module Citrus
     # in the order they appeared in the input.
     def captures
       @captures ||= begin
-        captures = {}
+        captures = Hash.new {|hash, key| hash[key] = [] }
         stack = []
         offset = 0
         close = false
@@ -1238,23 +1238,11 @@ module Citrus
 
               # We can lookup matches that were created by proxy by the name of
               # the rule they are proxy for.
-              if Proxy === rule
-                if captures[rule.rule_name]
-                  captures[rule.rule_name] << match
-                else
-                  captures[rule.rule_name] = [match]
-                end
-              end
+              captures[rule.rule_name] << match if Proxy === rule
 
               # We can lookup matches that were created by rules with labels by
               # that label.
-              if rule.label
-                if captures[rule.label]
-                  captures[rule.label] << match
-                else
-                  captures[rule.label] = [match]
-                end
-              end
+              captures[rule.label] << match if rule.label
 
               in_proxy = false
             end
@@ -1295,7 +1283,7 @@ module Citrus
 
     # Returns an array of all immediate submatches of this match.
     def matches
-      @matches ||= (0...captures.size).map {|n| captures[n] }.compact
+      @matches ||= (0...captures.size).map {|n| captures[n] }.flatten
     end
 
     # A shortcut for retrieving the first immediate submatch of this match.
@@ -1314,7 +1302,7 @@ module Citrus
       if @string.respond_to?(sym)
         @string.__send__(sym, *args, &block)
       else
-        captures[sym].first if captures[sym]
+        captures[sym].first
       end
     end
 
