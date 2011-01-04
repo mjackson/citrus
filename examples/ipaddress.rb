@@ -1,15 +1,19 @@
+# This file contains a small suite of tests for the grammars found in
+# ipaddress.citrus. If this file is run directly (i.e. using `ruby ip.rb') the
+# tests will run. Otherwise, this file may be required by another that needs
+# access to the IP address grammars just as any other file would be.
+
+# Always use the current version of Citrus with this example.
 $LOAD_PATH.unshift(File.expand_path('../../lib', __FILE__))
+
+# Make sure that the require statements in ip*address.citrus files can find
+# one another.
+$LOAD_PATH.unshift(File.expand_path('..', __FILE__))
 
 require 'citrus'
 
-# This file contains a small suite of tests for the grammars found in ip.citrus.
-# If this file is run directly (i.e. using `ruby ip.rb') the tests will run.
-# Otherwise, this file may be required by another that needs access to the IP
-# address grammars just as any other file would be.
-
-# Load and evaluate the grammars contained in ip.citrus into the global
-# namespace.
-Citrus.load(File.expand_path('../ip', __FILE__))
+# Load and evaluate the grammars contained in ipaddress.citrus.
+Citrus.require('ipaddress')
 
 if $0 == __FILE__
   require 'test/unit'

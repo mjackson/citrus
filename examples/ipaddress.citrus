@@ -1,0 +1,16 @@
+# The grammars in this file conform to the ABNF given in Appendix A of RFC 3986
+# Uniform Resource Identifier (URI): Generic Syntax.
+#
+# See http://tools.ietf.org/html/rfc3986#appendix-A for more information.
+
+require 'ipv4address'
+require 'ipv6address'
+
+grammar IPAddress
+  include IPv4Address
+  include IPv6Address
+
+  rule IPaddress
+    IPv4address | IPv6address
+  end
+end

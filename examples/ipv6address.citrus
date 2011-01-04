@@ -1,34 +1,4 @@
-# The grammars in this file conform to the ABNF given in Appendix A of RFC 3986
-# Uniform Resource Identifier (URI): Generic Syntax.
-#
-# See http://tools.ietf.org/html/rfc3986#appendix-A for more information.
-
-grammar IPv4Address
-  # A host identified by an IPv4 literal address is represented in
-  # dotted-decimal notation (a sequence of four decimal numbers in the
-  # range 0 to 255, separated by "."), as described in [RFC1123] by
-  # reference to [RFC0952].  Note that other forms of dotted notation may
-  # be interpreted on some platforms, as described in Section 7.4, but
-  # only the dotted-decimal form of four octets is allowed by this
-  # grammar.
-  rule IPv4address
-    (dec-octet '.' dec-octet '.' dec-octet '.' dec-octet) {
-      def version; 4 end
-    }
-  end
-
-  rule dec-octet
-      '25' [0-5]        # 250-255
-    | '2' [0-4] DIGIT   # 200-249
-    | '1' DIGIT DIGIT   # 100-199
-    | [1-9] DIGIT       # 10-99
-    | DIGIT             # 0-9
-  end
-
-  rule DIGIT
-    [0-9]
-  end
-end
+require 'ipv4address'
 
 grammar IPv6Address
   include IPv4Address
@@ -69,14 +39,5 @@ grammar IPv6Address
 
   rule HEXDIG
     DIGIT | [a-fA-F] # Hexadecimal should be case-insensitive.
-  end
-end
-
-grammar IPAddress
-  include IPv4Address
-  include IPv6Address
-
-  rule IPaddress
-    IPv4address | IPv6address
   end
 end

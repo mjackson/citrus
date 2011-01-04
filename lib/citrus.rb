@@ -16,8 +16,20 @@ module Citrus
 
   CLOSE = -1
 
-  # Evaluates the given Citrus parsing expression grammar +code+ in the global
-  # scope. Returns an array of any grammar modules that are created.
+  @cache = {}
+
+  class << self
+    # A map of paths of files that have been loaded via Citrus.load to the
+    # result of Citrus.eval on the code in that file. Note: These paths are not
+    # absolute unless you pass an absolute path to Citrus.load. That means that
+    # if you change the working directory and try to require the same file with
+    # a different relative path, it will be required twice.
+    attr_reader :cache
+  end
+
+  # Evaluates the given Citrus parsing expression grammar +code+ and returns an
+  # array of any grammar modules that are created. Accepts the same +options+ as
+  # GrammarMethods#parse.
   #
   #     Citrus.eval(<<CITRUS)
   #     grammar MyGrammar
@@ -33,6 +45,7 @@ module Citrus
   end
 
   # Evaluates the given expression and creates a new Rule object from it.
+  # Accepts the same +options+ as GrammarMethods#parse.
   #
   #     Citrus.rule('"a" | "b"')
   #     # => #<Citrus::Rule: ... >
@@ -41,19 +54,59 @@ module Citrus
     File.parse(expr, options.merge(:root => :expression)).value
   end
 
-  # Loads the grammar from the given +file+ into the global scope using #eval.
+  # Loads the grammar(s) from the given +file+. Accepts the same +options+ as
+  # Citrus.eval, plus the following:
+  #
+  # force::   Normally Citrus.load will not reload a file that is already in
+  #           Citrus.cache. However, if this option is +true+ the file will be
+  #           loaded, regardless of whether or not it is in the cache. Defaults
+  #           to +false+.
   #
   #     Citrus.load('mygrammar')
   #     # => [MyGrammar]
   #
   def self.load(file, options={})
-    file << '.citrus' unless ::File.file?(file)
-    raise LoadError, "Cannot find file #{file}" unless ::File.file?(file)
-    raise LoadError, "Cannot read file #{file}" unless ::File.readable?(file)
-    eval(::File.read(file), options)
-  rescue SyntaxError => e
-    e.message.replace("#{::File.expand_path(file)}: #{e.message}")
-    raise e
+    file += '.citrus' unless file =~ /\.citrus$/
+    force = options.delete(:force)
+
+    if force || !@cache[file]
+      raise LoadError, "Cannot find file #{file}" unless ::File.file?(file)
+      raise LoadError, "Cannot read file #{file}" unless ::File.readable?(file)
+
+      begin
+        @cache[file] = eval(::File.read(file), options)
+      rescue SyntaxError => e
+        e.message.replace("#{::File.expand_path(file)}: #{e.message}")
+        raise e
+      end
+    end
+
+    @cache[file]
+  end
+
+  # Searches the +$LOAD_PATH+ for a +file+ with the .citrus suffix and
+  # attempts to load it via #load. Returns the path to the file that was
+  # loaded on success, +nil+ on failure. Accepts the same +options+ as
+  # Citrus.load.
+  #
+  #     path = Citrus.require('mygrammar')
+  #     # => "/path/to/mygrammar.citrus"
+  #     Citrus.cache[path]
+  #     # => [MyGrammar]
+  #
+  def self.require(file, options={})
+    file += '.citrus' unless file =~ /\.citrus$/
+    found = nil
+
+    $LOAD_PATH.each do |dir|
+      found = Dir[::File.join(dir, file)].first
+      if found
+        Citrus.load(found, options)
+        break
+      end
+    end
+
+    found
   end
 
   # A standard error class that all Citrus errors extend.
