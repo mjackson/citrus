@@ -6,11 +6,11 @@
 # Always use the current version of Citrus with this example.
 $LOAD_PATH.unshift(File.expand_path('../../lib', __FILE__))
 
+require 'citrus'
+
 # Make sure that the require statements in ip*address.citrus files can find
 # one another.
 $LOAD_PATH.unshift(File.expand_path('..', __FILE__))
-
-require 'citrus'
 
 # Load and evaluate the grammars contained in ipaddress.citrus.
 Citrus.require('ipaddress')

@@ -18,13 +18,13 @@ module Citrus
 
   @cache = {}
 
-  class << self
-    # A map of paths of files that have been loaded via Citrus.load to the
-    # result of Citrus.eval on the code in that file. Note: These paths are not
-    # absolute unless you pass an absolute path to Citrus.load. That means that
-    # if you change the working directory and try to require the same file with
-    # a different relative path, it will be required twice.
-    attr_reader :cache
+  # Returns a map of paths of files that have been loaded via Citrus.load to the
+  # result of Citrus.eval on the code in that file. Note: These paths are not
+  # absolute unless you pass an absolute path to Citrus.load. That means that
+  # if you change the working directory and try to require the same file with
+  # a different relative path, it will be loaded twice.
+  def self.cache
+    @cache
   end
 
   # Evaluates the given Citrus parsing expression grammar +code+ and returns an
