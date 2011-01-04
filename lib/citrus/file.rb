@@ -181,12 +181,14 @@ module Citrus
     end
 
     rule :terminal do
-      any(:string_terminal, :regular_expression, :character_class, :dot)
-    end
+      any(:quoted_string, :case_insensitive_string, :regular_expression, :character_class, :dot) {
+        primitive = super()
 
-    rule :string_terminal do
-      any(:quoted_string, :case_insensitive_string) {
-        StringTerminal.new(super(), flags)
+        if String === primitive
+          StringTerminal.new(primitive, flags)
+        else
+          Terminal.new(primitive)
+        end
       }
     end
 
@@ -216,19 +218,19 @@ module Citrus
 
     rule :regular_expression do
       all(/\/(?:\\?.)*?\/[imxouesn]*/, :space) {
-        Terminal.new(eval(first.to_s))
+        eval(first.to_s)
       }
     end
 
     rule :character_class do
       all(/\[(?:\\?.)*?\]/, :space) {
-        Terminal.new(Regexp.new(first.to_s, nil, 'n'))
+        Regexp.new(first.to_s, nil, 'n')
       }
     end
 
     rule :dot do
       all('.', :space) {
-        Terminal.new(DOT)
+        DOT
       }
     end
 
