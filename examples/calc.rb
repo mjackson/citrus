@@ -1,114 +1,121 @@
+# This file contains a suite of tests for the Calc grammar found in calc.citrus.
+
 require 'citrus'
+Citrus.require File.expand_path('../calc', __FILE__)
+require 'test/unit'
 
-# A grammar for mathematical formulas that apply basic mathematical operations
-# to all numbers, respecting operator precedence and grouping of expressions
-# while ignoring whitespace.
-#
-# An identical grammar that is written using Citrus' own grammar syntax can be
-# found in calc.citrus.
-grammar :Calc do
-
-  ## Hierarchical syntax
-
-  rule :term do
-    any(:additive, :factor)
+class CalcTest < Test::Unit::TestCase
+  # A helper method that tests the successful parsing and evaluation of the
+  # given mathematical expression.
+  def do_test(expr)
+    match = ::Calc.parse(expr)
+    assert(match)
+    assert_equal(expr, match)
+    assert_equal(expr.length, match.length)
+    assert_equal(eval(expr), match.value)
   end
 
-  rule :additive do
-    all(:factor, :additive_operator, :term) {
-      additive_operator.value(factor.value, term.value)
-    }
+  def test_int
+    do_test('3')
   end
 
-  rule :factor do
-    any(:multiplicative, :prefix)
+  def test_float
+    do_test('1.5')
   end
 
-  rule :multiplicative do
-    all(:prefix, :multiplicative_operator, :factor) {
-      multiplicative_operator.value(prefix.value, factor.value)
-    }
+  def test_addition
+    do_test('1+2')
   end
 
-  rule :prefix do
-    any(:prefixed, :exponent)
+  def test_addition_multi
+    do_test('1+2+3')
   end
 
-  rule :prefixed do
-    all(:unary_operator, :prefix) {
-      unary_operator.value(prefix.value)
-    }
+  def test_addition_float
+    do_test('1.5+3')
   end
 
-  rule :exponent do
-    any(:exponential, :primary)
+  def test_subtraction
+    do_test('3-2')
   end
 
-  rule :exponential do
-    all(:primary, :exponential_operator, :prefix) {
-      exponential_operator.value(primary.value, prefix.value)
-    }
+  def test_subtraction_float
+    do_test('4.5-3')
   end
 
-  rule :primary do
-    any(:group, :number)
+  def test_multiplication
+    do_test('2*5')
   end
 
-  rule :group do
-    all(:lparen, :term, :rparen) {
-      term.value
-    }
+  def test_multiplication_float
+    do_test('1.5*3')
   end
 
-  ## Lexical syntax
-
-  rule :number do
-    any(:float, :integer)
+  def test_division
+    do_test('20/5')
   end
 
-  rule :float do
-    all(:digits, '.', :digits, zero_or_more(:space)) {
-      strip.to_f
-    }
+  def test_division_float
+    do_test('4.5/3')
   end
 
-  rule :integer do
-    all(:digits, zero_or_more(:space)) {
-      strip.to_i
-    }
+  def test_complex
+    do_test('7*4+3.5*(4.5/3)')
   end
 
-  rule :digits do
-    # Numbers may contain underscores in Ruby.
-    /[0-9]+(?:_[0-9]+)*/
+  def test_complex_spaced
+    do_test('7 * 4 + 3.5 * (4.5 / 3)')
   end
 
-  rule :additive_operator do
-    all(any('+', '-'), zero_or_more(:space)) { |a, b|
-      a.send(strip, b)
-    }
+  def test_complex_with_underscores
+    do_test('(12_000 / 3) * 2.5')
   end
 
-  rule :multiplicative_operator do
-    all(any('*', '/', '%'), zero_or_more(:space)) { |a, b|
-      a.send(strip, b)
-    }
+  def test_modulo
+    do_test('3 % 2 + 4')
   end
 
-  rule :exponential_operator do
-    all('**', zero_or_more(:space)) { |a, b|
-      a ** b
-    }
+  def test_exponent
+    do_test('2**9')
   end
 
-  rule :unary_operator do
-    all(any('~', '+', '-'), zero_or_more(:space)) { |n|
-      # Unary + and - require an @.
-      n.send(strip == '~' ? strip : '%s@' % strip)
-    }
+  def test_exponent_float
+    do_test('2**2.2')
   end
 
-  rule :lparen, ['(', zero_or_more(:space)]
-  rule :rparen, [')', zero_or_more(:space)]
-  rule :space,  /[ \t\n\r]/
+  def test_negative_exponent
+    do_test('2**-3')
+  end
+
+  def test_exponent_exponent
+    do_test('2**2**2')
+  end
+
+  def test_exponent_group
+    do_test('2**(3+1)')
+  end
+
+  def test_negative
+    do_test('-5')
+  end
+
+  def test_double_negative
+    do_test('--5')
+  end
+
+  def test_complement
+    do_test('~4')
+  end
+
+  def test_double_complement
+    do_test('~~4')
+  end
+
+  def test_mixed_unary
+    do_test('~-4')
+  end
+
+  def test_complex_with_negatives
+    do_test('4 * -7 / (8.0 + 1_2)**2')
+  end
 end

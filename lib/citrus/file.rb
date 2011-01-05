@@ -41,10 +41,8 @@ module Citrus
           file = req.value
           begin
             require file
-          rescue ::LoadError => e
-            # Re-raise the original LoadError unless Citrus.require finds a
-            # suitable candidate.
-            raise e unless Citrus.require(file)
+          rescue ::LoadError
+            Citrus.require(file)
           end
         end
 

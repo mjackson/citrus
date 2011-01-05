@@ -1,4 +1,5 @@
 require 'strscan'
+require 'pathname'
 require 'citrus/version'
 
 # Citrus is a compact and powerful parsing library for Ruby that combines the
@@ -98,12 +99,15 @@ module Citrus
     file += '.citrus' unless file =~ /\.citrus$/
     found = nil
 
-    $LOAD_PATH.each do |dir|
+    (Pathname.new(file).absolute? ? [''] : $LOAD_PATH).each do |dir|
       found = Dir[::File.join(dir, file)].first
-      if found
-        Citrus.load(found, options)
-        break
-      end
+      break if found
+    end
+
+    if found
+      Citrus.load(found, options)
+    else
+      raise LoadError, "Cannot find file #{file}"
     end
 
     found

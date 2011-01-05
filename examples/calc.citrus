@@ -1,8 +1,7 @@
 # A grammar for mathematical formulas that apply basic mathematical operations
 # to all numbers, respecting operator precedence and grouping of expressions
-# while ignoring whitespace.
-#
-# An identical grammar that is written using pure Ruby can be found in calc.rb.
+# while ignoring whitespace. This grammar should provide the same interpretation
+# as Ruby for all mathematical expressions.
 grammar Calc
 
   ## Hierarchical syntax
