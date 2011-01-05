@@ -774,8 +774,7 @@ module Citrus
       rule = grammar.rule(rule_name)
 
       unless rule
-        raise RuntimeError,
-          "No rule named \"#{rule_name}\" in grammar #{grammar.name}"
+        raise Error, "No rule named \"#{rule_name}\" in grammar #{grammar}"
       end
 
       rule
@@ -805,8 +804,8 @@ module Citrus
       rule = grammar.super_rule(rule_name)
 
       unless rule
-        raise RuntimeError,
-          "No rule named \"#{rule_name}\" in hierarchy of grammar #{grammar.name}"
+        raise Error,
+          "No rule named \"#{rule_name}\" in hierarchy of grammar #{grammar}"
       end
 
       rule
