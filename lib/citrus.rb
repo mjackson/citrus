@@ -1268,7 +1268,7 @@ module Citrus
         close = false
         index = 0
         last_length = nil
-        in_proxy = false
+        capture = true
         count = 0
 
         while index < @events.size
@@ -1298,12 +1298,10 @@ module Citrus
               # that label.
               captures[rule.label] << match if rule.label
 
-              in_proxy = false
+              capture = true
             end
 
-            unless last_length
-              last_length = event
-            end
+            last_length = event unless last_length
 
             close = false
           elsif event == CLOSE
@@ -1318,13 +1316,13 @@ module Citrus
               last_length = nil
             end
 
-            # We should not create captures when traversing the portion of the
-            # event stream that is masked by a proxy in the original rule
-            # definition.
-            unless in_proxy || stack.size == 1
+            if capture && stack.size != 1
               stack << offset
               stack << event
-              in_proxy = true if Proxy === event
+              # We should not create captures when traversing the portion of the
+              # event stream that is masked by a proxy in the original rule
+              # definition.
+              capture = false if Proxy === event
             end
           end
 
