@@ -621,12 +621,7 @@ module Citrus
     def parse(string, options={})
       opts = default_options.merge(options)
 
-      input = if opts[:memoize]
-        MemoizedInput.new(string)
-      else
-        Input.new(string)
-      end
-
+      input = (opts[:memoize] ? MemoizedInput : Input).new(string)
       input.pos = opts[:offset] if opts[:offset] > 0
 
       events = input.exec(self)
