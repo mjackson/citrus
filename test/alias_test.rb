@@ -46,7 +46,7 @@ class AliasTest < Test::Unit::TestCase
     assert_equal('alpha', rule.to_s)
   end
 
-  def test_to_s
+  def test_to_s_with_label
     rule = Alias.new(:alpha)
     rule.label = 'a_label'
     assert_equal('a_label:alpha', rule.to_s)
