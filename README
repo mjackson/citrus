@@ -510,7 +510,7 @@ case that could be used to test that our grammar works properly.
         assert_equal('23 + 12', match)
         assert_equal(35, match.value)
       end
-
+      
       def test_number
         match = Addition.parse('23', :root => :number)
         assert(match)
@@ -587,6 +587,8 @@ version that is contained in the `lib` directory).
 
 # Links
 
+
+Discussion around Citrus happens on the [citrus-users Google group](http://groups.google.com/group/citrus-users).
 
 The primary resource for all things to do with parsing expressions can be found
 on the original [Packrat and Parsing Expression Grammars page](http://pdos.csail.mit.edu/~baford/packrat)
