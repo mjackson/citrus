@@ -1077,7 +1077,8 @@ module Citrus
     def initialize(rule='', min=1, max=Infinity)
       raise ArgumentError, "Min cannot be greater than max" if min > max
       super([rule])
-      @range = Range.new(min, max)
+      @min = min
+      @max = max
     end
 
     # Returns the Rule object this rule uses to match.
@@ -1092,9 +1093,8 @@ module Citrus
       index = events.size
       start = index - 1
       length = n = 0
-      m = max
 
-      while n < m && input.exec(rule, events).size > index
+      while n < max && input.exec(rule, events).size > index
         length += events[-1]
         index = events.size
         n += 1
@@ -1111,14 +1111,10 @@ module Citrus
     end
 
     # The minimum number of times this rule must match.
-    def min
-      @range.begin
-    end
+    attr_reader :min
 
     # The maximum number of times this rule may match.
-    def max
-      @range.end
-    end
+    attr_reader :max
 
     # Returns the operator this rule uses as a string. Will be one of
     # <tt>+</tt>, <tt>?</tt>, or <tt>N*M</tt>.
