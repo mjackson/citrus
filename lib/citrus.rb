@@ -1375,11 +1375,9 @@ module Citrus
 
   private
 
-    # Setup both @captures and @matches instance variables.
+    # Initializes both the @captures and @matches instance variables.
     def process_events!
-      # @captures should automatically convert String keys to Symbols when
-      # fetching, and return an empty Array for all other unknown keys.
-      @captures = Hash.new {|hash, key| String === key ? hash[key.to_sym] : [] }
+      @captures = captures_hash
       @matches = []
 
       capture!(@events[0], self)
@@ -1465,6 +1463,22 @@ module Citrus
           @captures[rule.label] << match
         else
           @captures[rule.label] = [match]
+        end
+      end
+    end
+
+    # Returns a new Hash that is to be used for @captures. This hash normalizes
+    # String keys to Symbols, returns +nil+ for unknown Numeric keys, and an
+    # empty Array for all other unknown keys.
+    def captures_hash
+      Hash.new do |hash, key|
+        case key
+        when String
+          hash[key.to_sym]
+        when Numeric
+          nil
+        else
+          []
         end
       end
     end
