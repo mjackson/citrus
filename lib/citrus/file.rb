@@ -9,7 +9,7 @@ module Citrus
     end
 
     def module_namespace
-      module_segments[0..-2].inject(Object) do |namespace, constant|
+      module_segments[0...-1].inject(Object) do |namespace, constant|
         constant.empty? ? namespace : namespace.const_get(constant)
       end
     end
@@ -311,8 +311,8 @@ module Citrus
 
     rule :star do
       all(/[0-9]*/, '*', /[0-9]*/, :space) { |rule|
-        min = captures[0] == '' ? 0 : captures[0].to_i
-        max = captures[2] == '' ? Infinity : captures[2].to_i
+        min = captures[1] == '' ? 0 : captures[1].to_i
+        max = captures[3] == '' ? Infinity : captures[3].to_i
         Repeat.new(rule, min, max)
       }
     end

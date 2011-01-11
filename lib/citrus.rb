@@ -1232,7 +1232,7 @@ module Citrus
 
         while events[0].elide?
           elisions.unshift(events.shift)
-          events = events.slice(0, events.length - 2)
+          events.slice!(-2, events.length)
         end
 
         events[0].extend_match(self)
@@ -1240,6 +1240,9 @@ module Citrus
         elisions.each do |rule|
           rule.extend_match(self)
         end
+      else
+        # Create a default stream of events for the given string.
+        events = [Rule.for(string), CLOSE, string.length]
       end
 
       @events = events
@@ -1256,92 +1259,20 @@ module Citrus
     # Returns a hash of capture names to arrays of matches with that name,
     # in the order they appeared in the input.
     def captures
-      @captures ||= begin
-        captures = Hash.new {|hash, key| hash[key] = [] }
-        stack = []
-        offset = 0
-        close = false
-        index = 0
-        last_length = nil
-        capture = true
-        count = 0
-
-        while index < @events.size
-          event = @events[index]
-
-          if close
-            start = stack.pop
-
-            if Rule === start
-              rule = start
-              os = stack.pop
-              start = stack.pop
-
-              match = Match.new(@string.slice(os, event), @events[start..index])
-
-              # We can lookup immediate submatches by their index.
-              if stack.size == 1
-                captures[count] = match
-                count += 1
-              end
-
-              # We can lookup matches that were created by proxy by the name of
-              # the rule they are proxy for.
-              captures[rule.rule_name] << match if Proxy === rule
-
-              # We can lookup matches that were created by rules with labels by
-              # that label.
-              captures[rule.label] << match if rule.label
-
-              capture = true
-            end
-
-            last_length = event unless last_length
-
-            close = false
-          elsif event == CLOSE
-            close = true
-          else
-            stack << index
-
-            # We can calculate the offset of this rule event by adding back the
-            # last match length.
-            if last_length
-              offset += last_length
-              last_length = nil
-            end
-
-            if capture && stack.size != 1
-              stack << offset
-              stack << event
-              # We should not create captures when traversing the portion of the
-              # event stream that is masked by a proxy in the original rule
-              # definition.
-              capture = false if Proxy === event
-            end
-          end
-
-          index += 1
-        end
-
-        captures
-      end
+      process_events! unless @captures
+      @captures
     end
 
     # Returns an array of all immediate submatches of this match.
     def matches
-      @matches ||= (0...captures.size).map {|n| captures[n] }.flatten
+      process_events! unless @matches
+      @matches
     end
 
     # A shortcut for retrieving the first immediate submatch of this match.
     def first
-      captures[0]
+      matches.first
     end
-
-    # The default value for a match is its string value. This method is
-    # overridden in most cases to be more meaningful according to the desired
-    # interpretation.
-    alias_method :value, :to_s
 
     # Allows methods of this match's string to be called directly and provides
     # a convenient interface for retrieving the first match with a given name.
@@ -1358,6 +1289,32 @@ module Citrus
     end
 
     alias_method :to_str, :to_s
+
+    # The default value for a match is its string value. This method is
+    # overridden in most cases to be more meaningful according to the desired
+    # interpretation.
+    alias_method :value, :to_s
+
+    # Returns this match plus all sub #matches in an array.
+    def to_a
+      [captures[0]] + matches
+    end
+
+    alias_method :to_ary, :to_a
+
+    # Returns the capture at the given +key+. If it is an Integer (and an
+    # optional length) or a Range, the result of #to_a with the same arguments
+    # is returned. Otherwise, the value at +key+ in #captures is returned.
+    def [](key, *args)
+      case key
+      when Integer, Range
+        to_a[key, *args]
+      else
+        captures[key]
+      end
+    end
+
+    alias_method :fetch, :[]
 
     def ==(other)
       case other
@@ -1398,9 +1355,7 @@ module Citrus
           string = @string.slice(os, event)
           lines[start] = "#{space}#{string.inspect} rule=#{rule}, offset=#{os}, length=#{event}"
 
-          unless last_length
-            last_length = event
-          end
+          last_length = event unless last_length
 
           close = false
         elsif event == CLOSE
@@ -1420,6 +1375,102 @@ module Citrus
       end
 
       puts lines.compact.join("\n")
+    end
+
+  private
+
+    # Setup both @captures and @matches instance variables.
+    def process_events!
+      # @captures should automatically convert String keys to Symbols when
+      # fetching, and return an empty Array for all other unknown keys.
+      @captures = Hash.new {|hash, key| String === key ? hash[key.to_sym] : [] }
+      @matches = []
+
+      capture!(@events[0], self)
+
+      stack = []
+      offset = 0
+      close = false
+      index = 0
+      last_length = nil
+      capture = true
+
+      while index < @events.size
+        event = @events[index]
+
+        if close
+          start = stack.pop
+
+          if Rule === start
+            rule = start
+            os = stack.pop
+            start = stack.pop
+
+            match = Match.new(@string.slice(os, event), @events[start..index])
+            capture!(rule, match)
+
+            @matches << match if stack.size == 1
+
+            capture = true
+          end
+
+          last_length = event unless last_length
+
+          close = false
+        elsif event == CLOSE
+          close = true
+        else
+          stack << index
+
+          # We can calculate the offset of this rule event by adding back the
+          # last match length.
+          if last_length
+            offset += last_length
+            last_length = nil
+          end
+
+          if capture && stack.size != 1
+            stack << offset
+            stack << event
+
+            # We should not create captures when traversing a portion of the
+            # event stream that is masked by a proxy in the original rule
+            # definition.
+            capture = false if Proxy === event
+          end
+        end
+
+        index += 1
+      end
+
+      # Add numeric indices to @captures.
+      @captures[0] = self
+
+      @matches.each_with_index do |match, index|
+        @captures[index + 1] = match
+      end
+    end
+
+    def capture!(rule, match)
+      # We can lookup matches that were created by proxy by the name of
+      # the rule they are proxy for.
+      if Proxy === rule
+        if @captures.key?(rule.rule_name)
+          @captures[rule.rule_name] << match
+        else
+          @captures[rule.rule_name] = [match]
+        end
+      end
+
+      # We can lookup matches that were created by rules with labels by
+      # that label.
+      if rule.label
+        if @captures.key?(rule.label)
+          @captures[rule.label] << match
+        else
+          @captures[rule.label] = [match]
+        end
+      end
     end
   end
 end

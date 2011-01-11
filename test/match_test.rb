@@ -25,7 +25,6 @@ class MatchTest < Test::Unit::TestCase
     b = Rule.for('b')
     c = Rule.for('c')
     s = Rule.for([ a, b, c ])
-    s.name = 's'
     r = Repeat.new(s, 0, Infinity)
 
     events = [
