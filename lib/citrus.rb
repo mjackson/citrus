@@ -690,8 +690,6 @@ module Citrus
       end
     end
 
-    alias_method :eql?, :==
-
     def inspect # :nodoc:
       to_s
     end
@@ -1326,8 +1324,6 @@ module Citrus
         super
       end
     end
-
-    alias_method :eql?, :==
 
     def inspect
       @string.inspect
