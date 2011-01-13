@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require 'strscan'
 require 'pathname'
 require 'citrus/version'
@@ -243,11 +245,10 @@ module Citrus
       index = events.size
 
       if apply_rule(rule, position, events).size > index
-        position += events[-1]
-        @max_offset = position if position > @max_offset
+        @max_offset = pos if pos > @max_offset
+      else
+        self.pos = position
       end
-
-      self.pos = position
 
       events
     end
@@ -837,12 +838,12 @@ module Citrus
 
     # Returns an array of events for this rule on the given +input+.
     def exec(input, events=[])
-      length = input.scan_full(@regexp, false, false)
+      match = input.scan(@regexp)
 
-      if length
+      if match
         events << self
         events << CLOSE
-        events << length
+        events << match.length
       end
 
       events

@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require 'citrus'
 
 module Citrus
@@ -227,7 +229,7 @@ module Citrus
 
     rule :character_class do
       all(/\[(?:\\?.)*?\]/, :space) {
-        Regexp.new(first.to_s, nil, 'n')
+        eval("/#{first.to_s}/")
       }
     end
 

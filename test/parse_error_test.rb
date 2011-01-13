@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require File.expand_path('../helper', __FILE__)
 
 class ParseErrorTest < Test::Unit::TestCase
@@ -32,10 +34,10 @@ class ParseErrorTest < Test::Unit::TestCase
 
   def test_single_line
     begin
-      Sentence.parse('Once upon 4 time.')
+      Sentence.parse('Once upon ä time.')
     rescue ParseError => e
       assert_equal(10, e.offset)
-      assert_equal('Once upon 4 time.', e.line)
+      assert_equal('Once upon ä time.', e.line)
       assert_equal(1, e.line_number)
       assert_equal(10, e.line_offset)
     end

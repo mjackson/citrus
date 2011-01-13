@@ -26,7 +26,7 @@ class MemoizedInputTest < Test::Unit::TestCase
   def test_cache_hits1
     input = MemoizedInput.new('a')
     input.exec(LetterA.rule(:top))
-    assert_equal(3, input.cache_hits)
+    assert_equal(2, input.cache_hits)
   end
 
   def test_cache_hits2
