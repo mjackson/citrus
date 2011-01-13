@@ -13,7 +13,7 @@ module Citrus
   autoload :File, 'citrus/file'
 
   # A pattern to match any character, including newline.
-  DOT = /./m
+  DOT = /./mu
 
   Infinity = 1.0 / 0
 

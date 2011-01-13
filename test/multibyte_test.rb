@@ -15,6 +15,10 @@ class MultibyteTest < Test::Unit::TestCase
     rule :character_class do
       /[ä]+/
     end
+
+    rule :dot do
+      DOT
+    end
   end
 
   def test_multibyte_string
@@ -32,6 +36,11 @@ class MultibyteTest < Test::Unit::TestCase
     assert(m)
   end
 
+  def test_multibyte_dot
+    m = Multibyte.parse("ä", :root => :dot)
+    assert(m)
+  end
+
   Citrus.eval(<<-CITRUS)
   grammar Multibyte2
     rule string
@@ -44,6 +53,10 @@ class MultibyteTest < Test::Unit::TestCase
 
     rule character_class
       [ä]+
+    end
+
+    rule dot
+      .+
     end
   end
   CITRUS
@@ -60,6 +73,11 @@ class MultibyteTest < Test::Unit::TestCase
 
   def test_multibyte2_character_class
     m = Multibyte2.parse("äää", :root => :character_class)
+    assert(m)
+  end
+
+  def test_multibyte2_dot
+    m = Multibyte2.parse("äää", :root => :dot)
     assert(m)
   end
 end
