@@ -54,7 +54,7 @@
             <h2>Methods</h2>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000085">exec</a></li>
+              <li><a href="#M000084">exec</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -68,8 +68,8 @@
           <div id='section'>
             <div id='methods'>
               <h2>Public instance methods</h2>
-              <div class='method public-instance' id='method-M000085'>
-                <a name='M000085'></a>
+              <div class='method public-instance' id='method-M000084'>
+                <a name='M000084'></a>
                 <div class='synopsis'>
                   <span class='name'>exec</span>
                   <span class='arguments'>(input, events=[])</span>
@@ -80,10 +80,10 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000085-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000084-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000085-source'>      <span class="ruby-comment cmt"># File lib/citrus.rb, line 1123</span>&#x000A;1123:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">exec</span>(<span class="ruby-identifier">input</span>, <span class="ruby-identifier">events</span>=[])&#x000A;1124:       <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword kw">self</span>&#x000A;1125: &#x000A;1126:       <span class="ruby-identifier">index</span> = <span class="ruby-identifier">events</span>.<span class="ruby-identifier">size</span>&#x000A;1127:       <span class="ruby-identifier">n</span> = <span class="ruby-value">0</span>&#x000A;1128:       <span class="ruby-identifier">m</span> = <span class="ruby-identifier">rules</span>.<span class="ruby-identifier">length</span>&#x000A;1129: &#x000A;1130:       <span class="ruby-keyword kw">while</span> <span class="ruby-identifier">n</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">m</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">input</span>.<span class="ruby-identifier">exec</span>(<span class="ruby-identifier">rules</span>[<span class="ruby-identifier">n</span>], <span class="ruby-identifier">events</span>).<span class="ruby-identifier">size</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">index</span>&#x000A;1131:         <span class="ruby-identifier">n</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>&#x000A;1132:       <span class="ruby-keyword kw">end</span>&#x000A;1133: &#x000A;1134:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">index</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">events</span>.<span class="ruby-identifier">size</span>&#x000A;1135:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">CLOSE</span>&#x000A;1136:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">events</span>[<span class="ruby-value">-2</span>]&#x000A;1137:       <span class="ruby-keyword kw">else</span>&#x000A;1138:         <span class="ruby-identifier">events</span>.<span class="ruby-identifier">pop</span>&#x000A;1139:       <span class="ruby-keyword kw">end</span>&#x000A;1140: &#x000A;1141:       <span class="ruby-identifier">events</span>&#x000A;1142:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000084-source'>      <span class="ruby-comment cmt"># File lib/citrus.rb, line 1184</span>&#x000A;1184:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">exec</span>(<span class="ruby-identifier">input</span>, <span class="ruby-identifier">events</span>=[])&#x000A;1185:       <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword kw">self</span>&#x000A;1186: &#x000A;1187:       <span class="ruby-identifier">index</span> = <span class="ruby-identifier">events</span>.<span class="ruby-identifier">size</span>&#x000A;1188:       <span class="ruby-identifier">n</span> = <span class="ruby-value">0</span>&#x000A;1189:       <span class="ruby-identifier">m</span> = <span class="ruby-identifier">rules</span>.<span class="ruby-identifier">length</span>&#x000A;1190: &#x000A;1191:       <span class="ruby-keyword kw">while</span> <span class="ruby-identifier">n</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">m</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">input</span>.<span class="ruby-identifier">exec</span>(<span class="ruby-identifier">rules</span>[<span class="ruby-identifier">n</span>], <span class="ruby-identifier">events</span>).<span class="ruby-identifier">size</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">index</span>&#x000A;1192:         <span class="ruby-identifier">n</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>&#x000A;1193:       <span class="ruby-keyword kw">end</span>&#x000A;1194: &#x000A;1195:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">index</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">events</span>.<span class="ruby-identifier">size</span>&#x000A;1196:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">CLOSE</span>&#x000A;1197:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">events</span>[<span class="ruby-value">-2</span>]&#x000A;1198:       <span class="ruby-keyword kw">else</span>&#x000A;1199:         <span class="ruby-identifier">events</span>.<span class="ruby-identifier">pop</span>&#x000A;1200:       <span class="ruby-keyword kw">end</span>&#x000A;1201: &#x000A;1202:       <span class="ruby-identifier">events</span>&#x000A;1203:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

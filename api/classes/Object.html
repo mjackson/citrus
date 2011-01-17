@@ -59,7 +59,8 @@
                 </div>
                 <div class='description'>
                   <p>
-                  A sugar method for creating grammars.
+                  A sugar method for creating <a href="Citrus.html">Citrus</a> grammars from
+                  any namespace.
                   </p>
                   <pre>grammar :Calc do&#x000A;end&#x000A;&#x000A;module MyModule&#x000A;  grammar :Calc do&#x000A;  end&#x000A;end</pre>
                 </div>
@@ -67,7 +68,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('M000001-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000001-source'>      <span class="ruby-comment cmt"># File lib/citrus.rb, line 1390</span>&#x000A;1390:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">grammar</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;1391:     <span class="ruby-identifier">namespace</span> = <span class="ruby-identifier">respond_to?</span>(<span class="ruby-identifier">:const_set</span>) <span class="ruby-operator">?</span> <span class="ruby-keyword kw">self</span> <span class="ruby-operator">:</span> <span class="ruby-constant">Object</span>&#x000A;1392:     <span class="ruby-identifier">namespace</span>.<span class="ruby-identifier">const_set</span>(<span class="ruby-identifier">name</span>, <span class="ruby-constant">Citrus</span><span class="ruby-operator">::</span><span class="ruby-constant">Grammar</span>.<span class="ruby-identifier">new</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>))&#x000A;1393:   <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">NameError</span>&#x000A;1394:     <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-node">&quot;Invalid grammar name: #{name}&quot;</span>&#x000A;1395:   <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000001-source'>      <span class="ruby-comment cmt"># File lib/citrus.rb, line 1500</span>&#x000A;1500:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">grammar</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;1501:     <span class="ruby-identifier">namespace</span> = <span class="ruby-identifier">respond_to?</span>(<span class="ruby-identifier">:const_set</span>) <span class="ruby-operator">?</span> <span class="ruby-keyword kw">self</span> <span class="ruby-operator">:</span> <span class="ruby-constant">Object</span>&#x000A;1502:     <span class="ruby-identifier">namespace</span>.<span class="ruby-identifier">const_set</span>(<span class="ruby-identifier">name</span>, <span class="ruby-constant">Citrus</span><span class="ruby-operator">::</span><span class="ruby-constant">Grammar</span>.<span class="ruby-identifier">new</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>))&#x000A;1503:   <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">NameError</span>&#x000A;1504:     <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-node">&quot;Invalid grammar name: #{name}&quot;</span>&#x000A;1505:   <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>
