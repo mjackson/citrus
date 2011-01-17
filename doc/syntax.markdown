@@ -104,15 +104,6 @@ levels of precedence is below.
 
 See [Choice](api/classes/Citrus/Choice.html) for more information.
 
-## Grouping
-
-As is common in many programming languages, parentheses may be used to override
-the normal binding order of operators. In the following example parentheses are
-used to make the vertical bar between `'b'` and `'c'` bind tighter than the
-space between `'a'` and `'b'`.
-
-    'a' ('b' | 'c')   # match "a", then "b" or "c"
-
 ## Labels
 
 Match objects may be referred to by a different name than the rule that
@@ -196,3 +187,12 @@ Operator                  | Name                      | Precedence
 `:`                       | Label                     | 3
 `e1 e2`                   | Sequence                  | 2
 <code>e1 &#124; e2</code> | Ordered choice            | 1
+
+## Grouping
+
+As is common in many programming languages, parentheses may be used to override
+the normal binding order of operators. In the following example parentheses are
+used to make the vertical bar between `'b'` and `'c'` bind tighter than the
+space between `'a'` and `'b'`.
+
+    'a' ('b' | 'c')   # match "a", then "b" or "c"

@@ -21,11 +21,13 @@ module Citrus
 
   @cache = {}
 
-  # Returns a map of paths of files that have been loaded via Citrus.load to the
-  # result of Citrus.eval on the code in that file. Note: These paths are not
-  # absolute unless you pass an absolute path to Citrus.load. That means that
-  # if you change the working directory and try to require the same file with
-  # a different relative path, it will be loaded twice.
+  # Returns a map of paths of files that have been loaded via #load to the
+  # result of #eval on the code in that file.
+  #
+  # Note: These paths are not absolute unless you pass an absolute path to
+  # #load. That means that if you change the working directory and try to
+  # #require the same file with a different relative path, it will be loaded
+  # twice.
   def self.cache
     @cache
   end
@@ -48,7 +50,7 @@ module Citrus
   end
 
   # Evaluates the given expression and creates a new Rule object from it.
-  # Accepts the same +options+ as Citrus.eval.
+  # Accepts the same +options+ as #eval.
   #
   #     Citrus.rule('"a" | "b"')
   #     # => #<Citrus::Rule: ... >
@@ -58,10 +60,10 @@ module Citrus
   end
 
   # Loads the grammar(s) from the given +file+. Accepts the same +options+ as
-  # Citrus.eval, plus the following:
+  # #eval, plus the following:
   #
-  # force::   Normally Citrus.load will not reload a file that is already in
-  #           Citrus.cache. However, if this option is +true+ the file will be
+  # force::   Normally this method will not reload a file that is already in
+  #           the #cache. However, if this option is +true+ the file will be
   #           loaded, regardless of whether or not it is in the cache. Defaults
   #           to +false+.
   #
@@ -87,10 +89,9 @@ module Citrus
     @cache[file]
   end
 
-  # Searches the +$LOAD_PATH+ for a +file+ with the .citrus suffix and
-  # attempts to load it via #load. Returns the path to the file that was
-  # loaded on success, +nil+ on failure. Accepts the same +options+ as
-  # Citrus.load.
+  # Searches the <tt>$LOAD_PATH</tt> for a +file+ with the .citrus suffix and
+  # attempts to load it via #load. Returns the path to the file that was loaded
+  # on success, +nil+ on failure. Accepts the same +options+ as #load.
   #
   #     path = Citrus.require('mygrammar')
   #     # => "/path/to/mygrammar.citrus"
@@ -115,7 +116,7 @@ module Citrus
     found
   end
 
-  # A standard error class that all Citrus errors extend.
+  # A base class for all Citrus errors.
   class Error < RuntimeError; end
 
   # Raised when a parse fails.
@@ -332,7 +333,7 @@ module Citrus
     # created with this method may be assigned a name by being assigned to some
     # constant, e.g.:
     #
-    #     Calc = Citrus::Grammar.new {}
+    #     MyGrammar = Citrus::Grammar.new {}
     #
     def self.new(&block)
       mod = Module.new { include Grammar }
@@ -381,8 +382,7 @@ module Citrus
     end
 
     # Returns an array of all names of rules in this grammar as symbols ordered
-    # in the same way they were defined (i.e. rules that were defined later
-    # appear later in the array).
+    # in the same way they were declared.
     def rule_names
       @rule_names ||= []
     end
@@ -520,7 +520,7 @@ module Citrus
       ext(Choice.new(args), block)
     end
 
-    # Adds +label+ to the given +rule+.A block may be provided to specify
+    # Adds +label+ to the given +rule+. A block may be provided to specify
     # semantic behavior (via #ext).
     def label(rule, label, &block)
       rule = ext(rule, block)
@@ -564,7 +564,7 @@ module Citrus
       end
     end
 
-    # The grammar this rule belongs to.
+    # The grammar this rule belongs to, if any.
     attr_accessor :grammar
 
     # Sets the name of this rule.
@@ -601,7 +601,7 @@ module Citrus
     # The module this rule uses to extend new matches.
     attr_reader :extension
 
-    # The default set of options to use when calling #parse or #test.
+    # The default set of options to use when calling #parse.
     def default_options # :nodoc:
       { :consume  => true,
         :memoize  => false,
@@ -702,8 +702,8 @@ module Citrus
 
   # A Proxy is a Rule that is a placeholder for another rule. It stores the
   # name of some other rule in the grammar internally and resolves it to the
-  # actual Rule object at runtime. This lazy evaluation permits us to create
-  # Proxy objects for rules that we may not know the definition of yet.
+  # actual Rule object at runtime. This lazy evaluation permits creation of
+  # Proxy objects for rules that may not yet be defined.
   module Proxy
     include Rule
 
@@ -1487,7 +1487,7 @@ module Citrus
 end
 
 class Object
-  # A sugar method for creating grammars.
+  # A sugar method for creating Citrus grammars from any namespace.
   #
   #     grammar :Calc do
   #     end
