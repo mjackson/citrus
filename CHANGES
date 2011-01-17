@@ -1,0 +1,23 @@
+= 2.3.3 / 2011-01-17
+
+  * Added self to Match#captures hash. This means that a Match may retrieve a
+    reference to itself by using its own label, proxy name, or index 0 in the
+    hash.
+
+  * Match#captures returns an empty array for unknown Symbol keys, coerces
+    String keys to Symbols, and returns nil for unknown Numeric keys.
+
+  * Moved Citrus::VERSION to its own file.
+
+  * Citrus::LoadError is raised when Citrus is unable to load a file from the
+    file system because it cannot be found or it is not readable.
+
+  * Citrus::SyntaxError is raised when Citrus::File is unable to parse some
+    Citrus syntax.
+
+  * Added Citrus.require for requiring .citrus grammar files in a similar way
+    to Ruby's Kernel.require. Also, overloaded the require operator in Citrus
+    grammar files to failover to Citrus.require when Kernel.require raises a
+    LoadError.
+
+  * Improved UTF-8 support.
