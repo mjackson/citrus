@@ -572,13 +572,13 @@ To install the [Vim](http://www.vim.org/) scripts, copy the files in
 
 The project source directory contains several example scripts that demonstrate
 how grammars are to be constructed and used. Each Citrus file in the examples
-directory has an accompanying Ruby file with the same name that contains a suite
-of tests for that particular file.
+directory has an accompanying Ruby file that contains a suite of tests for that
+particular file.
 
 The best way to run any of these examples is to pass the name of the Ruby file
 directly to the Ruby interpreter on the command line, e.g.:
 
-    $ ruby -Ilib examples/calc.rb
+    $ ruby -Ilib examples/calc_test.rb
 
 This particular invocation uses the `-I` flag to ensure that you are using the
 version of Citrus that was bundled with that particular example file (i.e. the
