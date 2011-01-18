@@ -71,7 +71,7 @@ module Citrus
   #     # => [MyGrammar]
   #
   def self.load(file, options={})
-    file += '.citrus' unless file =~ /\.citrus$/
+    file += '.citrus' unless /\.citrus$/ === file
     force = options.delete(:force)
 
     if force || !@cache[file]
@@ -99,7 +99,7 @@ module Citrus
   #     # => [MyGrammar]
   #
   def self.require(file, options={})
-    file += '.citrus' unless file =~ /\.citrus$/
+    file += '.citrus' unless /\.citrus$/ === file
     found = nil
 
     (Pathname.new(file).absolute? ? [''] : $LOAD_PATH).each do |dir|
@@ -1296,7 +1296,7 @@ module Citrus
 
     # Returns this match plus all sub #matches in an array.
     def to_a
-      [captures[0]] + matches
+      [self] + matches
     end
 
     alias_method :to_ary, :to_a
@@ -1382,6 +1382,7 @@ module Citrus
       @matches = []
 
       capture!(@events[0], self)
+      @captures[0] = self
 
       stack = []
       offset = 0
@@ -1404,7 +1405,10 @@ module Citrus
             match = Match.new(@string.slice(os, event), @events[start..index])
             capture!(rule, match)
 
-            @matches << match if stack.size == 1
+            if stack.size == 1
+              @matches << match
+              @captures[@matches.size] = match
+            end
 
             capture = true
           end
@@ -1436,13 +1440,6 @@ module Citrus
         end
 
         index += 1
-      end
-
-      # Add numeric indices to @captures.
-      @captures[0] = self
-
-      @matches.each_with_index do |match, index|
-        @captures[index + 1] = match
       end
     end
 

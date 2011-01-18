@@ -336,7 +336,7 @@ module Citrus
     rule :space,            zero_or_more(any(:white, :comment))
   end
 
-  def File.parse(*args) # :nodoc:
+  def File.parse(*) # :nodoc:
     super
   rescue ParseError => e
     # Raise SyntaxError when a parse fails.
