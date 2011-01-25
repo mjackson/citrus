@@ -102,8 +102,10 @@ module Citrus
     file += '.citrus' unless /\.citrus$/ === file
     found = nil
 
-    (Pathname.new(file).absolute? ? [''] : $LOAD_PATH).each do |dir|
-      found = Dir[::File.join(dir, file)].first
+    paths = ['']
+    paths += $LOAD_PATH unless Pathname.new(file).absolute?
+    paths.each do |path|
+      found = Dir[::File.join(path, file)].first
       break if found
     end
 
