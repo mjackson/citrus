@@ -21,7 +21,7 @@ module Citrus
     end
   end
 
-  # A grammar for Citrus grammar files. This grammar is used in Citrus#eval to
+  # A grammar for Citrus grammar files. This grammar is used in Citrus.eval to
   # parse and evaluate Citrus grammars and serves as a prime example of how to
   # create a complex grammar complete with semantic interpretation in pure Ruby.
   File = Grammar.new do #:nodoc:
