@@ -11,8 +11,8 @@ grammar Calc
   end
 
   rule additive
-    (factor additive_operator term) {
-      additive_operator.value(factor.value, term.value)
+    (factor operator:('+' | '-') space* term) {
+      factor.value.send(operator.to_s, term.value)
     }
   end
 
@@ -21,8 +21,8 @@ grammar Calc
   end
 
   rule multiplicative
-    (prefix multiplicative_operator factor) {
-      multiplicative_operator.value(prefix.value, factor.value)
+    (prefix operator:('*' | '/' | '%') space* factor) {
+      prefix.value.send(operator.to_s, factor.value)
     }
   end
 
@@ -31,8 +31,10 @@ grammar Calc
   end
 
   rule prefixed
-    (unary_operator prefix) {
-      unary_operator.value(prefix.value)
+    (operator:('-' | '+' | '~') space* prefix) {
+      s = operator.to_s
+      s += '@' unless s == '~' # Unary + and - require an @.
+      prefix.value.send(s)
     }
   end
 
@@ -41,8 +43,8 @@ grammar Calc
   end
 
   rule exponential
-    (primary exponential_operator prefix) {
-      exponential_operator.value(primary.value, prefix.value)
+    (primary operator:'**' space* prefix) {
+      primary.value.send(operator.to_s, prefix.value)
     }
   end
 
@@ -77,31 +79,6 @@ grammar Calc
   rule digits
     # Numbers may contain underscores in Ruby.
     [0-9]+ ('_' [0-9]+)*
-  end
-
-  rule additive_operator
-    (('+' | '-') space*) { |a, b|
-      a.send(strip, b)
-    }
-  end
-
-  rule multiplicative_operator
-    (('*' | '/' | '%') space*) { |a, b|
-      a.send(strip, b)
-    }
-  end
-
-  rule exponential_operator
-    ('**' space*) { |a, b|
-      a ** b
-    }
-  end
-
-  rule unary_operator
-    (('~' | '+' | '-') space*) { |n|
-      # Unary + and - require an @.
-      n.send(strip == '~' ? strip : '%s@' % strip)
-    }
   end
 
   rule lparen '(' space* end
