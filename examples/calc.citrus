@@ -65,20 +65,15 @@ grammar Calc
   end
 
   rule float
-    (digits '.' digits space*) {
-      strip.to_f
-    }
+    (digits '.' digits space*) { to_f }
   end
 
   rule integer
-    (digits space*) {
-      strip.to_i
-    }
+    (digits space*) { to_i }
   end
 
   rule digits
-    # Numbers may contain underscores in Ruby.
-    [0-9]+ ('_' [0-9]+)*
+    [0-9]+ ('_' [0-9]+)* # Numbers may contain underscores.
   end
 
   rule lparen '(' space* end
