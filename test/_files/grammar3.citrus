@@ -1,0 +1,8 @@
+grammar EndTagGrammar
+  rule end_tag
+    /*./
+  end
+  rule number
+    end_tag
+  end
+end

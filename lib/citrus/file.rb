@@ -316,12 +316,12 @@ module Citrus
       }
     end
 
-    rule :require_keyword,  [ 'require', :space ]
-    rule :include_keyword,  [ 'include', :space ]
-    rule :grammar_keyword,  [ 'grammar', :space ]
-    rule :root_keyword,     [ 'root', :space ]
-    rule :rule_keyword,     [ 'rule', :space ]
-    rule :end_keyword,      [ 'end', :space ]
+    rule :require_keyword,  [ /\brequire\b/, :space ]
+    rule :include_keyword,  [ /\binclude\b/, :space ]
+    rule :grammar_keyword,  [ /\bgrammar\b/, :space ]
+    rule :root_keyword,     [ /\broot\b/, :space ]
+    rule :rule_keyword,     [ /\brule\b/, :space ]
+    rule :end_keyword,      [ /\bend\b/, :space ]
     rule :lparen,           [ '(', :space ]
     rule :rparen,           [ ')', :space ]
     rule :lcurly,           [ '{', :space ]
