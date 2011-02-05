@@ -19,8 +19,6 @@ module Citrus
 
   CLOSE = -1
 
-  @cache = {}
-
   # Returns a map of paths of files that have been loaded via #load to the
   # result of #eval on the code in that file.
   #
@@ -29,7 +27,7 @@ module Citrus
   # #require the same file with a different relative path, it will be loaded
   # twice.
   def self.cache
-    @cache
+    @cache ||= {}
   end
 
   # Evaluates the given Citrus parsing expression grammar +code+ and returns an
@@ -74,19 +72,19 @@ module Citrus
     file += '.citrus' unless /\.citrus$/ === file
     force = options.delete(:force)
 
-    if force || !@cache[file]
+    if force || !cache[file]
       raise LoadError, "Cannot find file #{file}" unless ::File.file?(file)
       raise LoadError, "Cannot read file #{file}" unless ::File.readable?(file)
 
       begin
-        @cache[file] = eval(::File.read(file), options)
+        cache[file] = eval(::File.read(file), options)
       rescue SyntaxError => e
         e.message.replace("#{::File.expand_path(file)}: #{e.message}")
         raise e
       end
     end
 
-    @cache[file]
+    cache[file]
   end
 
   # Searches the <tt>$LOAD_PATH</tt> for a +file+ with the .citrus suffix and
