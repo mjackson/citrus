@@ -670,6 +670,11 @@ module Citrus
       end
     end
 
+    # This alias allows strings to be compared to the string representation of
+    # Rule objects. It is most useful in assertions in unit tests, e.g.:
+    #
+    #     assert_equal('"a" | "b"', rule)
+    #
     alias_method :to_str, :to_s
 
     # Returns the Citrus notation of this rule as a string that is suitable to
@@ -1287,6 +1292,11 @@ module Citrus
       @string
     end
 
+    # This alias allows strings to be compared to the string value of Match
+    # objects. It is most useful in assertions in unit tests, e.g.:
+    #
+    #     assert_equal("a string", match)
+    #
     alias_method :to_str, :to_s
 
     # The default value for a match is its string value. This method is
