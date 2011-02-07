@@ -1299,8 +1299,6 @@ module Citrus
       [self] + matches
     end
 
-    alias_method :to_ary, :to_a
-
     # Returns the capture at the given +key+. If it is an Integer (and an
     # optional length) or a Range, the result of #to_a with the same arguments
     # is returned. Otherwise, the value at +key+ in #captures is returned.
