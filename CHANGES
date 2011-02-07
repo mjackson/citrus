@@ -1,3 +1,15 @@
+= 2.3.5 / 2011-02-07
+
+  * Fixed a bug that prevented Match objects from being printed properly using
+    Kernel#puts (thanks joachimm).
+
+  * Fixed a bug that prevented using rules with names that begin with "end"
+    (thanks Mark Wilden).
+
+  * Citrus#require accepts relative file paths, in addition to absolute ones.
+
+  * Simplified/cleaned up some example files.
+
 = 2.3.4 / 2011-01-17
 
   * Added CHANGES file.
