@@ -1321,8 +1321,6 @@ module Citrus
       end
     end
 
-    alias_method :fetch, :[]
-
     def ==(other)
       case other
       when String
