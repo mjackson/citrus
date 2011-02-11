@@ -11,7 +11,7 @@
 		<key>decreaseIndentPattern</key>
 		<string>^\s*end\s*$</string>
 		<key>increaseIndentPattern</key>
-		<string>^\s*(grammar|rule)\s+\w+\s*$</string>
+		<string>^\s*(grammar|rule)\s+[\w\-]+\s*$</string>
 	</dict>
 	<key>uuid</key>
 	<string>2087091C-5138-429B-9B5A-C64E771F5894</string>
