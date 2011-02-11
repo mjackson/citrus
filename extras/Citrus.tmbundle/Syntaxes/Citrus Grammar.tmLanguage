@@ -10,6 +10,8 @@
 	<string>(grammer|rule).*$</string>
 	<key>foldingStopMarker</key>
 	<string>^\s*end</string>
+	<key>keyEquivalent</key>
+	<string>^~C</string>
 	<key>name</key>
 	<string>Citrus Grammar</string>
 	<key>patterns</key>
@@ -43,7 +45,7 @@
 		</dict>
 		<dict>
 			<key>begin</key>
-			<string>^\s*(grammar)\s+((?:(?:::)?[A-Z]\w*)+)</string>
+			<string>^\s*(grammar)\s+((?:(::)?[A-Z]\w*)+)</string>
 			<key>beginCaptures</key>
 			<dict>
 				<key>1</key>
@@ -55,6 +57,11 @@
 				<dict>
 					<key>name</key>
 					<string>entity.name.grammar.citrus</string>
+				</dict>
+				<key>3</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.entity.grammar.citrus</string>
 				</dict>
 			</dict>
 			<key>end</key>
@@ -88,9 +95,14 @@
 							<key>name</key>
 							<string>entity.name.module.citrus</string>
 						</dict>
+						<key>3</key>
+						<dict>
+							<key>name</key>
+							<string>punctuation.definition.entity.grammar.citrus</string>
+						</dict>
 					</dict>
 					<key>match</key>
-					<string>\b(include)\s+((?:(?:::)?[A-Z]\w*)+)</string>
+					<string>\b(include)\s+((?:(::)?[A-Z]\w*)+)</string>
 					<key>name</key>
 					<string>meta.include.citrus</string>
 				</dict>
@@ -110,6 +122,8 @@
 							<string>entity.name.rule.citrus</string>
 						</dict>
 					</dict>
+					<key>contentName</key>
+					<string>meta.scope.rule.citrus</string>
 					<key>end</key>
 					<string>\bend\b</string>
 					<key>endCaptures</key>
@@ -147,6 +161,14 @@
 						<dict>
 							<key>include</key>
 							<string>#operator</string>
+						</dict>
+						<dict>
+							<key>include</key>
+							<string>#super</string>
+						</dict>
+						<dict>
+							<key>include</key>
+							<string>#rule-reference</string>
 						</dict>
 						<dict>
 							<key>begin</key>
@@ -276,6 +298,13 @@
 			<key>name</key>
 			<string>string.regexp.citrus</string>
 		</dict>
+		<key>rule-reference</key>
+		<dict>
+			<key>match</key>
+			<string>[a-zA-Z][a-zA-Z0-9_-]*</string>
+			<key>name</key>
+			<string>variable.other.citrus</string>
+		</dict>
 		<key>string</key>
 		<dict>
 			<key>patterns</key>
@@ -345,6 +374,13 @@
 					</array>
 				</dict>
 			</array>
+		</dict>
+		<key>super</key>
+		<dict>
+			<key>match</key>
+			<string>\bsuper\b</string>
+			<key>name</key>
+			<string>variable.language.citrus</string>
 		</dict>
 	</dict>
 	<key>scopeName</key>
