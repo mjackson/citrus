@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#!/usr/bin/env ruby
+#Yes! lets do all this stuff without using citrus!
+# A correct scope selector assures that this command can only be called
+# inside rules
+require "#{ENV['TM_SUPPORT_PATH']}/lib/escape"
+
+line = STDIN.read
+
+caret_placement = 0
+tmp = ENV['TM_LINE_NUMBER'].to_i - 1
+
+if tmp &gt; 0
+class String
+  def index_of_nth_occurrence_of(n, ch)
+    self.unpack("U*").each_with_index do |e, i|
+      return i if e == ch &amp;&amp; (n -= 1) == 0
+    end
+    return -1
+  end
+end
+  caret_placement += line.index_of_nth_occurrence_of(tmp,?\n) + ENV['TM_LINE_INDEX'].to_i
+else
+  caret_placement =ENV['TM_LINE_INDEX'].to_i-ENV['TM_INPUT_START_LINE_INDEX'].to_i - 1
+end
+
+#strip constructs that can trip us
+original = line.dup
+# remove nested {}, strings and comments and &lt;&gt;
+line.gsub!(/&lt;[\&gt;]*&gt;|\#.*|(["'\/])(?:\\?.)*?\1|\[(?:\\?.)\]/){|s| " "*s.size}
+while nil != line.gsub!(/\{[^\{\}]*\}/){|s| " "*s.size}
+end
+
+
+rule_names_rgxp = /^([ \t]*)rule([ \t])([a-zA-Z][a-zA-Z0-9_-]*)/
+leading_space =""
+trailing_space = ""
+rules = line.scan(rule_names_rgxp).map do |ls,ts,rn|
+  leading_space = ls
+  trailing_space = ts
+  rn
+end
+
+start = line[0..caret_placement].rindex(rule_names_rgxp)
+start += line[start..caret_placement].match(rule_names_rgxp).end(0)
+
+# Find end of current rule + insertion point, be explicit about space or tabs
+m = line[caret_placement+1 .. -1].match(/^(([ \t]*)end\b|\s*(rule)\b)/)
+to_insert = ""
+if m.nil?
+  insert_at = stop = line.size
+  to_insert = "#{leading_space}end\n"
+elsif m[3] # has rule
+  insert_at = stop = m.begin(0) + caret_placement
+  to_insert = "#{leading_space}end\n"  
+else  # has end
+  stop = m.begin(0) + caret_placement
+  if m[2].size == leading_space.size
+    insert_at = m.end(0) + caret_placement
+  else
+    insert_at = stop
+    to_insert = "#{leading_space}end\n"  
+  end
+end
+
+rule_content = line[start..stop]
+# find rule aliases, avoid labels
+inner_rules = rule_content.scan(/([a-zA-Z][a-zA-Z0-9_-]*\b)(?!:)/).flatten
+inner_rules -= rules
+to_insert += inner_rules.map do |rule|
+  "\n#{leading_space}rule#{trailing_space}#{rule}\n#{leading_space}end"
+end.join("\n")
+pre = original[0..caret_placement]
+post = original[caret_placement+1..insert_at]
+remainder = original[insert_at +1..-1] || ""
+
+print e_sn(pre)+"$0"+e_sn(post + to_insert+ remainder)
+
+
+</string>
+	<key>disableOutputAutoIndent</key>
+	<true/>
+	<key>fallbackInput</key>
+	<string>document</string>
+	<key>input</key>
+	<string>selection</string>
+	<key>keyEquivalent</key>
+	<string>@i</string>
+	<key>name</key>
+	<string>Stub Undeclared Rules</string>
+	<key>output</key>
+	<string>insertAsSnippet</string>
+	<key>scope</key>
+	<string>meta.scope.rule.citrus</string>
+	<key>uuid</key>
+	<string>FF4BD86B-1D05-4D2E-AEFB-68EC9815FBCD</string>
+</dict>
+</plist>
