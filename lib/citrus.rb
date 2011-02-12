@@ -308,7 +308,11 @@ module Citrus
 
       if memo[position]
         @cache_hits += 1
-        events.concat(memo[position])
+        c = memo[position]
+        unless c.empty?
+          events.concat(c)
+          self.pos += events[-1]
+        end
       else
         index = events.size
         rule.exec(self, events)
