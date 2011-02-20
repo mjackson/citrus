@@ -1,0 +1,161 @@
+# A grammar for email addresses that closely conforms to RFC 5322, with the
+# notable exception that this grammar does not allow for folding white space
+# or comments within atoms.
+grammar EmailAddress
+  root addr-spec
+
+  # ALPHA           =  %x41-5A / %x61-7A   ; A-Z / a-z
+  rule ALPHA
+    [A-Za-z]
+  end
+
+  # DIGIT           =  %x30-39
+  #                        ; 0-9
+  rule DIGIT
+    [0-9]
+  end
+
+  # DQUOTE          =  %x22
+  #                        ; " (Double Quote)
+  rule DQUOTE
+    '"'
+  end
+
+  # NO-WS-CTL       =       %d1-8 /         ; US-ASCII control characters
+  #                         %d11 /          ;  that do not include the
+  #                         %d12 /          ;  carriage return, line feed,
+  #                         %d14-31 /       ;  and white space characters
+  #                         %d127
+  rule NO-WS-CTL
+    [\x01-\x08\x0B\x0C\x0E-\x1F\x7F]
+  end
+
+  # quoted-pair     =       ("\" text) / obs-qp
+  rule quoted-pair
+    ("\\" text) | obs-qp
+  end
+
+  # atext           =   ALPHA / DIGIT /    ; Printable US-ASCII
+  #                     "!" / "#" /        ;  characters not including
+  #                     "$" / "%" /        ;  specials.  Used for atoms.
+  #                     "&" / "'" /
+  #                     "*" / "+" /
+  #                     "-" / "/" /
+  #                     "=" / "?" /
+  #                     "^" / "_" /
+  #                     "`" / "{" /
+  #                     "|" / "}" /
+  #                     "~"
+  rule atext
+    ALPHA | DIGIT | [!\#$\%&'*+-/=?^_`{|}~]
+  end
+
+  # atom            =       [CFWS] 1*atext [CFWS]
+  rule atom
+    atext 1*
+  end
+
+  # dot-atom-text   =       1*atext *("." 1*atext)
+  rule dot-atom-text
+    atext 1* ("." atext 1*)*
+  end
+
+  # dot-atom        =       [CFWS] dot-atom-text [CFWS]
+  rule dot-atom
+    dot-atom-text
+  end
+
+  # qtext           =   %d33 /             ; Printable US-ASCII
+  #                     %d35-91 /          ;  characters not including
+  #                     %d93-126 /         ;  "\" or the quote character
+  #                     obs-qtext
+  rule qtext
+    [\x21\x23-\x5B\x5D-\x7E] | obs-qtext
+  end
+
+  # qcontent        =       qtext / quoted-pair
+  rule qcontent
+    qtext | quoted-pair
+  end
+
+  # quoted-string   =       [CFWS]
+  #                         DQUOTE *([FWS] qcontent) [FWS] DQUOTE
+  #                         [CFWS]
+  rule quoted-string
+    '"' qcontent* '"'
+  end
+
+  # word            =       atom / quoted-string
+  rule word
+    atom | quoted-string
+  end
+
+  # addr-spec       =       local-part "@" domain
+  rule addr-spec
+    local-part "@" domain
+  end
+
+  # local-part      =       dot-atom / quoted-string / obs-local-part
+  rule local-part
+    dot-atom | quoted-string | obs-local-part
+  end
+
+  # domain          =       dot-atom / domain-literal / obs-domain
+  rule domain
+    dot-atom | domain-literal | obs-domain
+  end
+
+  # domain-literal  =       [CFWS] "[" *([FWS] dcontent) [FWS] "]" [CFWS]
+  rule domain-literal
+    "[" dtext* "]"
+  end
+
+  # dtext           =   %d33-90 /          ; Printable US-ASCII
+  #                     %d94-126 /         ;  characters not including
+  #                     obs-dtext          ;  "[", "]", or "\"
+  rule dtext
+    [\x21-\x5A\x5E-\x7E] | obs-dtext
+  end
+
+  # text            =   %d1-9 /            ; Characters excluding CR
+  #                     %d11 /             ;  and LF
+  #                     %d12 /
+  #                     %d14-127
+  rule text
+    [\x01-\x09\x0B\x0C\x0E-\x7F]
+  end
+
+  # obs-NO-WS-CTL   =   %d1-8 /            ; US-ASCII control
+  #                     %d11 /             ;  characters that do not
+  #                     %d12 /             ;  include the carriage
+  #                     %d14-31 /          ;  return, line feed, and
+  #                     %d127              ;  white space characters
+  rule obs-NO-WS-CTL
+    [\x01-\x08\x0B\x0C\x0E-\x1F\x7F]
+  end
+
+  # obs-qtext       =   obs-NO-WS-CTL
+  rule obs-qtext
+    obs-NO-WS-CTL
+  end
+
+  # obs-qp          =   "\" (%d0 / obs-NO-WS-CTL / LF / CR)
+  rule obs-qp
+    "\\" ("\x00" | obs-NO-WS-CTL | "\n" | "\r")
+  end
+
+  # obs-local-part  =       word *("." word)
+  rule obs-local-part
+    word ("." word)*
+  end
+
+  # obs-domain      =       atom *("." atom)
+  rule obs-domain
+    atom ("." atom)*
+  end
+
+  # obs-dtext       =   obs-NO-WS-CTL / quoted-pair
+  rule obs-dtext
+    obs-NO-WS-CTL | quoted-pair
+  end
+end

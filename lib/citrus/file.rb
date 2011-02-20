@@ -220,7 +220,7 @@ module Citrus
 
     rule :character_class do
       all(/\[(?:\\?.)*?\]/, :space) {
-        eval("/#{first.to_s}/")
+        eval("/#{first.to_s.gsub('/', '\\/')}/")
       }
     end
 

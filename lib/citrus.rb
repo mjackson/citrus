@@ -308,9 +308,9 @@ module Citrus
 
       if memo[position]
         @cache_hits += 1
-        mem = memo[position]
-        unless mem.empty?
-          events.concat(mem)
+        c = memo[position]
+        unless c.empty?
+          events.concat(c)
           self.pos += events[-1]
         end
       else
