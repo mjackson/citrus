@@ -332,7 +332,6 @@ module Citrus
       super(string)
       @heads = {}
       @lrstack = nil
-      @memoized = true
     end
     class LR
       attr_accessor :seed, :rule, :head, :next
@@ -355,10 +354,6 @@ module Citrus
       def inspect
         "<#Head rule=#{@rule} involved=[#{involved_set.to_a.join(", ")}] eval=[#{eval_set.to_a.join(", ")}]"
       end
-    end
-
-    def memoized?
-      @memoized
     end
 
     private
@@ -389,7 +384,6 @@ module Citrus
           # Memoize the result so we can use it next time this same rule is
           # executed at this position.
           memo[position] = events.slice(index, events.size)
-          memo[position] = events.slice(index, events.size) if memoized?
           # if this rule has been seen before, (same rule was accessed as child)
           # start growing the seed 
           if lr.head
@@ -406,7 +400,6 @@ module Citrus
       def grow_lr(rule, position, mem, head)
         @heads[position]=head
         progress = position
-        @memoized=false
         # Don't memoize while growing the seed        
         while true
           head.eval_set = head.involved_set.dup
@@ -417,7 +410,6 @@ module Citrus
           @cache[rule][position] = events
           progress = pos
         end
-        @memoized=true
         # set the last successful parse value
         @heads[position]=nil
         self.pos = progress
@@ -1491,7 +1483,7 @@ module Citrus
     end
 
     def inspect
-      @string.inspect
+      "#<#{self.class.name} rule={#{@events.first}} #{captures.map{|k,v| "#{k}:\"#{v}\"" }.join(" ")} matches=#{matches.inspect}>"
     end
 
     # Prints the entire subtree of this match using the given +indent+ to
