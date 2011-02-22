@@ -26,27 +26,30 @@ class IndirectLeftRecursionTest < Test::Unit::TestCase
   
   grammar :BigILR do
     rule :t do
-      :term
+      ext(:term)
     end
     
     rule :term do
-      any(all(:t, '+', :f),
-          all(:t, '-', :f),
+      any(all(:t, '+', :f){t.value + f.value},
+          all(:t, '-', :f){t.value - f.value},
           :f)
     end
     
     rule :f do
-      :fact
+      ext(:fa)
+    end
+    rule :fa do
+      ext(:fact)
     end
 
     rule :fact do
-      any(all(:f, '*', :num),
-          all(:f, '/', :num),
+      any(all(:f, '*', :num){f.value * num.value},
+          all(:f, '/', :num){f.value / num.value},
           :num)
     end
 
     rule :num do
-      /[0-9]+/
+      ext(/[0-9]+/){to_i}
     end
   end
 
@@ -54,11 +57,12 @@ class IndirectLeftRecursionTest < Test::Unit::TestCase
     match = BigILR.parse("3-4-5", {:leftrecursive=>true})
     assert(match)
     assert_equal("3-4-5", match)
+    assert_equal(-6, match.value)
     
-    match = BigILR.parse("5*4-5", {:leftrecursive=>true})
+    match = BigILR.parse("5*4*2-5*9*2", {:leftrecursive=>true})
     assert(match)
-    assert_equal("5*4-5", match)
-    
+    assert_equal("5*4*2-5*9*2", match)
+    assert_equal(-50, match.value)
   end
   
 end
