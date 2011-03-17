@@ -879,6 +879,8 @@ module Citrus
       end
     end
 
+    alias_method :eql?, :==
+
     # Returns +true+ if this rule is a Terminal.
     def terminal? # :nodoc:
       true
@@ -921,6 +923,8 @@ module Citrus
         super
       end
     end
+
+    alias_method :eql?, :==
 
     # Returns the Citrus notation of this rule as a string.
     def to_citrus # :nodoc:
@@ -1342,6 +1346,8 @@ module Citrus
         super
       end
     end
+
+    alias_method :eql?, :==
 
     def inspect
       @string.inspect
