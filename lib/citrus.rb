@@ -648,6 +648,11 @@ module Citrus
       nil
     end
 
+    # Tests the given +obj+ for case equality with this rule.
+    def ===(obj)
+      !test(obj).nil?
+    end
+
     # Returns +true+ if this rule is a Terminal.
     def terminal?
       false
@@ -699,6 +704,8 @@ module Citrus
         super
       end
     end
+
+    alias_method :eql?, :==
 
     def inspect # :nodoc:
       to_s
