@@ -1,0 +1,179 @@
+require 'ipv4address'
+require 'ipv6address'
+
+# A grammar for URI's that conforms to RFC 3986.
+grammar UniformResourceIdentifier
+  include IPv4Address
+  include IPv6Address
+
+  # URI           = scheme ":" hier-part [ "?" query ] [ "#" fragment ]
+  rule URI
+    scheme ":" hier-part ("?" query)? ("#" fragment)?
+  end
+
+  # hier-part     = "//" authority path-abempty
+  #               / path-absolute
+  #               / path-rootless
+  #               / path-empty
+  rule hier-part
+    "//" authority path-abempty | path-absolute | path-rootless | path-empty
+  end
+
+  # URI-reference = URI / relative-ref
+  rule URI-reference
+    URI | relative-ref
+  end
+
+  # absolute-URI  = scheme ":" hier-part [ "?" query ]
+  rule absolute-URI
+    scheme ":" hier-part ("?" query)?
+  end
+
+  # relative-ref  = relative-part [ "?" query ] [ "#" fragment ]
+  rule relative-ref
+    relative-part ("?" query)? ("#" fragment)?
+  end
+
+  # relative-part = "//" authority path-abempty
+  #               / path-absolute
+  #               / path-noscheme
+  #               / path-empty
+  rule relative-part
+    "//" authority path-abempty | path-absolute | path-noscheme | path-empty
+  end
+
+  # scheme      = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
+  rule scheme
+    ALPHA (ALPHA | DIGIT | "+" | "-" | ".")*
+  end
+
+  # authority   = [ userinfo "@" ] host [ ":" port ]
+  rule authority
+    (userinfo "@")? host (":" port)?
+  end
+
+  # userinfo    = *( unreserved / pct-encoded / sub-delims / ":" )
+  rule userinfo
+    (unreserved | pct-encoded | sub-delims | ":")*
+  end
+
+  # host        = IP-literal / IPv4address / reg-name
+  rule host
+    IP-literal | IPv4address | reg-name
+  end
+
+  # port        = *DIGIT
+  rule port
+    DIGIT*
+  end
+
+  # IP-literal = "[" ( IPv6address / IPvFuture  ) "]"
+  rule IP-literal
+    "[" (IPv6address | IPvFuture) "]"
+  end
+
+  # IPvFuture  = "v" 1*HEXDIG "." 1*( unreserved / sub-delims / ":" )
+  rule IPvFuture
+    "v" HEXDIG+ "." (unreserved | sub-delims | ":")+
+  end
+
+  # reg-name    = *( unreserved / pct-encoded / sub-delims )
+  rule reg-name
+    (unreserved | pct-encoded | sub-delims)*
+  end
+
+  # path          = path-abempty    ; begins with "/" or is empty
+  #               / path-absolute   ; begins with "/" but not "//"
+  #               / path-noscheme   ; begins with a non-colon segment
+  #               / path-rootless   ; begins with a segment
+  #               / path-empty      ; zero characters
+  rule path
+    path-abempty | path-absolute | path-noscheme | path-rootless | path-empty
+  end
+
+  # path-abempty  = *( "/" segment )
+  rule path-abempty
+    ("/" segment)*
+  end
+
+  # path-absolute = "/" [ segment-nz *( "/" segment ) ]
+  rule path-absolute
+    "/" (segment-nz ("/" segment)*)?
+  end
+
+  # path-noscheme = segment-nz-nc *( "/" segment )
+  rule path-noscheme
+    segment-nz-nc ("/" segment)*
+  end
+
+  # path-rootless = segment-nz *( "/" segment )
+  rule path-rootless
+    segment-nz ("/" segment)*
+  end
+
+  # path-empty    = 0<pchar>
+  rule path-empty
+    ''
+  end
+
+  # segment       = *pchar
+  rule segment
+    pchar*
+  end
+
+  # segment-nz    = 1*pchar
+  rule segment-nz
+    pchar 1*
+  end
+
+  # segment-nz-nc = 1*( unreserved / pct-encoded / sub-delims / "@" )
+  #               ; non-zero-length segment without any colon ":"
+  rule segment-nz-nc
+    (unreserved | pct-encoded | sub-delims | "@") 1*
+  end
+
+  # pchar         = unreserved / pct-encoded / sub-delims / ":" / "@"
+  rule pchar
+    unreserved | pct-encoded | sub-delims | ":" | "@"
+  end
+
+  # query       = *( pchar / "/" / "?" )
+  rule query
+    (pchar | "/" | "?")*
+  end
+
+  # fragment    = *( pchar / "/" / "?" )
+  rule fragment
+    (pchar | "/" | "?")*
+  end
+
+  # pct-encoded   = "%" HEXDIG HEXDIG
+  rule pct-encoded
+    "%" HEXDIG HEXDIG
+  end
+
+  # unreserved    = ALPHA / DIGIT / "-" / "." / "_" / "~"
+  rule unreserved
+    ALPHA | DIGIT | "-" | "." | "_" | "~"
+  end
+
+  # reserved      = gen-delims / sub-delims
+  rule reserved
+    gen-delims | sub-delims
+  end
+
+  # gen-delims    = ":" / "/" / "?" / "#" / "[" / "]" / "@"
+  rule gen-delims
+    ":" | "/" | "?" | "#" | "[" | "]" | "@"
+  end
+
+  # sub-delims    = "!" / "$" / "&" / "'" / "(" / ")"
+  #               / "*" / "+" / "," / ";" / "="
+  rule sub-delims
+    "!" | "$" | "&" | "'" | "(" | ")" | "*" | "+" | "," | ";" | "="
+  end
+
+  rule ALPHA
+    [a-zA-Z]
+  end
+end
