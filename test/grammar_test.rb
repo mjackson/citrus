@@ -118,7 +118,8 @@ class GrammarTest < Test::Unit::TestCase
     assert_equal('((a))', match)
     assert_equal(5, match.length)
 
-    str = ('(' * 200) + 'a' + (')' * 200)
+    n = 100
+    str = ('(' * n) + 'a' + (')' * n)
     match = grammar.parse(str)
     assert(match)
     assert_equal(str, match)
