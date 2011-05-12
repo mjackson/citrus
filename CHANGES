@@ -1,3 +1,12 @@
+= Next
+
+  * Fixed a bug that prevented parsing nested blocks correctly (issue #21).
+
+  * Added URI example.
+
+  * Moved example grammars inside lib/citrus/grammars and added
+    lib/citrus/grammars.rb for easily requiring Citrus example grammars.
+
 = 2.3.7 / 2011-02-20
 
   * Fixed a bug that prevented forward slashes from being used inside character
