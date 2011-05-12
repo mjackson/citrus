@@ -73,7 +73,7 @@ module Citrus
     end
 
     rule :expression do
-      all(:sequence, zero_or_more([ :bar, :sequence ])) {
+      all(:sequence, zero_or_more([['|', zero_or_one(:space)], :sequence])) {
         rules = captures[:sequence].map {|s| s.value }
         rules.length > 1 ? Choice.new(rules) : rules.first
       }
@@ -123,7 +123,7 @@ module Citrus
     end
 
     rule :grouping do
-      all(:lparen, :expression, :rparen) {
+      all(['(', zero_or_one(:space)], :expression, [')', zero_or_one(:space)]) {
         expression.value
       }
     end
@@ -241,7 +241,11 @@ module Citrus
     end
 
     rule :tag do
-      mod all(:lt, :module_name, :gt) do
+      mod all(
+        ['<', zero_or_one(:space)],
+        :module_name,
+        ['>', zero_or_one(:space)]
+      ) do
         include ModuleNameHelpers
 
         def value
@@ -251,7 +255,11 @@ module Citrus
     end
 
     rule :block do
-      all(:lcurly, zero_or_more(any(:block, /[^{}]+/)), :rcurly) {
+      all(
+        '{',
+        zero_or_more(any(:block, /[^{}]+/)),
+        ['}', zero_or_one(:space)]
+      ) {
         proc = eval("Proc.new #{to_s}", TOPLEVEL_BINDING)
 
         # Attempt to detect if this is a module block using some
@@ -322,13 +330,6 @@ module Citrus
     rule :root_keyword,     [ /\broot\b/, :space ]
     rule :rule_keyword,     [ /\brule\b/, :space ]
     rule :end_keyword,      [ /\bend\b/, :space ]
-    rule :lparen,           [ '(', :space ]
-    rule :rparen,           [ ')', :space ]
-    rule :lcurly,           [ '{', :space ]
-    rule :rcurly,           [ '}', :space ]
-    rule :bar,              [ '|', :space ]
-    rule :lt,               [ '<', :space ]
-    rule :gt,               [ '>', :space ]
 
     rule :constant,         /[A-Z][a-zA-Z0-9_]*/
     rule :white,            /[ \t\n\r]/

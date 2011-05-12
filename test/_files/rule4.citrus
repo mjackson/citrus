@@ -1,0 +1,5 @@
+rule method
+  (def space method_name statements ends) {
+    "#{method_name.value} = function() { #{statements.value} }"
+  }
+end
