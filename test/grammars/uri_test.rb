@@ -1,12 +1,7 @@
-examples = File.expand_path('..', __FILE__)
-$LOAD_PATH.unshift(examples) unless $LOAD_PATH.include?(examples)
+require File.expand_path('../../helper', __FILE__)
+require 'citrus/grammars'
 
-# This file contains a suite of tests for the UniformResourceIdentifier grammar
-# found in uri.citrus.
-
-require 'citrus'
 Citrus.require 'uri'
-require 'test/unit'
 
 class UniformResourceIdentifierTest < Test::Unit::TestCase
   U = UniformResourceIdentifier

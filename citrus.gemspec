@@ -17,7 +17,6 @@ Gem::Specification.new do |s|
 
   s.files = Dir['benchmark/**'] +
     Dir['doc/**'] +
-    Dir['examples/**'] +
     Dir['extras/**'] +
     Dir['lib/**/*.rb'] +
     Dir['test/**/*'] +

@@ -1,9 +1,7 @@
-# This file contains a suite of tests for the EmailAddress grammar
-# found in email.citrus.
+require File.expand_path('../../helper', __FILE__)
+require 'citrus/grammars'
 
-require 'citrus'
-Citrus.require File.expand_path('../email', __FILE__)
-require 'test/unit'
+Citrus.require 'email'
 
 class EmailAddressTest < Test::Unit::TestCase
   def test_addr_spec_valid

@@ -1,8 +1,7 @@
-# This file contains a suite of tests for the Calc grammar found in calc.citrus.
+require File.expand_path('../../helper', __FILE__)
+require 'citrus/grammars'
 
-require 'citrus'
-Citrus.require File.expand_path('../calc', __FILE__)
-require 'test/unit'
+Citrus.require 'calc'
 
 class CalcTest < Test::Unit::TestCase
   # A helper method that tests the successful parsing and evaluation of the

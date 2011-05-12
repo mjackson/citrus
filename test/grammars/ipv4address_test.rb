@@ -1,12 +1,7 @@
-examples = File.expand_path('..', __FILE__)
-$LOAD_PATH.unshift(examples) unless $LOAD_PATH.include?(examples)
+require File.expand_path('../../helper', __FILE__)
+require 'citrus/grammars'
 
-# This file contains a suite of tests for the IPv4Address grammar found in
-# ipv4address.citrus.
-
-require 'citrus'
 Citrus.require 'ipv4address'
-require 'test/unit'
 
 class IPv4AddressTest < Test::Unit::TestCase
   def test_dec_octet
