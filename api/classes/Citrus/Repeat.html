@@ -68,13 +68,13 @@
             <h2>Methods</h2>
             <h3>public class</h3>
             <ol>
-              <li><a href="#M000079">new</a></li>
+              <li><a href="#M000083">new</a></li>
             </ol>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000081">exec</a></li>
-              <li><a href="#M000082">operator</a></li>
-              <li><a href="#M000080">rule</a></li>
+              <li><a href="#M000085">exec</a></li>
+              <li><a href="#M000086">operator</a></li>
+              <li><a href="#M000084">rule</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -111,22 +111,22 @@
             </div>
             <div id='methods'>
               <h2>Public class methods</h2>
-              <div class='method public-class' id='method-M000079'>
-                <a name='M000079'></a>
+              <div class='method public-class' id='method-M000083'>
+                <a name='M000083'></a>
                 <div class='synopsis'>
                   <span class='name'>new</span>
                   <span class='arguments'>(rule='', min=1, max=Infinity)</span>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000079-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000083-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000079-source'>      <span class="ruby-comment cmt"># File lib/citrus.rb, line 1076</span>&#x000A;1076:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">rule</span>=<span class="ruby-value str">''</span>, <span class="ruby-identifier">min</span>=<span class="ruby-value">1</span>, <span class="ruby-identifier">max</span>=<span class="ruby-constant">Infinity</span>)&#x000A;1077:       <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-value str">&quot;Min cannot be greater than max&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">min</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">max</span>&#x000A;1078:       <span class="ruby-keyword kw">super</span>([<span class="ruby-identifier">rule</span>])&#x000A;1079:       <span class="ruby-ivar">@min</span> = <span class="ruby-identifier">min</span>&#x000A;1080:       <span class="ruby-ivar">@max</span> = <span class="ruby-identifier">max</span>&#x000A;1081:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000083-source'>      <span class="ruby-comment cmt"># File lib/citrus.rb, line 1096</span>&#x000A;1096:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">rule</span>=<span class="ruby-value str">''</span>, <span class="ruby-identifier">min</span>=<span class="ruby-value">1</span>, <span class="ruby-identifier">max</span>=<span class="ruby-constant">Infinity</span>)&#x000A;1097:       <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-value str">&quot;Min cannot be greater than max&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">min</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">max</span>&#x000A;1098:       <span class="ruby-keyword kw">super</span>([<span class="ruby-identifier">rule</span>])&#x000A;1099:       <span class="ruby-ivar">@min</span> = <span class="ruby-identifier">min</span>&#x000A;1100:       <span class="ruby-ivar">@max</span> = <span class="ruby-identifier">max</span>&#x000A;1101:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <h2>Public instance methods</h2>
-              <div class='method public-instance' id='method-M000081'>
-                <a name='M000081'></a>
+              <div class='method public-instance' id='method-M000085'>
+                <a name='M000085'></a>
                 <div class='synopsis'>
                   <span class='name'>exec</span>
                   <span class='arguments'>(input, events=[])</span>
@@ -137,14 +137,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000081-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000085-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000081-source'>      <span class="ruby-comment cmt"># File lib/citrus.rb, line 1089</span>&#x000A;1089:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">exec</span>(<span class="ruby-identifier">input</span>, <span class="ruby-identifier">events</span>=[])&#x000A;1090:       <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword kw">self</span>&#x000A;1091: &#x000A;1092:       <span class="ruby-identifier">index</span> = <span class="ruby-identifier">events</span>.<span class="ruby-identifier">size</span>&#x000A;1093:       <span class="ruby-identifier">start</span> = <span class="ruby-identifier">index</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>&#x000A;1094:       <span class="ruby-identifier">length</span> = <span class="ruby-identifier">n</span> = <span class="ruby-value">0</span>&#x000A;1095: &#x000A;1096:       <span class="ruby-keyword kw">while</span> <span class="ruby-identifier">n</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">max</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">input</span>.<span class="ruby-identifier">exec</span>(<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">events</span>).<span class="ruby-identifier">size</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">index</span>&#x000A;1097:         <span class="ruby-identifier">length</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">events</span>[<span class="ruby-value">-1</span>]&#x000A;1098:         <span class="ruby-identifier">index</span> = <span class="ruby-identifier">events</span>.<span class="ruby-identifier">size</span>&#x000A;1099:         <span class="ruby-identifier">n</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>&#x000A;1100:       <span class="ruby-keyword kw">end</span>&#x000A;1101: &#x000A;1102:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">n</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-identifier">min</span>&#x000A;1103:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">CLOSE</span>&#x000A;1104:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">length</span>&#x000A;1105:       <span class="ruby-keyword kw">else</span>&#x000A;1106:         <span class="ruby-identifier">events</span>.<span class="ruby-identifier">slice!</span>(<span class="ruby-identifier">start</span>, <span class="ruby-identifier">index</span>)&#x000A;1107:       <span class="ruby-keyword kw">end</span>&#x000A;1108: &#x000A;1109:       <span class="ruby-identifier">events</span>&#x000A;1110:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000085-source'>      <span class="ruby-comment cmt"># File lib/citrus.rb, line 1109</span>&#x000A;1109:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">exec</span>(<span class="ruby-identifier">input</span>, <span class="ruby-identifier">events</span>=[])&#x000A;1110:       <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword kw">self</span>&#x000A;1111: &#x000A;1112:       <span class="ruby-identifier">index</span> = <span class="ruby-identifier">events</span>.<span class="ruby-identifier">size</span>&#x000A;1113:       <span class="ruby-identifier">start</span> = <span class="ruby-identifier">index</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>&#x000A;1114:       <span class="ruby-identifier">length</span> = <span class="ruby-identifier">n</span> = <span class="ruby-value">0</span>&#x000A;1115: &#x000A;1116:       <span class="ruby-keyword kw">while</span> <span class="ruby-identifier">n</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">max</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">input</span>.<span class="ruby-identifier">exec</span>(<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">events</span>).<span class="ruby-identifier">size</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">index</span>&#x000A;1117:         <span class="ruby-identifier">length</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">events</span>[<span class="ruby-value">-1</span>]&#x000A;1118:         <span class="ruby-identifier">index</span> = <span class="ruby-identifier">events</span>.<span class="ruby-identifier">size</span>&#x000A;1119:         <span class="ruby-identifier">n</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>&#x000A;1120:       <span class="ruby-keyword kw">end</span>&#x000A;1121: &#x000A;1122:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">n</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-identifier">min</span>&#x000A;1123:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">CLOSE</span>&#x000A;1124:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">length</span>&#x000A;1125:       <span class="ruby-keyword kw">else</span>&#x000A;1126:         <span class="ruby-identifier">events</span>.<span class="ruby-identifier">slice!</span>(<span class="ruby-identifier">start</span>, <span class="ruby-identifier">index</span>)&#x000A;1127:       <span class="ruby-keyword kw">end</span>&#x000A;1128: &#x000A;1129:       <span class="ruby-identifier">events</span>&#x000A;1130:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='method public-instance' id='method-M000082'>
-                <a name='M000082'></a>
+              <div class='method public-instance' id='method-M000086'>
+                <a name='M000086'></a>
                 <div class='synopsis'>
                   <span class='name'>operator</span>
                   <span class='arguments'>()</span>
@@ -156,14 +156,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000082-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000086-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000082-source'>      <span class="ruby-comment cmt"># File lib/citrus.rb, line 1120</span>&#x000A;1120:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">operator</span>&#x000A;1121:       <span class="ruby-ivar">@operator</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword kw">case</span> [<span class="ruby-identifier">min</span>, <span class="ruby-identifier">max</span>]&#x000A;1122:         <span class="ruby-keyword kw">when</span> [<span class="ruby-value">0</span>, <span class="ruby-value">0</span>] <span class="ruby-keyword kw">then</span> <span class="ruby-value str">''</span>&#x000A;1123:         <span class="ruby-keyword kw">when</span> [<span class="ruby-value">0</span>, <span class="ruby-value">1</span>] <span class="ruby-keyword kw">then</span> <span class="ruby-value str">'?'</span>&#x000A;1124:         <span class="ruby-keyword kw">when</span> [<span class="ruby-value">1</span>, <span class="ruby-constant">Infinity</span>] <span class="ruby-keyword kw">then</span> <span class="ruby-value str">'+'</span>&#x000A;1125:         <span class="ruby-keyword kw">else</span>&#x000A;1126:           [<span class="ruby-identifier">min</span>, <span class="ruby-identifier">max</span>].<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">n</span><span class="ruby-operator">|</span> <span class="ruby-identifier">n</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">n</span> <span class="ruby-operator">==</span> <span class="ruby-constant">Infinity</span> <span class="ruby-value">? </span><span class="ruby-value str">''</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">n</span>.<span class="ruby-identifier">to_s</span> }.<span class="ruby-identifier">join</span>(<span class="ruby-value str">'*'</span>)&#x000A;1127:         <span class="ruby-keyword kw">end</span>&#x000A;1128:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000086-source'>      <span class="ruby-comment cmt"># File lib/citrus.rb, line 1140</span>&#x000A;1140:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">operator</span>&#x000A;1141:       <span class="ruby-ivar">@operator</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword kw">case</span> [<span class="ruby-identifier">min</span>, <span class="ruby-identifier">max</span>]&#x000A;1142:         <span class="ruby-keyword kw">when</span> [<span class="ruby-value">0</span>, <span class="ruby-value">0</span>] <span class="ruby-keyword kw">then</span> <span class="ruby-value str">''</span>&#x000A;1143:         <span class="ruby-keyword kw">when</span> [<span class="ruby-value">0</span>, <span class="ruby-value">1</span>] <span class="ruby-keyword kw">then</span> <span class="ruby-value str">'?'</span>&#x000A;1144:         <span class="ruby-keyword kw">when</span> [<span class="ruby-value">1</span>, <span class="ruby-constant">Infinity</span>] <span class="ruby-keyword kw">then</span> <span class="ruby-value str">'+'</span>&#x000A;1145:         <span class="ruby-keyword kw">else</span>&#x000A;1146:           [<span class="ruby-identifier">min</span>, <span class="ruby-identifier">max</span>].<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">n</span><span class="ruby-operator">|</span> <span class="ruby-identifier">n</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">n</span> <span class="ruby-operator">==</span> <span class="ruby-constant">Infinity</span> <span class="ruby-value">? </span><span class="ruby-value str">''</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">n</span>.<span class="ruby-identifier">to_s</span> }.<span class="ruby-identifier">join</span>(<span class="ruby-value str">'*'</span>)&#x000A;1147:         <span class="ruby-keyword kw">end</span>&#x000A;1148:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='method public-instance' id='method-M000080'>
-                <a name='M000080'></a>
+              <div class='method public-instance' id='method-M000084'>
+                <a name='M000084'></a>
                 <div class='synopsis'>
                   <span class='name'>rule</span>
                   <span class='arguments'>()</span>
@@ -174,10 +174,10 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000080-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000084-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000080-source'>      <span class="ruby-comment cmt"># File lib/citrus.rb, line 1084</span>&#x000A;1084:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">rule</span>&#x000A;1085:       <span class="ruby-identifier">rules</span>[<span class="ruby-value">0</span>]&#x000A;1086:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000084-source'>      <span class="ruby-comment cmt"># File lib/citrus.rb, line 1104</span>&#x000A;1104:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">rule</span>&#x000A;1105:       <span class="ruby-identifier">rules</span>[<span class="ruby-value">0</span>]&#x000A;1106:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

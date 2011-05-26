@@ -55,12 +55,12 @@
             <h2>Methods</h2>
             <h3>public class</h3>
             <ol>
-              <li><a href="#M000073">new</a></li>
+              <li><a href="#M000077">new</a></li>
             </ol>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000075">exec</a></li>
-              <li><a href="#M000074">rule</a></li>
+              <li><a href="#M000079">exec</a></li>
+              <li><a href="#M000078">rule</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -74,22 +74,22 @@
           <div id='section'>
             <div id='methods'>
               <h2>Public class methods</h2>
-              <div class='method public-class' id='method-M000073'>
-                <a name='M000073'></a>
+              <div class='method public-class' id='method-M000077'>
+                <a name='M000077'></a>
                 <div class='synopsis'>
                   <span class='name'>new</span>
                   <span class='arguments'>(rule='')</span>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000073-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000077-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000073-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 983</span>&#x000A;983:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">rule</span>=<span class="ruby-value str">''</span>)&#x000A;984:       <span class="ruby-keyword kw">super</span>([<span class="ruby-identifier">rule</span>])&#x000A;985:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000077-source'>      <span class="ruby-comment cmt"># File lib/citrus.rb, line 1003</span>&#x000A;1003:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">rule</span>=<span class="ruby-value str">''</span>)&#x000A;1004:       <span class="ruby-keyword kw">super</span>([<span class="ruby-identifier">rule</span>])&#x000A;1005:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <h2>Public instance methods</h2>
-              <div class='method public-instance' id='method-M000075'>
-                <a name='M000075'></a>
+              <div class='method public-instance' id='method-M000079'>
+                <a name='M000079'></a>
                 <div class='synopsis'>
                   <span class='name'>exec</span>
                   <span class='arguments'>(input, events=[])</span>
@@ -100,14 +100,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000075-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000079-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000075-source'>      <span class="ruby-comment cmt"># File lib/citrus.rb, line 993</span>&#x000A; 993:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">exec</span>(<span class="ruby-identifier">input</span>, <span class="ruby-identifier">events</span>=[])&#x000A; 994:       <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">input</span>.<span class="ruby-identifier">test</span>(<span class="ruby-identifier">rule</span>)&#x000A; 995:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword kw">self</span>&#x000A; 996:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">CLOSE</span>&#x000A; 997:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value">0</span>&#x000A; 998:       <span class="ruby-keyword kw">end</span>&#x000A; 999: &#x000A;1000:       <span class="ruby-identifier">events</span>&#x000A;1001:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000079-source'>      <span class="ruby-comment cmt"># File lib/citrus.rb, line 1013</span>&#x000A;1013:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">exec</span>(<span class="ruby-identifier">input</span>, <span class="ruby-identifier">events</span>=[])&#x000A;1014:       <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">input</span>.<span class="ruby-identifier">test</span>(<span class="ruby-identifier">rule</span>)&#x000A;1015:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword kw">self</span>&#x000A;1016:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">CLOSE</span>&#x000A;1017:         <span class="ruby-identifier">events</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value">0</span>&#x000A;1018:       <span class="ruby-keyword kw">end</span>&#x000A;1019: &#x000A;1020:       <span class="ruby-identifier">events</span>&#x000A;1021:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='method public-instance' id='method-M000074'>
-                <a name='M000074'></a>
+              <div class='method public-instance' id='method-M000078'>
+                <a name='M000078'></a>
                 <div class='synopsis'>
                   <span class='name'>rule</span>
                   <span class='arguments'>()</span>
@@ -118,10 +118,10 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000074-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000078-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000074-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 988</span>&#x000A;988:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">rule</span>&#x000A;989:       <span class="ruby-identifier">rules</span>[<span class="ruby-value">0</span>]&#x000A;990:     <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000078-source'>      <span class="ruby-comment cmt"># File lib/citrus.rb, line 1008</span>&#x000A;1008:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">rule</span>&#x000A;1009:       <span class="ruby-identifier">rules</span>[<span class="ruby-value">0</span>]&#x000A;1010:     <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>
