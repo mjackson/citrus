@@ -143,14 +143,14 @@ same name as a rule in the parent also have access to the `super` keyword to
 invoke the parent rule.
 
     grammar Number
-      def number
+      rule number
         [0-9]+
       end
     end
-    
+
     grammar FloatingPoint
       include Number
-      
+
       rule number
         super ('.' super)?
       end
