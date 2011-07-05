@@ -8,4 +8,5 @@
 
 require 'citrus'
 
-$LOAD_PATH.unshift(::File.expand_path('../grammars', __FILE__))
+grammars = ::File.expand_path(::File.join('..', 'grammars'), __FILE__)
+$LOAD_PATH.unshift(grammars) unless $LOAD_PATH.include?(grammars)
