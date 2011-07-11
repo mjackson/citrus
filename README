@@ -164,7 +164,7 @@ Both positive and negative lookahead are supported in Citrus. Use the `&` and
 `!` operators to indicate that an expression either should or should not match.
 In neither case is any input consumed.
 
-    &'a' 'b'      # match a "b" preceded by an "a"
+    'a' &'b'      # match an "a" that is followed by a "b"
     'a' !'b'      # match an "a" that is not followed by a "b"
     !'a' .        # match any character except for "a"
 
