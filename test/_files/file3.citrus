@@ -1,0 +1,9 @@
+grammar SuperThree
+  rule keyword
+    super_keyword | "keyword"
+  end
+
+  rule super_keyword
+    "super"
+  end
+end

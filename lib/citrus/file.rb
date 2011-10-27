@@ -165,7 +165,7 @@ module Citrus
     end
 
     rule :super do
-      all('super', :space) {
+      all('super', andp(" "), :space) {
         Super.new
       }
     end

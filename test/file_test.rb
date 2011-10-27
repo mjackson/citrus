@@ -9,7 +9,7 @@ class CitrusFileTest < Test::Unit::TestCase
     assert(match)
   end
 
-  %w<rule grammar>.each do |type|
+  %w<file grammar rule>.each do |type|
     Dir[::File.dirname(__FILE__) + "/_files/#{type}*.citrus"].each do |path|
       module_eval(<<-CODE.gsub(/^        /, ''), __FILE__, __LINE__ + 1)
         def test_#{::File.basename(path, '.citrus')}
