@@ -1,9 +1,4 @@
-
-
-                                  ~* Citrus *~
-
-                          Parsing Expressions for Ruby
-
+Citrus :: Parsing Expressions for Ruby
 
 Citrus is a compact and powerful parsing library for
 [Ruby](http://ruby-lang.org/) that combines the elegance and expressiveness of
@@ -52,13 +47,13 @@ In Citrus, there are three main types of objects: rules, grammars, and matches.
 
 ## Rules
 
-A [Rule](api/classes/Citrus/Rule.html) is an object that specifies some matching
-behavior on a string. There are two types of rules: terminals and non-terminals.
-Terminals can be either Ruby strings or regular expressions that specify some
-input to match. For example, a terminal created from the string "end" would
-match any sequence of the characters "e", "n", and "d", in that order. Terminals
-created from regular expressions may match any sequence of characters that can
-be generated from that expression.
+A [Rule](http://mjijackson.com/citrus/api/classes/Citrus/Rule.html) is an object
+that specifies some matching behavior on a string. There are two types of rules:
+terminals and non-terminals. Terminals can be either Ruby strings or regular
+expressions that specify some input to match. For example, a terminal created
+from the string "end" would match any sequence of the characters "e", "n", and
+"d", in that order. Terminals created from regular expressions may match any
+sequence of characters that can be generated from that expression.
 
 Non-terminals are rules that may contain other rules but do not themselves match
 directly on the input. For example, a Repeat is a non-terminal that may contain
@@ -70,9 +65,9 @@ of Ruby modules. Rules use these modules to extend the matches they create.
 
 ## Grammars
 
-A [Grammar](api/classes/Citrus/Grammar.html) is a container for rules. Usually
-the rules in a grammar collectively form a complete specification for some
-language, or a well-defined subset thereof.
+A [Grammar](http://mjijackson.com/citrus/api/classes/Citrus/Grammar.html) is a
+container for rules. Usually the rules in a grammar collectively form a complete
+specification for some language, or a well-defined subset thereof.
 
 A Citrus grammar is really just a souped-up Ruby
 [module](http://ruby-doc.org/core/classes/Module.html). These modules may be
@@ -84,8 +79,9 @@ Ruby's `super` keyword.
 
 ## Matches
 
-A [Match](api/classes/Citrus/Match.html) object represents a successful
-recognition of some piece of the input. Matches are created by rule objects during a parse.
+A [Match](http://mjijackson.com/citrus/api/classes/Citrus/Match.html) object
+represents a successful recognition of some piece of the input. Matches are
+created by rule objects during a parse.
 
 Matches are arranged in a tree structure where any match may contain any number
 of other matches. Each match contains information about its own subtree. The
@@ -132,8 +128,9 @@ match in a case-insensitive manner.
 Besides case sensitivity, case-insensitive strings have the same behavior as
 double quoted strings.
 
-See [Terminal](api/classes/Citrus/Terminal.html) and
-[StringTerminal](api/classes/Citrus/StringTerminal.html) for more information.
+See [Terminal](http://mjijackson.com/citrus/api/classes/Citrus/Terminal.html) and
+[StringTerminal](http://mjijackson.com/citrus/api/classes/Citrus/StringTerminal.html)
+for more information.
 
 ## Repetition
 
@@ -156,7 +153,8 @@ The `+` and `?` operators are supported as well for the common cases of `1*` and
     'abc'+        # match "abc" one or more times
     'abc'?        # match "abc" zero or one time
 
-See [Repeat](api/classes/Citrus/Repeat.html) for more information.
+See [Repeat](http://mjijackson.com/citrus/api/classes/Citrus/Repeat.html) for
+more information.
 
 ## Lookahead
 
@@ -177,9 +175,10 @@ that does not match a given expression.
 When using this operator (the tilde), at least one character must be consumed
 for the rule to succeed.
 
-See [AndPredicate](api/classes/Citrus/AndPredicate.html),
-[NotPredicate](api/classes/Citrus/NotPredicate.html), and
-[ButPredicate](api/classes/Citrus/ButPredicate.html) for more information.
+See [AndPredicate](http://mjijackson.com/citrus/api/classes/Citrus/AndPredicate.html),
+[NotPredicate](http://mjijackson.com/citrus/api/classes/Citrus/NotPredicate.html),
+and [ButPredicate](http://mjijackson.com/citrus/api/classes/Citrus/ButPredicate.html)
+for more information.
 
 ## Sequences
 
@@ -189,7 +188,8 @@ should match in that order.
     'a' 'b' 'c'   # match "a", then "b", then "c"
     'a' [0-9]     # match "a", then a numeric digit
 
-See [Sequence](api/classes/Citrus/Sequence.html) for more information.
+See [Sequence](http://mjijackson.com/citrus/api/classes/Citrus/Sequence.html)
+for more information.
 
 ## Choices
 
@@ -204,7 +204,8 @@ It is important to note when using ordered choice that any operator binds more
 tightly than the vertical bar. A full chart of operators and their respective
 levels of precedence is below.
 
-See [Choice](api/classes/Citrus/Choice.html) for more information.
+See [Choice](http://mjijackson.com/citrus/api/classes/Citrus/Choice.html) for
+more information.
 
 ## Labels
 
@@ -262,33 +263,34 @@ In the example above, the `FloatingPoint` grammar includes `Number`. Both have a
 rule named `number`, so `FloatingPoint#number` has access to `Number#number` by
 means of using `super`.
 
-See [Super](api/classes/Citrus/Super.html) for more information.
+See [Super](http://mjijackson.com/citrus/api/classes/Citrus/Super.html) for more
+information.
 
 ## Precedence
 
 The following table contains a list of all Citrus symbols and operators and
 their precedence. A higher precedence indicates tighter binding.
 
-Operator  | Name                      | Precedence
---------- | ------------------------- | ----------
-''        | String (single quoted)    | 7
-""        | String (double quoted)    | 7
-``        | String (case insensitive) | 7
-[]        | Character class           | 7
-.         | Dot (any character)       | 7
-//        | Regular expression        | 7
-()        | Grouping                  | 7
-*         | Repetition (arbitrary)    | 6
-+         | Repetition (one or more)  | 6
-?         | Repetition (zero or one)  | 6
-&         | And predicate             | 5
-!         | Not predicate             | 5
-~         | But predicate             | 5
-<>        | Extension (module name)   | 4
-{}        | Extension (literal)       | 4
-:         | Label                     | 3
-e1 e2     | Sequence                  | 2
-e1 | e2   | Ordered choice            | 1
+Operator                  | Name                      | Precedence
+------------------------- | ------------------------- | ----------
+`''`                      | String (single quoted)    | 7
+`""`                      | String (double quoted)    | 7
+<code>``</code>           | String (case insensitive) | 7
+`[]`                      | Character class           | 7
+`.`                       | Dot (any character)       | 7
+`//`                      | Regular expression        | 7
+`()`                      | Grouping                  | 7
+`*`                       | Repetition (arbitrary)    | 6
+`+`                       | Repetition (one or more)  | 6
+`?`                       | Repetition (zero or one)  | 6
+`&`                       | And predicate             | 5
+`!`                       | Not predicate             | 5
+`~`                       | But predicate             | 5
+`<>`                      | Extension (module name)   | 4
+`{}`                      | Extension (literal)       | 4
+`:`                       | Label                     | 3
+`e1 e2`                   | Sequence                  | 2
+<code>e1 &#124; e2</code> | Ordered choice            | 1
 
 ## Grouping
 
@@ -341,8 +343,9 @@ and "1 + 2+3", but it does not have enough semantic information to be able to
 actually interpret these expressions.
 
 At this point, when the grammar parses a string it generates a tree of
-[Match](api/classes/Citrus/Match.html) objects. Each match is created by a rule
-and may itself be comprised of any number of submatches.
+[Match](http://mjijackson.com/citrus/api/classes/Citrus/Match.html) objects.
+Each match is created by a rule and may itself be comprised of any number of
+submatches.
 
 Submatches are created whenever a rule contains another rule. For example, in
 the grammar above `number` matches a string of digits followed by white space.
@@ -415,11 +418,11 @@ commands in a terminal.
 Congratulations! You just ran your first piece of Citrus code.
 
 One interesting thing to notice about the above sequence of commands is the
-return value of [Citrus#load](api/classes/Citrus.html#M000003). When you use
-`Citrus.load` to load a grammar file (and likewise
-[Citrus#eval](api/classes/Citrus.html#M000004) to evaluate a raw string of
-grammar code), the return value is an array of all the grammars present in that
-file.
+return value of [Citrus#load](http://mjijackson.com/citrus/api/classes/Citrus.html#M000003).
+When you use `Citrus.load` to load a grammar file (and likewise
+[Citrus#eval](http://mjijackson.com/citrus/api/classes/Citrus.html#M000004) to
+evaluate a raw string of grammar code), the return value is an array of all the
+grammars present in that file.
 
 Take a look at
 [calc.citrus](http://github.com/mjijackson/citrus/blob/master/lib/citrus/grammars/calc.citrus)
@@ -431,9 +434,9 @@ mathematical expressions.
 If you need more than just a `value` method on your match object, you can attach
 additional methods as well. There are two ways to do this. The first lets you
 define additional methods inline in your semantic block. This block will be used
-to create a new Module using [Module#new](http://ruby-doc.org/core/classes/Module.html#M001682). Using the
-`Addition` example above, we might refactor the `additive` rule to look like
-this:
+to create a new Module using [Module#new](http://ruby-doc.org/core/classes/Module.html#M001682).
+Using the `Addition` example above, we might refactor the `additive` rule to
+look like this:
 
     rule additive
       (number plus term:(additive | number)) {
@@ -530,11 +533,11 @@ made to test equality of match objects with string values.
 
 ## Debugging
 
-When a parse fails, a [ParseError](api/classes/Citrus/ParseError.html) object is
-generated which provides a wealth of information about exactly where the parse
-failed including the offset, line number, line text, and line offset. Using this
-object, you could possibly provide some useful feedback to the user about why
-the input was bad. The following code demonstrates one way to do this.
+When a parse fails, a [ParseError](http://mjijackson.com/citrus/api/classes/Citrus/ParseError.html)
+object is generated which provides a wealth of information about exactly where
+the parse failed including the offset, line number, line text, and line offset.
+Using this object, you could possibly provide some useful feedback to the user
+about why the input was bad. The following code demonstrates one way to do this.
 
     def parse_some_stuff(stuff)
       match = StuffGrammar.parse(stuff)
