@@ -3,6 +3,7 @@
 require 'strscan'
 require 'pathname'
 require 'citrus/version'
+require 'set'
 
 # Citrus is a compact and powerful parsing library for Ruby that combines the
 # elegance and expressiveness of the language with the simplicity and power of
@@ -326,6 +327,144 @@ module Citrus
     end
   end
 
+  class LeftRecursiveInput < MemoizedInput
+    def initialize(string)
+      super(string)
+      @heads = {}
+      @lrstack = nil
+    end
+    class LR
+      attr_accessor :seed, :rule, :head, :next
+      def initialize(seed, rule, head, n)
+        @seed = seed
+        @rule = rule
+        @head = head
+        @next = n
+      end
+    end
+
+    class Head
+      attr_accessor :rule, :involved_set, :eval_set
+      def initialize(rule)
+        @rule = rule
+        @involved_set = Set.new
+        @eval_set = Set.new
+      end
+      
+      def inspect
+        "<#Head rule=#{@rule} involved=[#{involved_set.to_a.join(", ")}] eval=[#{eval_set.to_a.join(", ")}]"
+      end
+    end
+
+    private
+      def apply_rule(rule, position, events) # :nodoc:
+        c = recall(rule, position)
+        if c
+          @cache_hits += 1
+          # if identical parent rule has already been here
+          # flag it
+          if c.kind_of?(LR)
+            setup_lr(rule,c)
+            c = c.seed
+          end
+          unless c.empty?
+            events.concat(c)
+            self.pos += events[-1]
+          end
+        else
+          index = events.size
+          lr = LR.new([], rule, nil, @lrstack)
+          @lrstack = lr        
+          # Memoize lr, then evaluate R
+          memo = @cache[rule]
+          memo[position] = lr
+          rule.exec(self, events)
+          # pop lr off the rule invocation stack
+          @lrstack = @lrstack.next
+          # Memoize the result so we can use it next time this same rule is
+          # executed at this position.
+          memo[position] = events.slice(index, events.size)
+          # if this rule has been seen before, (same rule was accessed as child)
+          # start growing the seed 
+          if lr.head
+            lr.seed = events.slice(index, events.size)
+            ans = lr_answer(rule, position, lr)
+            events.slice!(index, events.size)
+            events.concat(ans)
+          end
+        end
+     
+        events
+      end
+
+      def grow_lr(rule, position, mem, head)
+        @heads[position]=head
+        progress = position
+        # Don't memoize while growing the seed        
+        while true
+          head.eval_set = head.involved_set.dup
+          self.pos = position
+          events = []
+          rule.exec(self,events)
+          break if events.size==0 || pos <= progress
+          @cache[rule][position] = events
+          progress = pos
+        end
+        # set the last successful parse value
+        @heads[position]=nil
+        self.pos = progress
+        @cache[rule][position]
+      end
+    
+    
+      def setup_lr(rule, lr)
+        if lr.head == nil
+          lr.head = Head.new(rule)
+        end
+        s = @lrstack
+        while s.head != lr.head
+          s.head = lr.head
+          lr.head.involved_set << s.rule
+          s = s.next
+        end
+      end
+    
+      def lr_answer(rule, position, mem)
+        head = mem.head
+        if head.rule != rule
+          return mem.seed
+        else
+          @cache[rule][position] = mem.seed
+          if mem.seed == []
+            return []
+          else
+            return grow_lr(rule,position,mem, head)
+          end
+        end
+      end
+
+    
+      def recall(rule, position)
+        memo = @cache[rule] ||= {}
+        head = @heads[position]
+        unless head
+          return memo[position]
+        end
+      
+        if memo[position] == nil && rule != head.rule && !head.involved_set.include?(rule)
+          return []
+        end
+        if head.eval_set.include? rule
+          head.eval_set.delete(rule)
+          events = []
+          rule.exec(self, events)
+          self.pos = position
+          return events
+        end
+        memo[position]
+      end
+  end
+
   # Inclusion of this module into another extends the receiver with the grammar
   # helper methods in GrammarMethods. Although this module does not actually
   # provide any methods, constants, or variables to modules that include it, the
@@ -625,8 +764,15 @@ module Citrus
     #             to 0.
     def parse(string, options={})
       opts = default_options.merge(options)
+      
+      if opts[:memoize]
+        input = MemoizedInput.new(string)
+      elsif opts[:leftrecursive]
+        input = LeftRecursiveInput.new(string)
+      else
+        input = Input.new(string)
+      end
 
-      input = (opts[:memoize] ? MemoizedInput : Input).new(string)
       input.pos = opts[:offset] if opts[:offset] > 0
 
       events = input.exec(self)
@@ -1350,7 +1496,7 @@ module Citrus
     alias_method :eql?, :==
 
     def inspect
-      @string.inspect
+      "#<#{self.class.name} rule={#{@events.first}} #{captures.map{|k,v| "#{k}:\"#{v}\"" }.join(" ")} matches=#{matches.inspect}>"
     end
 
     # Prints the entire subtree of this match using the given +indent+ to

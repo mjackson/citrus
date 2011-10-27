@@ -297,6 +297,15 @@
 			<string>((/[eimnosux]*))</string>
 			<key>name</key>
 			<string>string.regexp.citrus</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>match</key>
+					<string>\\.</string>
+					<key>name</key>
+					<string>constant.character.escape.citrus</string>
+				</dict>
+			</array>
 		</dict>
 		<key>rule-reference</key>
 		<dict>
