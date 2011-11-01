@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
     Dir['extras/**'] +
     Dir['lib/**/*.rb'] +
     Dir['test/**/*'] +
-    %w< citrus.gemspec Rakefile README CHANGES >
+    %w< citrus.gemspec Rakefile README.md CHANGES >
 
   s.test_files = s.files.select {|path| path =~ /^test\/.*_test.rb/ }
 
@@ -28,7 +28,7 @@ Gem::Specification.new do |s|
 
   s.has_rdoc = true
   s.rdoc_options = %w< --line-numbers --inline-source --title Citrus --main Citrus >
-  s.extra_rdoc_files = %w< README CHANGES >
+  s.extra_rdoc_files = %w< README.md CHANGES >
 
   s.homepage = 'http://mjijackson.com/citrus'
 end
