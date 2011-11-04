@@ -97,7 +97,7 @@ expression may match zero or more times.</p>
 <code>!</code> operators to indicate that an expression either should or should not match.
 In neither case is any input consumed.</p>
 
-<pre><code>&amp;'a' 'b'      # match a "b" preceded by an "a"
+<pre><code>'a' &amp;'b'      # match an "a" that is followed by a "b"
 'a' !'b'      # match an "a" that is not followed by a "b"
 !'a' .        # match any character except for "a"
 </code></pre>
