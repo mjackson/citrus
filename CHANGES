@@ -2,6 +2,8 @@
 
   * Fixed a bug that prevented rule names from starting with "super".
 
+  * Several minor bug fixes.
+
 = 2.4.0 / 2011-05-11
 
   * Fixed a bug that prevented parsing nested blocks correctly (issue #21).
