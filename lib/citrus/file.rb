@@ -165,7 +165,7 @@ module Citrus
     end
 
     rule :super do
-      all('super', andp(" "), :space) {
+      ext(:super_keyword) {
         Super.new
       }
     end
@@ -329,6 +329,7 @@ module Citrus
     rule :grammar_keyword,  [ /\bgrammar\b/, :space ]
     rule :root_keyword,     [ /\broot\b/, :space ]
     rule :rule_keyword,     [ /\brule\b/, :space ]
+    rule :super_keyword,    [ /\bsuper\b/, :space ]
     rule :end_keyword,      [ /\bend\b/, :space ]
 
     rule :constant,         /[A-Z][a-zA-Z0-9_]*/

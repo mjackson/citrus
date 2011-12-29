@@ -1,0 +1,3 @@
+rule abc
+  "abc" | super
+end
