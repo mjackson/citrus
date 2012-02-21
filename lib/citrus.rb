@@ -173,13 +173,18 @@ module Citrus
   # An Input is a scanner that is responsible for executing rules at different
   # positions in the input string and persisting event streams.
   class Input < StringScanner
-    def initialize(string)
-      super(string)
+    def initialize(source)
+      super(source_text(source))
+      @source = source
       @max_offset = 0
     end
 
     # The maximum offset in the input that was successfully parsed.
     attr_reader :max_offset
+
+    # The initial source passed at construction. Typically a String
+    # or a Pathname.
+    attr_reader :source
 
     def reset # :nodoc:
       @max_offset = 0
@@ -267,6 +272,19 @@ module Citrus
     alias_method :to_str, :string
 
   private
+
+    # Returns the text to parse from +source+.
+    def source_text(source)
+      if source.respond_to?(:to_path)
+        ::File.read(source.to_path)
+      elsif source.respond_to?(:read)
+        source.read
+      elsif source.respond_to?(:to_str)
+        source.to_str
+      else
+        raise ArgumentError, "Unable to parse from #{source}", caller
+      end
+    end
 
     # Appends all events for +rule+ at the given +position+ to +events+.
     def apply_rule(rule, position, events)
@@ -626,10 +644,11 @@ module Citrus
     #             +false+.
     # offset::    The offset in +string+ at which to start parsing. Defaults
     #             to 0.
-    def parse(string, options={})
+    def parse(source, options={})
       opts = default_options.merge(options)
 
-      input = (opts[:memoize] ? MemoizedInput : Input).new(string)
+      input = (opts[:memoize] ? MemoizedInput : Input).new(source)
+      string = input.string
       input.pos = opts[:offset] if opts[:offset] > 0
 
       events = input.exec(self)
