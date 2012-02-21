@@ -263,6 +263,9 @@ module Citrus
       events[-1]
     end
 
+    # Returns the scanned string.
+    alias_method :to_str, :string
+
   private
 
     # Appends all events for +rule+ at the given +position+ to +events+.
@@ -636,7 +639,7 @@ module Citrus
         raise ParseError, input
       end
 
-      Match.new(string, events, opts[:offset])
+      Match.new(input, events, opts[:offset])
     end
 
     # Tests whether or not this rule matches on the given +string+. Returns the
@@ -1239,8 +1242,8 @@ module Citrus
   # instantiated as needed. This class provides several convenient tree
   # traversal methods that help when examining and interpreting parse results.
   class Match
-    def initialize(source, events=[], offset = 0)
-      @source = source
+    def initialize(input, events=[], offset = 0)
+      @input = input
       @offset = offset
 
       if events.length > 0
@@ -1258,16 +1261,17 @@ module Citrus
         end
       else
         # Create a default stream of events for the given string.
-        events = [Rule.for(source), CLOSE, source.length]
+        string = input.to_str
+        events = [Rule.for(string), CLOSE, string.length]
       end
 
       @events = events
     end
 
     # The main parsed text.
-    attr_reader :source
+    attr_reader :input
 
-    # The index of this match in the source text.
+    # The index of this match in the input text.
     attr_reader :offset
 
     # The array of events for this match.
@@ -1280,7 +1284,7 @@ module Citrus
 
     # Returns the slice of the source text that this match captures.
     def string
-      @string ||= @source[offset, length]
+      @string ||= input.to_str[offset, length]
     end
 
     # Returns a hash of capture names to arrays of matches with that name,
@@ -1431,7 +1435,7 @@ module Citrus
             os = stack.pop
             start = stack.pop
 
-            match = Match.new(source, @events[start..index], @offset + os)
+            match = Match.new(input, @events[start..index], @offset + os)
             capture!(rule, match)
 
             if stack.size == 1
