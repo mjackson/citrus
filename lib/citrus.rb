@@ -636,7 +636,7 @@ module Citrus
         raise ParseError, input
       end
 
-      Match.new(string.slice(opts[:offset], length), events)
+      Match.new(string, events, opts[:offset])
     end
 
     # Tests whether or not this rule matches on the given +string+. Returns the
@@ -1239,14 +1239,11 @@ module Citrus
   # instantiated as needed. This class provides several convenient tree
   # traversal methods that help when examining and interpreting parse results.
   class Match
-    def initialize(string, events=[])
-      @string = string
+    def initialize(source, events=[], offset = 0)
+      @source = source
+      @offset = offset
 
       if events.length > 0
-        if events[-1] != string.length
-          raise ArgumentError, "Invalid events for length #{string.length}"
-        end
-
         elisions = []
 
         while events[0].elide?
@@ -1261,18 +1258,29 @@ module Citrus
         end
       else
         # Create a default stream of events for the given string.
-        events = [Rule.for(string), CLOSE, string.length]
+        events = [Rule.for(source), CLOSE, source.length]
       end
 
       @events = events
     end
+
+    # The main parsed text.
+    attr_reader :source
+
+    # The index of this match in the source text.
+    attr_reader :offset
 
     # The array of events for this match.
     attr_reader :events
 
     # Returns the length of this match.
     def length
-      @string.length
+      @events.last
+    end
+
+    # Returns the slice of the source text that this match captures.
+    def string
+      @string ||= @source[offset, length]
     end
 
     # Returns a hash of capture names to arrays of matches with that name,
@@ -1296,16 +1304,14 @@ module Citrus
     # Allows methods of this match's string to be called directly and provides
     # a convenient interface for retrieving the first match with a given name.
     def method_missing(sym, *args, &block)
-      if @string.respond_to?(sym)
-        @string.__send__(sym, *args, &block)
+      if string.respond_to?(sym)
+        string.__send__(sym, *args, &block)
       else
         captures[sym].first
       end
     end
 
-    def to_s
-      @string
-    end
+    alias_method :to_s, :string
 
     # This alias allows strings to be compared to the string value of Match
     # objects. It is most useful in assertions in unit tests, e.g.:
@@ -1339,9 +1345,9 @@ module Citrus
     def ==(other)
       case other
       when String
-        @string == other
+        string == other
       when Match
-        @string == other.to_s
+        string == other.to_s
       else
         super
       end
@@ -1350,7 +1356,7 @@ module Citrus
     alias_method :eql?, :==
 
     def inspect
-      @string.inspect
+      string.inspect
     end
 
     # Prints the entire subtree of this match using the given +indent+ to
@@ -1372,7 +1378,7 @@ module Citrus
           rule = stack.pop
 
           space = indent * (stack.size / 3)
-          string = @string.slice(os, event)
+          string = self.string.slice(os, event)
           lines[start] = "#{space}#{string.inspect} rule=#{rule}, offset=#{os}, length=#{event}"
 
           last_length = event unless last_length
@@ -1425,7 +1431,7 @@ module Citrus
             os = stack.pop
             start = stack.pop
 
-            match = Match.new(@string.slice(os, event), @events[start..index])
+            match = Match.new(source, @events[start..index], @offset + os)
             capture!(rule, match)
 
             if stack.size == 1

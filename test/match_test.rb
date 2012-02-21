@@ -20,6 +20,14 @@ class MatchTest < Test::Unit::TestCase
     assert_equal(false, match2 == match1)
   end
 
+  def test_string
+    match1 = Match.new('abcdef')
+    assert_equal 'abcdef', match1.string
+
+    match2 = Match.new('abcdef', [Rule.for('bcd'), -1, 3], 1)
+    assert_equal 'bcd', match2.string
+  end
+
   def test_matches
     a = Rule.for('a')
     b = Rule.for('b')
@@ -59,11 +67,18 @@ class MatchTest < Test::Unit::TestCase
       CLOSE, 3
     ]
 
-    match.matches.each do |m|
+    match.matches.each_with_index do |m, i|
       assert_equal(sub_events, m.events)
+      assert_equal(i*3, m.offset)
+      assert_equal(3, m.length)
+      assert_equal("abc", m.string)
       assert_equal("abc", m)
       assert(m.matches)
       assert_equal(3, m.matches.length)
+      m.matches.each_with_index do |m2,i2|
+        assert_equal(i*3+i2, m2.offset)
+        assert_equal(1, m2.length)
+      end
     end
   end
 
