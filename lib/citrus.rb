@@ -395,6 +395,16 @@ module Citrus
       rule.parse(string, options)
     end
 
+    # Parse the given file at +path+ using this grammar's root role. Accept the same
+    # +options+ as #parser.
+    def parse_file(path, options = {})
+      unless path.respond_to?(:to_path)
+        require 'pathname'
+        path = Pathname.new(path)
+      end
+      parse(path, options)
+    end
+
     # Returns the name of this grammar as a string.
     def name
       super.to_s
