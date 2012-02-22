@@ -1271,7 +1271,7 @@ module Citrus
   # instantiated as needed. This class provides several convenient tree
   # traversal methods that help when examining and interpreting parse results.
   class Match
-    def initialize(input, events=[], offset = 0)
+    def initialize(input, events=[], offset=0)
       @input = input
       @offset = offset
 
@@ -1297,10 +1297,10 @@ module Citrus
       @events = events
     end
 
-    # The main parsed text.
+    # The original Input this Match was generated on.
     attr_reader :input
 
-    # The index of this match in the input text.
+    # The index of this match in the #input.
     attr_reader :offset
 
     # The array of events for this match.
@@ -1308,7 +1308,7 @@ module Citrus
 
     # Returns the length of this match.
     def length
-      @events.last
+      events.last
     end
 
     # Convenient shortcut for +input.source+
