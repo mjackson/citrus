@@ -382,26 +382,25 @@ module Citrus
       super
     end
 
-    # Parses the given +string+ using this grammar's root rule. Accepts the same
+    # Parses the given +source+ using this grammar's root rule. Accepts the same
     # +options+ as Rule#parse, plus the following:
     #
     # root::    The name of the root rule to start parsing at. Defaults to this
     #           grammar's #root.
-    def parse(string, options={})
+    def parse(source, options={})
       rule_name = options.delete(:root) || root
       raise Error, "No root rule specified" unless rule_name
       rule = rule(rule_name)
       raise Error, "No rule named \"#{rule_name}\"" unless rule
-      rule.parse(string, options)
+      rule.parse(source, options)
     end
 
-    # Parse the given file at +path+ using this grammar's root role. Accept the same
-    # +options+ as #parser.
-    def parse_file(path, options = {})
-      unless path.respond_to?(:to_path)
-        require 'pathname'
-        path = Pathname.new(path)
-      end
+    # Parses the contents of the file at the given +path+ using this grammar's
+    # #root rule. Accepts the same +options+ as #parse.
+    def parse_file(path, options={})
+      path = Pathname.new(path.to_str) unless Pathname === path
+      raise Error, "Cannot find file #{path}" unless path.exist?
+      raise Error, "Cannot read file #{path}" unless path.readable?
       parse(path, options)
     end
 
