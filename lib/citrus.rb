@@ -173,13 +173,18 @@ module Citrus
   # An Input is a scanner that is responsible for executing rules at different
   # positions in the input string and persisting event streams.
   class Input < StringScanner
-    def initialize(string)
-      super(string)
+    def initialize(source)
+      super(source_text(source))
+      @source = source
       @max_offset = 0
     end
 
     # The maximum offset in the input that was successfully parsed.
     attr_reader :max_offset
+
+    # The initial source passed at construction. Typically a String
+    # or a Pathname.
+    attr_reader :source
 
     def reset # :nodoc:
       @max_offset = 0
@@ -263,7 +268,23 @@ module Citrus
       events[-1]
     end
 
+    # Returns the scanned string.
+    alias_method :to_str, :string
+
   private
+
+    # Returns the text to parse from +source+.
+    def source_text(source)
+      if source.respond_to?(:to_path)
+        ::File.read(source.to_path)
+      elsif source.respond_to?(:read)
+        source.read
+      elsif source.respond_to?(:to_str)
+        source.to_str
+      else
+        raise ArgumentError, "Unable to parse from #{source}", caller
+      end
+    end
 
     # Appends all events for +rule+ at the given +position+ to +events+.
     def apply_rule(rule, position, events)
@@ -372,6 +393,16 @@ module Citrus
       rule = rule(rule_name)
       raise Error, "No rule named \"#{rule_name}\"" unless rule
       rule.parse(string, options)
+    end
+
+    # Parse the given file at +path+ using this grammar's root role. Accept the same
+    # +options+ as #parser.
+    def parse_file(path, options = {})
+      unless path.respond_to?(:to_path)
+        require 'pathname'
+        path = Pathname.new(path)
+      end
+      parse(path, options)
     end
 
     # Returns the name of this grammar as a string.
@@ -623,10 +654,11 @@ module Citrus
     #             +false+.
     # offset::    The offset in +string+ at which to start parsing. Defaults
     #             to 0.
-    def parse(string, options={})
+    def parse(source, options={})
       opts = default_options.merge(options)
 
-      input = (opts[:memoize] ? MemoizedInput : Input).new(string)
+      input = (opts[:memoize] ? MemoizedInput : Input).new(source)
+      string = input.string
       input.pos = opts[:offset] if opts[:offset] > 0
 
       events = input.exec(self)
@@ -636,7 +668,7 @@ module Citrus
         raise ParseError, input
       end
 
-      Match.new(string.slice(opts[:offset], length), events)
+      Match.new(input, events, opts[:offset])
     end
 
     # Tests whether or not this rule matches on the given +string+. Returns the
@@ -1239,14 +1271,11 @@ module Citrus
   # instantiated as needed. This class provides several convenient tree
   # traversal methods that help when examining and interpreting parse results.
   class Match
-    def initialize(string, events=[])
-      @string = string
+    def initialize(input, events=[], offset = 0)
+      @input = input
+      @offset = offset
 
       if events.length > 0
-        if events[-1] != string.length
-          raise ArgumentError, "Invalid events for length #{string.length}"
-        end
-
         elisions = []
 
         while events[0].elide?
@@ -1261,18 +1290,35 @@ module Citrus
         end
       else
         # Create a default stream of events for the given string.
+        string = input.to_str
         events = [Rule.for(string), CLOSE, string.length]
       end
 
       @events = events
     end
 
+    # The main parsed text.
+    attr_reader :input
+
+    # The index of this match in the input text.
+    attr_reader :offset
+
     # The array of events for this match.
     attr_reader :events
 
     # Returns the length of this match.
     def length
-      @string.length
+      @events.last
+    end
+
+    # Convenient shortcut for +input.source+
+    def source
+      (input.respond_to?(:source) && input.source) || input
+    end
+
+    # Returns the slice of the source text that this match captures.
+    def string
+      @string ||= input.to_str[offset, length]
     end
 
     # Returns a hash of capture names to arrays of matches with that name,
@@ -1296,16 +1342,14 @@ module Citrus
     # Allows methods of this match's string to be called directly and provides
     # a convenient interface for retrieving the first match with a given name.
     def method_missing(sym, *args, &block)
-      if @string.respond_to?(sym)
-        @string.__send__(sym, *args, &block)
+      if string.respond_to?(sym)
+        string.__send__(sym, *args, &block)
       else
         captures[sym].first
       end
     end
 
-    def to_s
-      @string
-    end
+    alias_method :to_s, :string
 
     # This alias allows strings to be compared to the string value of Match
     # objects. It is most useful in assertions in unit tests, e.g.:
@@ -1339,9 +1383,9 @@ module Citrus
     def ==(other)
       case other
       when String
-        @string == other
+        string == other
       when Match
-        @string == other.to_s
+        string == other.to_s
       else
         super
       end
@@ -1350,7 +1394,7 @@ module Citrus
     alias_method :eql?, :==
 
     def inspect
-      @string.inspect
+      string.inspect
     end
 
     # Prints the entire subtree of this match using the given +indent+ to
@@ -1372,7 +1416,7 @@ module Citrus
           rule = stack.pop
 
           space = indent * (stack.size / 3)
-          string = @string.slice(os, event)
+          string = self.string.slice(os, event)
           lines[start] = "#{space}#{string.inspect} rule=#{rule}, offset=#{os}, length=#{event}"
 
           last_length = event unless last_length
@@ -1425,7 +1469,7 @@ module Citrus
             os = stack.pop
             start = stack.pop
 
-            match = Match.new(@string.slice(os, event), @events[start..index])
+            match = Match.new(input, @events[start..index], @offset + os)
             capture!(rule, match)
 
             if stack.size == 1

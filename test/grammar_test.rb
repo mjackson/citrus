@@ -126,6 +126,29 @@ class GrammarTest < Test::Unit::TestCase
     assert_equal(str.length, match.length)
   end
 
+  def test_parse_file
+    grammar = Grammar.new {
+      rule("words"){ rep(any(" ", /[a-z]+/)) }
+    }
+
+    require 'tempfile'
+    Tempfile.open('citrus') do |tmp|
+      tmp << "abd def"
+      tmp.close
+
+      match = grammar.parse_file(tmp.path)
+
+      assert(match)
+      assert_instance_of(Input, match.input)
+      assert_instance_of(Pathname, match.source)
+
+      match.matches.each do |m|
+        assert_instance_of(Input, m.input)
+        assert_instance_of(Pathname, m.source)
+      end
+    end
+  end
+
   def test_global_grammar
     assert_raise ArgumentError do
       grammar(:abc)

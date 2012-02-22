@@ -1,6 +1,21 @@
 require File.expand_path('../helper', __FILE__)
 
 class InputTest < Test::Unit::TestCase
+  def test_new
+    # to_str
+    assert_equal('abc', Input.new('abc').string)
+
+    # read
+    selftext = ::File.read(__FILE__)
+    ::File.open(__FILE__, 'r') do |io|
+      assert_equal(selftext, Input.new(io).string)
+    end
+
+    # to_path
+    path = Struct.new(:to_path).new(__FILE__)
+    assert_equal(selftext, Input.new(path).string)
+  end
+
   def test_memoized?
     assert_equal(false, Input.new('').memoized?)
   end
