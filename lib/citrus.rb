@@ -1301,6 +1301,11 @@ module Citrus
       @events.last
     end
 
+    # Convenient shortcut for +input.source+
+    def source
+      (input.respond_to?(:source) && input.source) || input
+    end
+
     # Returns the slice of the source text that this match captures.
     def string
       @string ||= input.to_str[offset, length]

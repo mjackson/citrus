@@ -20,6 +20,15 @@ class MatchTest < Test::Unit::TestCase
     assert_equal(false, match2 == match1)
   end
 
+  def test_source
+    match1 = Match.new('abcdef')
+    assert_equal 'abcdef', match1.source
+
+    path   = Struct.new(:to_path).new(__FILE__)
+    match2 = Match.new(Input.new(path))
+    assert_equal path, match2.source
+  end
+
   def test_string
     match1 = Match.new('abcdef')
     assert_equal 'abcdef', match1.string
