@@ -73,9 +73,6 @@ module Citrus
     force = options.delete(:force)
 
     if force || !cache[file]
-      raise LoadError, "Cannot find file #{file}" unless ::File.file?(file)
-      raise LoadError, "Cannot read file #{file}" unless ::File.readable?(file)
-
       begin
         cache[file] = eval(::File.read(file), options)
       rescue SyntaxError => e
@@ -117,7 +114,10 @@ module Citrus
   end
 
   # A base class for all Citrus errors.
-  class Error < RuntimeError; end
+  class Error < StandardError; end
+
+  # Raised when Citrus.require can't find the file to load.
+  class LoadError < Error; end
 
   # Raised when a parse fails.
   class ParseError < Error
@@ -155,9 +155,6 @@ module Citrus
       "#{line}\n#{' ' * line_offset}^"
     end
   end
-
-  # Raised when Citrus.load fails to load a file.
-  class LoadError < Error; end
 
   # Raised when Citrus::File.parse fails.
   class SyntaxError < Error
@@ -399,8 +396,6 @@ module Citrus
     # #root rule. Accepts the same +options+ as #parse.
     def parse_file(path, options={})
       path = Pathname.new(path.to_str) unless Pathname === path
-      raise Error, "Cannot find file #{path}" unless path.exist?
-      raise Error, "Cannot read file #{path}" unless path.readable?
       parse(path, options)
     end
 

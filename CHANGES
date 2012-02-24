@@ -6,6 +6,9 @@
   * Matches keep track of their offset in the original source  (thanks
     blambeau).
 
+  * Citrus.load no longer raises Citrus::LoadError for files that can't be found
+    or are not readable. Users must rescue Errno::ENOENT instead, for example.
+
 = 2.4.1 / 2011-11-04
 
   * Fixed a bug that prevented rule names from starting with "super".
