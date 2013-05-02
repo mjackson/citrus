@@ -15,7 +15,7 @@ desc "Generate API documentation"
 task :api => 'lib/citrus.rb' do |t|
   output_dir = ENV['OUTPUT_DIR'] || 'api'
   rm_rf output_dir
-  sh((<<-SH).gsub(/[\s\n]+/, ' ').strip)
+  sh((<<-SH).gsub(/\s+/, ' ').strip)
   hanna
     --op #{output_dir}
     --promiscuous
