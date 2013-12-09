@@ -18,7 +18,6 @@ class SuperTest < Test::Unit::TestCase
     rule_2a = grammar2.rule(:a)
     rule_2a_als = rule_2a.rules[0]
     rule_2a_sup = rule_2a.rules[1]
-    rule_1a = grammar1.rule(:a)
 
     events = rule_2a.exec(Input.new('abc'))
     assert_equal([
@@ -58,12 +57,9 @@ class SuperTest < Test::Unit::TestCase
       rule :a, any(sup, :b)
       rule :b, sup
     }
-    rule_1a = grammar1.rule(:a)
-    rule_1b = grammar1.rule(:b)
     rule_2a = grammar2.rule(:a)
     rule_2a_sup = rule_2a.rules[0]
     rule_2a_als = rule_2a.rules[1]
-    rule_2b = grammar2.rule(:b)
 
     events = rule_2a.exec(Input.new('abc'))
     assert_equal([

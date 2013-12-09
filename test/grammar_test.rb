@@ -74,7 +74,7 @@ class GrammarTest < Test::Unit::TestCase
       rule(:num) { all(1, 2, 3) }
     }
     assert_raise ParseError do
-      match = grammar.parse('12')
+      grammar.parse('12')
     end
   end
 
@@ -99,7 +99,7 @@ class GrammarTest < Test::Unit::TestCase
       rule(:alphanum) { any(/[a-z]/, 0..9) }
     }
     assert_raise ParseError do
-      match = grammar.parse('A')
+      grammar.parse('A')
     end
   end
 

@@ -12,7 +12,6 @@ class AliasTest < Test::Unit::TestCase
       rule :b, 'abc'
     }
     rule_a = grammar.rule(:a)
-    rule_b = grammar.rule(:b)
     events = rule_a.exec(Input.new('abc'))
     assert_equal([rule_a, CLOSE, 3], events)
   end
@@ -36,7 +35,6 @@ class AliasTest < Test::Unit::TestCase
       rule :b, :a
     }
     rule_b2 = grammar2.rule(:b)
-    rule_a1 = grammar1.rule(:a)
     events = rule_b2.exec(Input.new('abc'))
     assert_equal([rule_b2, CLOSE, 3], events)
   end

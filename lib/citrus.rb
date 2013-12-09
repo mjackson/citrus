@@ -480,9 +480,16 @@ module Citrus
     # Gets/sets the +name+ of the root rule of this grammar. If no root rule is
     # explicitly specified, the name of this grammar's first rule is returned.
     def root(name=nil)
-      @root = name.to_sym if name
-      # The first rule in a grammar is the default root.
-      @root || rule_names.first
+      if name
+        @root = name.to_sym
+      else
+        # The first rule in a grammar is the default root.
+        if instance_variable_defined?(:@root)
+          @root
+        else
+          rule_names.first
+        end
+      end
     end
 
     # Creates a new rule that will match any single character. A block may be
@@ -1268,6 +1275,8 @@ module Citrus
     def initialize(input, events=[], offset=0)
       @input = input
       @offset = offset
+      @captures = nil
+      @matches = nil
 
       if events.length > 0
         elisions = []
