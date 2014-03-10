@@ -1,3 +1,4 @@
+require 'citrus'
 class Object
   # A sugar method for creating Citrus grammars from any namespace.
   #
