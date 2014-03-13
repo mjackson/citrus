@@ -9,6 +9,8 @@
   * Citrus.load no longer raises Citrus::LoadError for files that can't be found
     or are not readable. Users must rescue Errno::ENOENT instead, for example.
 
+  * Removed a few ruby warnings (thanks tbuehlmann)
+
 = 2.4.1 / 2011-11-04
 
   * Fixed a bug that prevented rule names from starting with "super".
