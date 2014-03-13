@@ -1345,6 +1345,10 @@ module Citrus
     # Allows methods of this match's string to be called directly and provides
     # a convenient interface for retrieving the first match with a given name.
     def method_missing(sym, *args, &block)
+      unless defined?(Citrus::METHOD_MISSING_WARNED)
+        warn("[`#{sym}`] Citrus::Match#method_missing is unsafe and will be removed in 3.0. Use captures.")
+        Citrus.send(:const_set, :METHOD_MISSING_WARNED, true)
+      end
       if string.respond_to?(sym)
         string.__send__(sym, *args, &block)
       else
