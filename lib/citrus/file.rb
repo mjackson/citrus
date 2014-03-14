@@ -6,6 +6,10 @@ module Citrus
   # Some helper methods for rules that alias +module_name+ and don't want to
   # use +Kernel#eval+ to retrieve Module objects.
   module ModuleNameHelpers #:nodoc:
+    def module_name
+      capture(:module_name)
+    end
+
     def module_segments
       @module_segments ||= module_name.value.split('::')
     end
@@ -58,6 +62,7 @@ module Citrus
           captures[:include].each {|inc| grammar.include(inc.value) }
           captures[:rule].each {|r| grammar.rule(r.rule_name.value, r.value) }
 
+          root = capture(:root)
           grammar.root(root.value) if root
 
           grammar
@@ -66,10 +71,17 @@ module Citrus
     end
 
     rule :rule do
-      all(:rule_keyword, :rule_name, zero_or_one(:expression), :end_keyword) {
-        # An empty rule definition matches the empty string.
-        expression ? expression.value : Rule.for('')
-      }
+      mod all(:rule_keyword, :rule_name, zero_or_one(:expression), :end_keyword) do
+        def rule_name
+          capture(:rule_name)
+        end
+
+        def value
+          # An empty rule definition matches the empty string.
+          expr = capture(:expression)
+          expr ? expr.value : Rule.for('')
+        end
+      end
     end
 
     rule :expression do
@@ -88,7 +100,8 @@ module Citrus
 
     rule :labelled do
       all(zero_or_one(:label), :extended) {
-        rule = extended.value
+        label = capture(:label)
+        rule = capture(:extended).value
         rule.label = label.value if label
         rule
       }
@@ -96,7 +109,8 @@ module Citrus
 
     rule :extended do
       all(:prefix, zero_or_one(:extension)) {
-        rule = prefix.value
+        extension = capture(:extension)
+        rule = capture(:prefix).value
         rule.extension = extension.value if extension
         rule
       }
@@ -104,7 +118,8 @@ module Citrus
 
     rule :prefix do
       all(zero_or_one(:predicate), :suffix) {
-        rule = suffix.value
+        predicate = capture(:predicate)
+        rule = capture(:suffix).value
         rule = predicate.value(rule) if predicate
         rule
       }
@@ -112,7 +127,8 @@ module Citrus
 
     rule :suffix do
       all(:primary, zero_or_one(:repeat)) {
-        rule = primary.value
+        repeat = capture(:repeat)
+        rule = capture(:primary).value
         rule = repeat.value(rule) if repeat
         rule
       }
@@ -124,7 +140,7 @@ module Citrus
 
     rule :grouping do
       all(['(', zero_or_one(:space)], :expression, [')', zero_or_one(:space)]) {
-        expression.value
+        capture(:expression).value
       }
     end
 
@@ -132,7 +148,7 @@ module Citrus
 
     rule :require do
       all(:require_keyword, :quoted_string) {
-        quoted_string.value
+        capture(:quoted_string).value
       }
     end
 
@@ -148,7 +164,7 @@ module Citrus
 
     rule :root do
       all(:root_keyword, :rule_name) {
-        rule_name.value
+        capture(:rule_name).value
       }
     end
 
@@ -172,7 +188,7 @@ module Citrus
 
     rule :alias do
       all(notp(:end_keyword), :rule_name) {
-        Alias.new(rule_name.value)
+        Alias.new(capture(:rule_name).value)
       }
     end
 
@@ -232,7 +248,7 @@ module Citrus
 
     rule :label do
       all(/[a-zA-Z0-9_]+/, :space, ':', :space) {
-        first.to_sym
+        first.to_str.to_sym
       }
     end
 
@@ -312,8 +328,8 @@ module Citrus
 
     rule :star do
       all(/[0-9]*/, '*', /[0-9]*/, :space) { |rule|
-        min = captures[1] == '' ? 0 : captures[1].to_i
-        max = captures[3] == '' ? Infinity : captures[3].to_i
+        min = captures[1] == '' ? 0 : captures[1].to_str.to_i
+        max = captures[3] == '' ? Infinity : captures[3].to_str.to_i
         Repeat.new(rule, min, max)
       }
     end

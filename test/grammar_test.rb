@@ -149,6 +149,13 @@ class GrammarTest < Test::Unit::TestCase
     end
   end
 
+  def test_labeled_production
+    grammar = Grammar.new {
+      rule(:abc) { label('abc', :p){ capture(:p) } }
+    }
+    assert_equal('abc', grammar.parse('abc').value)
+  end
+
   def test_global_grammar
     assert_raise ArgumentError do
       grammar(:abc)

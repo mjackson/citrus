@@ -9,12 +9,12 @@ class ExtensionTest < Test::Unit::TestCase
 
   module NumericModule
     def add_one
-      to_i + 1
+      to_str.to_i + 1
     end
   end
 
   NumericProcBare = Proc.new {
-    to_i + 1
+    to_str.to_i + 1
   }
 
   def test_match_module
