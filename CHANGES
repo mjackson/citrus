@@ -4,7 +4,7 @@
     extensions by default. Use "require 'citrus/core_ext.rb'" instead of
     "require 'citrus'" to keep the previous behavior.
 
-  * Remove Match#method_missing, add Match#capture(name)
+  * Removed Match#method_missing, added #capture(name) and #captures(name)
 
     Match#method_missing is unsafe as illustrated in Github issue #41.
     In particular, it makes composing a grammar with aribitrary gems
@@ -41,6 +41,10 @@
         rule int
           [0-9]+ { to_str.to_i }
         end
+
+    Match#captures now accepts an optional label name as first argument and
+    returns the corresponding array of matches for that label (useful in case
+    the label belongs to a repetition).
 
 = 2.5.0 / 2014-03-13
 

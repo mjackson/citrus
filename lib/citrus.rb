@@ -1326,9 +1326,9 @@ module Citrus
 
     # Returns a hash of capture names to arrays of matches with that name,
     # in the order they appeared in the input.
-    def captures
+    def captures(name = nil)
       process_events! unless @captures
-      @captures
+      name ? @captures[name] : @captures
     end
 
     # Convenient method for captures[name].first
