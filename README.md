@@ -232,8 +232,8 @@ Additionally, extensions may be specified inline using curly braces. When using
 this method, the code inside the curly braces may be invoked by calling the
 `value` method on the match object.
 
-    [0-9] { to_i }        # match any digit and return its integer value when
-                          # calling the #value method on the match object
+    [0-9] { to_str.to_i }     # match any digit and return its integer value when
+                              # calling the #value method on the match object
 
 Note that when using the inline block method you may also specify arguments in
 between vertical bars immediately following the opening curly brace, just like
@@ -358,13 +358,13 @@ blocks. Let's extend the `Addition` grammar using this technique.
     grammar Addition
       rule additive
         (number plus term:(additive | number)) {
-          number.value + term.value
+          capture(:number).value + capture(:term).value
         }
       end
 
       rule number
         ([0-9]+ space) {
-          to_i
+          to_str.to_i
         }
       end
 
@@ -383,17 +383,19 @@ execute by calling `value` on match objects that result from those rules. It's
 easiest to explain what is going on here by starting with the lowest level
 block, which is defined within `number`.
 
-Inside this block we see a call to another method, namely `to_i`. When called in
-the context of a match object, methods that are not defined may be called on a
-match's internal string object via `method_missing`. Thus, the call to `to_i`
-should return the integer value of the match.
+Inside this block we see a call to another method, namely `to_str`. When called
+in the context of a match object, this method returns the match's internal
+string object. Thus, the call to `to_str.to_i` should return the integer value
+of the match.
 
 Similarly, matches created by `additive` will also have a `value` method. Notice
 the use of the `term` label within the rule definition. This label allows the
 match that is created by the choice between `additive` and `number` to be
-retrieved using the `term` method. The value of an additive match is determined
+retrieved using `capture(:term)`. The value of an additive match is determined
 to be the values of its `number` and `term` matches added together using Ruby's
-addition operator.
+addition operator. Note that the plural form `captures(:term)` can be used to
+get an array of matches for a given label (e.g. when the label belongs to a
+repetition).
 
 Since `additive` is the first rule defined in the grammar, any match that
 results from parsing a string with this grammar will have a `value` method that
@@ -441,11 +443,11 @@ look like this:
     rule additive
       (number plus term:(additive | number)) {
         def lhs
-          number.value
+          capture(:number).value
         end
 
         def rhs
-          term.value
+          capture(:term).value
         end
 
         def value
@@ -475,11 +477,11 @@ define the following module.
 
     module Additive
       def lhs
-        number.value
+        capture(:number).value
       end
 
       def rhs
-        term.value
+        capture(:term).value
       end
 
       def value
