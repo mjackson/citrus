@@ -151,7 +151,7 @@ class GrammarTest < Test::Unit::TestCase
 
   def test_labeled_production
     grammar = Grammar.new {
-      rule(:abc) { label('abc', :p){ p } }
+      rule(:abc) { label('abc', :p){ capture(:p) } }
     }
     assert_equal('abc', grammar.parse('abc').value)
   end
