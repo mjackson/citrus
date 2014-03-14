@@ -1,10 +1,8 @@
+= 3.0.1 / 2014-03-14
+
+  * Fixed bad 3.0.0 release.
+
 = 3.0.0 / 2014-03-14
-
-  * Moved Object#grammar to citrus/core_ext.rb. Citrus no longer installs core
-    extensions by default. Use "require 'citrus/core_ext.rb'" instead of
-    "require 'citrus'" to keep the previous behavior.
-
-= 2.5.0 / 2014-03-13
 
   * Moved Object#grammar to citrus/core_ext.rb. Citrus no longer installs core
     extensions by default. Use "require 'citrus/core_ext.rb'" instead of
