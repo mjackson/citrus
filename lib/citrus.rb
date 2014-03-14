@@ -1331,6 +1331,11 @@ module Citrus
       @captures
     end
 
+    # Convenient method for captures[name].first
+    def capture(name)
+      captures[name].first
+    end
+
     # Returns an array of all immediate submatches of this match.
     def matches
       process_events! unless @matches
@@ -1340,16 +1345,6 @@ module Citrus
     # A shortcut for retrieving the first immediate submatch of this match.
     def first
       matches.first
-    end
-
-    # Allows methods of this match's string to be called directly and provides
-    # a convenient interface for retrieving the first match with a given name.
-    def method_missing(sym, *args, &block)
-      if string.respond_to?(sym)
-        string.__send__(sym, *args, &block)
-      else
-        captures[sym].first
-      end
     end
 
     alias_method :to_s, :string

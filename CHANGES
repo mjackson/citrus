@@ -4,6 +4,44 @@
     extensions by default. Use "require 'citrus/core_ext.rb'" instead of
     "require 'citrus'" to keep the previous behavior.
 
+  * Remove Match#method_missing, add Match#capture(name)
+
+    Match#method_missing is unsafe as illustrated in Github issue #41.
+    In particular, it makes composing a grammar with aribitrary gems
+    unsafe when the latter make core extensions, lead to unexpected
+    results with labels match existing Kernel methods (e.g. `p`), and
+    prevents Match from getting new methods in a backward compatible
+    way. This commit therefore removes it.
+
+    In Citrus 2.x, method_missing was used as a trick to allow rule
+    productions to denote captured values by their name:
+
+        rule pair
+          (foo ':' bar) {
+            [foo.value, bar.value]
+          }
+        end
+
+    Also, it allowed invoking String operators on the Match's text:
+
+        rule int
+          [0-9]+ { to_i }
+        end
+
+    Those two scenarios no longer work out of the box in Citrus 3.0.
+    You should use capture(label) for the former, and to_str for the
+    latter:
+
+        rule pair
+          (foo ':' bar) {
+            [capture(:foo).value, capture(:bar).value]
+          }
+        end
+
+        rule int
+          [0-9]+ { to_str.to_i }
+        end
+
 = 2.5.0 / 2014-03-13
 
   * Inputs may be generated from many different sources, including Pathname and
