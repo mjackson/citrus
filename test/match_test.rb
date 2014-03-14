@@ -94,13 +94,13 @@ class MatchTest < Test::Unit::TestCase
   grammar :Addition do
     rule :additive do
       all(:number, :plus, label(any(:additive, :number), 'term')) {
-        number.value + term.value
+        capture(:number).value + capture(:term).value
       }
     end
 
     rule :number do
       all(/[0-9]+/, :space) {
-        strip.to_i
+        to_str.strip.to_i
       }
     end
 
@@ -138,5 +138,24 @@ class MatchTest < Test::Unit::TestCase
     assert(match)
     assert(match.matches)
     assert_equal(3, match.matches.length)
+  end
+
+  def test_capture
+    match = Addition.parse('1+2')
+    assert(match.capture(:number))
+    assert_equal(1, match.capture(:number).value)
+  end
+
+  def test_captures
+    match = Addition.parse('1+2')
+    assert(match.captures)
+    assert_equal(7, match.captures.size)
+  end
+
+  def test_captures_with_a_name
+    match = Addition.parse('1+2')
+    assert(match.captures(:number))
+    assert_equal(2, match.captures(:number).size)
+    assert_equal([1, 2], match.captures(:number).map(&:value))
   end
 end

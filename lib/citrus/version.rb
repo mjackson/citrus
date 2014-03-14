@@ -1,6 +1,6 @@
 module Citrus
   # The current version of Citrus as [major, minor, patch].
-  VERSION = [3, 0, 0]
+  VERSION = [2, 5, 0]
 
   # Returns the current version of Citrus as a string.
   def self.version
