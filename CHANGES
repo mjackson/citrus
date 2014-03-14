@@ -6,15 +6,15 @@
 
   * Removed Match#method_missing, added #capture(name) and #captures(name)
 
-    Match#method_missing is unsafe as illustrated in Github issue #41.
-    In particular, it makes composing a grammar with aribitrary gems
-    unsafe when the latter make core extensions, lead to unexpected
-    results with labels match existing Kernel methods (e.g. `p`), and
-    prevents Match from getting new methods in a backward compatible
-    way. This commit therefore removes it.
+    Match#method_missing is unsafe as illustrated in Github issue #41. In
+    particular, it makes composing a grammar with aribitrary gems unsafe (e.g.
+    when the latter make core extensions), leads to unexpected results with
+    labels match existing Kernel methods (e.g. `p`), and prevents Match from
+    getting new methods in a backward compatible way. This commit therefore
+    removes it.
 
-    In Citrus 2.x, method_missing was used as a trick to allow rule
-    productions to denote captured values by their name:
+    In Citrus 2.x, method_missing allowed rule productions to denote captured
+    matches by label name:
 
         rule pair
           (foo ':' bar) {
@@ -28,9 +28,8 @@
           [0-9]+ { to_i }
         end
 
-    Those two scenarios no longer work out of the box in Citrus 3.0.
-    You should use capture(label) for the former, and to_str for the
-    latter:
+    Those two scenarios no longer work out of the box in Citrus 3.0. You must
+    use capture(label) for the former, and to_str for the latter:
 
         rule pair
           (foo ':' bar) {
