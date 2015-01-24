@@ -30,5 +30,5 @@ Gem::Specification.new do |s|
   s.rdoc_options = %w< --line-numbers --inline-source --title Citrus --main Citrus >
   s.extra_rdoc_files = %w< README.md CHANGES >
 
-  s.homepage = 'http://mjijackson.com/citrus'
+  s.homepage = 'http://mjackson.github.io/citrus'
 end

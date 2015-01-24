@@ -120,7 +120,7 @@ grammar code), the return value is an array of all the grammars present in that
 file.
 
 Take a look at
-[examples/calc.citrus](http://github.com/mjijackson/citrus/blob/master/examples/calc.citrus)
+[examples/calc.citrus](http://github.com/mjackson/citrus/blob/master/examples/calc.citrus)
 for an example of a calculator that is able to parse and evaluate more complex
 mathematical expressions.
 

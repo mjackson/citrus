@@ -15,7 +15,7 @@ Via [RubyGems](http://rubygems.org/):
 
 From a local copy:
 
-    $ git clone git://github.com/mjijackson/citrus.git
+    $ git clone git://github.com/mjackson/citrus.git
     $ cd citrus
     $ rake package install
 
@@ -47,7 +47,7 @@ In Citrus, there are three main types of objects: rules, grammars, and matches.
 
 ## Rules
 
-A [Rule](http://mjijackson.com/citrus/api/classes/Citrus/Rule.html) is an object
+A [Rule](http://mjackson.github.io/citrus/api/classes/Citrus/Rule.html) is an object
 that specifies some matching behavior on a string. There are two types of rules:
 terminals and non-terminals. Terminals can be either Ruby strings or regular
 expressions that specify some input to match. For example, a terminal created
@@ -65,7 +65,7 @@ of Ruby modules. Rules use these modules to extend the matches they create.
 
 ## Grammars
 
-A [Grammar](http://mjijackson.com/citrus/api/classes/Citrus/Grammar.html) is a
+A [Grammar](http://mjackson.github.io/citrus/api/classes/Citrus/Grammar.html) is a
 container for rules. Usually the rules in a grammar collectively form a complete
 specification for some language, or a well-defined subset thereof.
 
@@ -79,7 +79,7 @@ Ruby's `super` keyword.
 
 ## Matches
 
-A [Match](http://mjijackson.com/citrus/api/classes/Citrus/Match.html) object
+A [Match](http://mjackson.github.io/citrus/api/classes/Citrus/Match.html) object
 represents a successful recognition of some piece of the input. Matches are
 created by rule objects during a parse.
 
@@ -128,8 +128,8 @@ match in a case-insensitive manner.
 Besides case sensitivity, case-insensitive strings have the same behavior as
 double quoted strings.
 
-See [Terminal](http://mjijackson.com/citrus/api/classes/Citrus/Terminal.html) and
-[StringTerminal](http://mjijackson.com/citrus/api/classes/Citrus/StringTerminal.html)
+See [Terminal](http://mjackson.github.io/citrus/api/classes/Citrus/Terminal.html) and
+[StringTerminal](http://mjackson.github.io/citrus/api/classes/Citrus/StringTerminal.html)
 for more information.
 
 ## Repetition
@@ -153,7 +153,7 @@ The `+` and `?` operators are supported as well for the common cases of `1*` and
     'abc'+        # match "abc" one or more times
     'abc'?        # match "abc" zero or one time
 
-See [Repeat](http://mjijackson.com/citrus/api/classes/Citrus/Repeat.html) for
+See [Repeat](http://mjackson.github.io/citrus/api/classes/Citrus/Repeat.html) for
 more information.
 
 ## Lookahead
@@ -175,9 +175,9 @@ that does not match a given expression.
 When using this operator (the tilde), at least one character must be consumed
 for the rule to succeed.
 
-See [AndPredicate](http://mjijackson.com/citrus/api/classes/Citrus/AndPredicate.html),
-[NotPredicate](http://mjijackson.com/citrus/api/classes/Citrus/NotPredicate.html),
-and [ButPredicate](http://mjijackson.com/citrus/api/classes/Citrus/ButPredicate.html)
+See [AndPredicate](http://mjackson.github.io/citrus/api/classes/Citrus/AndPredicate.html),
+[NotPredicate](http://mjackson.github.io/citrus/api/classes/Citrus/NotPredicate.html),
+and [ButPredicate](http://mjackson.github.io/citrus/api/classes/Citrus/ButPredicate.html)
 for more information.
 
 ## Sequences
@@ -188,7 +188,7 @@ should match in that order.
     'a' 'b' 'c'   # match "a", then "b", then "c"
     'a' [0-9]     # match "a", then a numeric digit
 
-See [Sequence](http://mjijackson.com/citrus/api/classes/Citrus/Sequence.html)
+See [Sequence](http://mjackson.github.io/citrus/api/classes/Citrus/Sequence.html)
 for more information.
 
 ## Choices
@@ -204,7 +204,7 @@ It is important to note when using ordered choice that any operator binds more
 tightly than the vertical bar. A full chart of operators and their respective
 levels of precedence is below.
 
-See [Choice](http://mjijackson.com/citrus/api/classes/Citrus/Choice.html) for
+See [Choice](http://mjackson.github.io/citrus/api/classes/Citrus/Choice.html) for
 more information.
 
 ## Labels
@@ -263,7 +263,7 @@ In the example above, the `FloatingPoint` grammar includes `Number`. Both have a
 rule named `number`, so `FloatingPoint#number` has access to `Number#number` by
 means of using `super`.
 
-See [Super](http://mjijackson.com/citrus/api/classes/Citrus/Super.html) for more
+See [Super](http://mjackson.github.io/citrus/api/classes/Citrus/Super.html) for more
 information.
 
 ## Precedence
@@ -343,7 +343,7 @@ and "1 + 2+3", but it does not have enough semantic information to be able to
 actually interpret these expressions.
 
 At this point, when the grammar parses a string it generates a tree of
-[Match](http://mjijackson.com/citrus/api/classes/Citrus/Match.html) objects.
+[Match](http://mjackson.github.io/citrus/api/classes/Citrus/Match.html) objects.
 Each match is created by a rule and may itself be comprised of any number of
 submatches.
 
@@ -420,14 +420,14 @@ commands in a terminal.
 Congratulations! You just ran your first piece of Citrus code.
 
 One interesting thing to notice about the above sequence of commands is the
-return value of [Citrus#load](http://mjijackson.com/citrus/api/classes/Citrus.html#M000003).
+return value of [Citrus#load](http://mjackson.github.io/citrus/api/classes/Citrus.html#M000003).
 When you use `Citrus.load` to load a grammar file (and likewise
-[Citrus#eval](http://mjijackson.com/citrus/api/classes/Citrus.html#M000004) to
+[Citrus#eval](http://mjackson.github.io/citrus/api/classes/Citrus.html#M000004) to
 evaluate a raw string of grammar code), the return value is an array of all the
 grammars present in that file.
 
 Take a look at
-[calc.citrus](http://github.com/mjijackson/citrus/blob/master/lib/citrus/grammars/calc.citrus)
+[calc.citrus](http://github.com/mjackson/citrus/blob/master/lib/citrus/grammars/calc.citrus)
 for an example of a calculator that is able to parse and evaluate more complex
 mathematical expressions.
 
@@ -535,7 +535,7 @@ made to test equality of match objects with string values.
 
 ## Debugging
 
-When a parse fails, a [ParseError](http://mjijackson.com/citrus/api/classes/Citrus/ParseError.html)
+When a parse fails, a [ParseError](http://mjackson.github.io/citrus/api/classes/Citrus/ParseError.html)
 object is generated which provides a wealth of information about exactly where
 the parse failed including the offset, line number, line text, and line offset.
 Using this object, you could possibly provide some useful feedback to the user

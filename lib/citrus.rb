@@ -8,7 +8,7 @@ require 'citrus/version'
 # elegance and expressiveness of the language with the simplicity and power of
 # parsing expressions.
 #
-# http://mjijackson.com/citrus
+# http://mjackson.github.io/citrus
 module Citrus
   autoload :File, 'citrus/file'
 

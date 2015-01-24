@@ -13,6 +13,6 @@ Via [RubyGems](http://rubygems.org/):
 
 From a local copy:
 
-    $ git clone git://github.com/mjijackson/citrus.git
+    $ git clone git://github.com/mjackson/citrus.git
     $ cd citrus
     $ rake package install
