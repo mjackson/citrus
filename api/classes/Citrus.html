@@ -44,18 +44,18 @@
             the simplicity and power of parsing expressions.
             </p>
             <p>
-            <a href="http://mjijackson.com/citrus">mjijackson.com/citrus</a>
+            <a href="http://mjackson.github.io/citrus">mjackson.github.io/citrus</a>
             </p>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
             <h3>public class</h3>
             <ol>
-              <li><a href="#M000002">cache</a></li>
-              <li><a href="#M000003">eval</a></li>
-              <li><a href="#M000005">load</a></li>
-              <li><a href="#M000006">require</a></li>
-              <li><a href="#M000004">rule</a></li>
+              <li><a href="#M000001">cache</a></li>
+              <li><a href="#M000002">eval</a></li>
+              <li><a href="#M000004">load</a></li>
+              <li><a href="#M000005">require</a></li>
+              <li><a href="#M000003">rule</a></li>
             </ol>
           </div>
           <div id='section'>
@@ -113,8 +113,8 @@
             </div>
             <div id='methods'>
               <h2>Public class methods</h2>
-              <div class='method public-class' id='method-M000002'>
-                <a name='M000002'></a>
+              <div class='method public-class' id='method-M000001'>
+                <a name='M000001'></a>
                 <div class='synopsis'>
                   <span class='name'>cache</span>
                   <span class='arguments'>()</span>
@@ -122,25 +122,25 @@
                 <div class='description'>
                   <p>
                   Returns a map of paths of files that have been loaded via <a
-                  href="Citrus.html#M000005">load</a> to the result of <a
-                  href="Citrus.html#M000003">eval</a> on the code in that file.
+                  href="Citrus.html#M000004">load</a> to the result of <a
+                  href="Citrus.html#M000002">eval</a> on the code in that file.
                   </p>
                   <p>
                   Note: These paths are not absolute unless you pass an absolute path to <a
-                  href="Citrus.html#M000005">load</a>. That means that if you change the
-                  working directory and try to <a href="Citrus.html#M000006">require</a> the
+                  href="Citrus.html#M000004">load</a>. That means that if you change the
+                  working directory and try to <a href="Citrus.html#M000005">require</a> the
                   same file with a different relative path, it will be loaded twice.
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000002-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000001-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000002-source'>    <span class="ruby-comment cmt"># File lib/citrus.rb, line 29</span>&#x000A;29:   <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">cache</span>&#x000A;30:     <span class="ruby-ivar">@cache</span> <span class="ruby-operator">||=</span> {}&#x000A;31:   <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000001-source'>    <span class="ruby-comment cmt"># File lib/citrus.rb, line 29</span>&#x000A;29:   <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">cache</span>&#x000A;30:     <span class="ruby-ivar">@cache</span> <span class="ruby-operator">||=</span> {}&#x000A;31:   <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='method public-class' id='method-M000003'>
-                <a name='M000003'></a>
+              <div class='method public-class' id='method-M000002'>
+                <a name='M000002'></a>
                 <div class='synopsis'>
                   <span class='name'>eval</span>
                   <span class='arguments'>(code, options={})</span>
@@ -150,19 +150,19 @@
                   Evaluates the given <a href="Citrus.html">Citrus</a> parsing expression
                   grammar <tt>code</tt> and returns an array of any grammar modules that are
                   created. Accepts the same <tt>options</tt> as <a
-                  href="Citrus/GrammarMethods.html#M000010">GrammarMethods#parse</a>.
+                  href="Citrus/GrammarMethods.html#M000009">GrammarMethods#parse</a>.
                   </p>
                   <pre>Citrus.eval(&lt;&lt;CITRUS)&#x000A;grammar MyGrammar&#x000A;  rule abc&#x000A;    &quot;abc&quot;&#x000A;  end&#x000A;end&#x000A;CITRUS&#x000A;# =&gt; [MyGrammar]</pre>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000003-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000002-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000003-source'>    <span class="ruby-comment cmt"># File lib/citrus.rb, line 46</span>&#x000A;46:   <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">eval</span>(<span class="ruby-identifier">code</span>, <span class="ruby-identifier">options</span>={})&#x000A;47:     <span class="ruby-constant">File</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">code</span>, <span class="ruby-identifier">options</span>).<span class="ruby-identifier">value</span>&#x000A;48:   <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000002-source'>    <span class="ruby-comment cmt"># File lib/citrus.rb, line 46</span>&#x000A;46:   <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">eval</span>(<span class="ruby-identifier">code</span>, <span class="ruby-identifier">options</span>={})&#x000A;47:     <span class="ruby-constant">File</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">code</span>, <span class="ruby-identifier">options</span>).<span class="ruby-identifier">value</span>&#x000A;48:   <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='method public-class' id='method-M000005'>
-                <a name='M000005'></a>
+              <div class='method public-class' id='method-M000004'>
+                <a name='M000004'></a>
                 <div class='synopsis'>
                   <span class='name'>load</span>
                   <span class='arguments'>(file, options={})</span>
@@ -170,28 +170,28 @@
                 <div class='description'>
                   <p>
                   Loads the grammar(s) from the given <tt>file</tt>. Accepts the same
-                  <tt>options</tt> as <a href="Citrus.html#M000003">eval</a>, plus the
+                  <tt>options</tt> as <a href="Citrus.html#M000002">eval</a>, plus the
                   following:
                   </p>
                   <table>
                   <tr><td valign="top">force:</td><td>Normally this method will not reload a file that is already in the <a
-                  href="Citrus.html#M000002">cache</a>. However, if this option is
+                  href="Citrus.html#M000001">cache</a>. However, if this option is
                   <tt>true</tt> the file will be loaded, regardless of whether or not it is
                   in the cache. Defaults to <tt>false</tt>.
                   
                   </td></tr>
                   </table>
-                  <pre>Citrus.load('mygrammar')&#x000A;# =&gt; [MyGrammar]</pre>
+                  <pre>Citrus.load(&#39;mygrammar&#39;)&#x000A;# =&gt; [MyGrammar]</pre>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000005-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000004-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000005-source'>    <span class="ruby-comment cmt"># File lib/citrus.rb, line 71</span>&#x000A;71:   <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">load</span>(<span class="ruby-identifier">file</span>, <span class="ruby-identifier">options</span>={})&#x000A;72:     <span class="ruby-identifier">file</span> <span class="ruby-operator">+=</span> <span class="ruby-value str">'.citrus'</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-regexp re">/\.citrus$/</span> <span class="ruby-operator">===</span> <span class="ruby-identifier">file</span>&#x000A;73:     <span class="ruby-identifier">force</span> = <span class="ruby-identifier">options</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:force</span>)&#x000A;74: &#x000A;75:     <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">force</span> <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-identifier">cache</span>[<span class="ruby-identifier">file</span>]&#x000A;76:       <span class="ruby-identifier">raise</span> <span class="ruby-constant">LoadError</span>, <span class="ruby-node">&quot;Cannot find file #{file}&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-operator">::</span><span class="ruby-constant">File</span>.<span class="ruby-identifier">file?</span>(<span class="ruby-identifier">file</span>)&#x000A;77:       <span class="ruby-identifier">raise</span> <span class="ruby-constant">LoadError</span>, <span class="ruby-node">&quot;Cannot read file #{file}&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-operator">::</span><span class="ruby-constant">File</span>.<span class="ruby-identifier">readable?</span>(<span class="ruby-identifier">file</span>)&#x000A;78: &#x000A;79:       <span class="ruby-keyword kw">begin</span>&#x000A;80:         <span class="ruby-identifier">cache</span>[<span class="ruby-identifier">file</span>] = <span class="ruby-identifier">eval</span>(<span class="ruby-operator">::</span><span class="ruby-constant">File</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">file</span>), <span class="ruby-identifier">options</span>)&#x000A;81:       <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">SyntaxError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>&#x000A;82:         <span class="ruby-identifier">e</span>.<span class="ruby-identifier">message</span>.<span class="ruby-identifier">replace</span>(<span class="ruby-node">&quot;#{::File.expand_path(file)}: #{e.message}&quot;</span>)&#x000A;83:         <span class="ruby-identifier">raise</span> <span class="ruby-identifier">e</span>&#x000A;84:       <span class="ruby-keyword kw">end</span>&#x000A;85:     <span class="ruby-keyword kw">end</span>&#x000A;86: &#x000A;87:     <span class="ruby-identifier">cache</span>[<span class="ruby-identifier">file</span>]&#x000A;88:   <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000004-source'>    <span class="ruby-comment cmt"># File lib/citrus.rb, line 71</span>&#x000A;71:   <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">load</span>(<span class="ruby-identifier">file</span>, <span class="ruby-identifier">options</span>={})&#x000A;72:     <span class="ruby-identifier">file</span> <span class="ruby-operator">+=</span> <span class="ruby-value str">&#39;.citrus&#39;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-regexp re">/\.citrus$/</span> <span class="ruby-operator">===</span> <span class="ruby-identifier">file</span>&#x000A;73:     <span class="ruby-identifier">force</span> = <span class="ruby-identifier">options</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:force</span>)&#x000A;74: &#x000A;75:     <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">force</span> <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-identifier">cache</span>[<span class="ruby-identifier">file</span>]&#x000A;76:       <span class="ruby-keyword kw">begin</span>&#x000A;77:         <span class="ruby-identifier">cache</span>[<span class="ruby-identifier">file</span>] = <span class="ruby-identifier">eval</span>(<span class="ruby-operator">::</span><span class="ruby-constant">File</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">file</span>), <span class="ruby-identifier">options</span>)&#x000A;78:       <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">SyntaxError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>&#x000A;79:         <span class="ruby-identifier">e</span>.<span class="ruby-identifier">message</span>.<span class="ruby-identifier">replace</span>(<span class="ruby-node">&quot;#{::File.expand_path(file)}: #{e.message}&quot;</span>)&#x000A;80:         <span class="ruby-identifier">raise</span> <span class="ruby-identifier">e</span>&#x000A;81:       <span class="ruby-keyword kw">end</span>&#x000A;82:     <span class="ruby-keyword kw">end</span>&#x000A;83: &#x000A;84:     <span class="ruby-identifier">cache</span>[<span class="ruby-identifier">file</span>]&#x000A;85:   <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='method public-class' id='method-M000006'>
-                <a name='M000006'></a>
+              <div class='method public-class' id='method-M000005'>
+                <a name='M000005'></a>
                 <div class='synopsis'>
                   <span class='name'>require</span>
                   <span class='arguments'>(file, options={})</span>
@@ -199,22 +199,22 @@
                 <div class='description'>
                   <p>
                   Searches the <tt>$LOAD_PATH</tt> for a <tt>file</tt> with the .citrus
-                  suffix and attempts to load it via <a href="Citrus.html#M000005">load</a>.
+                  suffix and attempts to load it via <a href="Citrus.html#M000004">load</a>.
                   Returns the path to the file that was loaded on success, <tt>nil</tt> on
                   failure. Accepts the same <tt>options</tt> as <a
-                  href="Citrus.html#M000005">load</a>.
+                  href="Citrus.html#M000004">load</a>.
                   </p>
-                  <pre>path = Citrus.require('mygrammar')&#x000A;# =&gt; &quot;/path/to/mygrammar.citrus&quot;&#x000A;Citrus.cache[path]&#x000A;# =&gt; [MyGrammar]</pre>
+                  <pre>path = Citrus.require(&#39;mygrammar&#39;)&#x000A;# =&gt; &quot;/path/to/mygrammar.citrus&quot;&#x000A;Citrus.cache[path]&#x000A;# =&gt; [MyGrammar]</pre>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000006-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000005-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000006-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 99</span>&#x000A; 99:   <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">require</span>(<span class="ruby-identifier">file</span>, <span class="ruby-identifier">options</span>={})&#x000A;100:     <span class="ruby-identifier">file</span> <span class="ruby-operator">+=</span> <span class="ruby-value str">'.citrus'</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-regexp re">/\.citrus$/</span> <span class="ruby-operator">===</span> <span class="ruby-identifier">file</span>&#x000A;101:     <span class="ruby-identifier">found</span> = <span class="ruby-keyword kw">nil</span>&#x000A;102: &#x000A;103:     <span class="ruby-identifier">paths</span> = [<span class="ruby-value str">''</span>]&#x000A;104:     <span class="ruby-identifier">paths</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">$LOAD_PATH</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">Pathname</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">file</span>).<span class="ruby-identifier">absolute?</span>&#x000A;105:     <span class="ruby-identifier">paths</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">path</span><span class="ruby-operator">|</span>&#x000A;106:       <span class="ruby-identifier">found</span> = <span class="ruby-constant">Dir</span>[<span class="ruby-operator">::</span><span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">file</span>)].<span class="ruby-identifier">first</span>&#x000A;107:       <span class="ruby-keyword kw">break</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">found</span>&#x000A;108:     <span class="ruby-keyword kw">end</span>&#x000A;109: &#x000A;110:     <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">found</span>&#x000A;111:       <span class="ruby-constant">Citrus</span>.<span class="ruby-identifier">load</span>(<span class="ruby-identifier">found</span>, <span class="ruby-identifier">options</span>)&#x000A;112:     <span class="ruby-keyword kw">else</span>&#x000A;113:       <span class="ruby-identifier">raise</span> <span class="ruby-constant">LoadError</span>, <span class="ruby-node">&quot;Cannot find file #{file}&quot;</span>&#x000A;114:     <span class="ruby-keyword kw">end</span>&#x000A;115: &#x000A;116:     <span class="ruby-identifier">found</span>&#x000A;117:   <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000005-source'>     <span class="ruby-comment cmt"># File lib/citrus.rb, line 96</span>&#x000A; 96:   <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">require</span>(<span class="ruby-identifier">file</span>, <span class="ruby-identifier">options</span>={})&#x000A; 97:     <span class="ruby-identifier">file</span> <span class="ruby-operator">+=</span> <span class="ruby-value str">&#39;.citrus&#39;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-regexp re">/\.citrus$/</span> <span class="ruby-operator">===</span> <span class="ruby-identifier">file</span>&#x000A; 98:     <span class="ruby-identifier">found</span> = <span class="ruby-keyword kw">nil</span>&#x000A; 99: &#x000A;100:     <span class="ruby-identifier">paths</span> = [<span class="ruby-value str">&#39;&#39;</span>]&#x000A;101:     <span class="ruby-identifier">paths</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">$LOAD_PATH</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">Pathname</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">file</span>).<span class="ruby-identifier">absolute?</span>&#x000A;102:     <span class="ruby-identifier">paths</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">path</span><span class="ruby-operator">|</span>&#x000A;103:       <span class="ruby-identifier">found</span> = <span class="ruby-constant">Dir</span>[<span class="ruby-operator">::</span><span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">file</span>)].<span class="ruby-identifier">first</span>&#x000A;104:       <span class="ruby-keyword kw">break</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">found</span>&#x000A;105:     <span class="ruby-keyword kw">end</span>&#x000A;106: &#x000A;107:     <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">found</span>&#x000A;108:       <span class="ruby-constant">Citrus</span>.<span class="ruby-identifier">load</span>(<span class="ruby-identifier">found</span>, <span class="ruby-identifier">options</span>)&#x000A;109:     <span class="ruby-keyword kw">else</span>&#x000A;110:       <span class="ruby-identifier">raise</span> <span class="ruby-constant">LoadError</span>, <span class="ruby-node">&quot;Cannot find file #{file}&quot;</span>&#x000A;111:     <span class="ruby-keyword kw">end</span>&#x000A;112: &#x000A;113:     <span class="ruby-identifier">found</span>&#x000A;114:   <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='method public-class' id='method-M000004'>
-                <a name='M000004'></a>
+              <div class='method public-class' id='method-M000003'>
+                <a name='M000003'></a>
                 <div class='synopsis'>
                   <span class='name'>rule</span>
                   <span class='arguments'>(expr, options={})</span>
@@ -223,15 +223,15 @@
                   <p>
                   Evaluates the given expression and creates a new <a
                   href="Citrus/Rule.html">Rule</a> object from it. Accepts the same
-                  <tt>options</tt> as <a href="Citrus.html#M000003">eval</a>.
+                  <tt>options</tt> as <a href="Citrus.html#M000002">eval</a>.
                   </p>
-                  <pre>Citrus.rule('&quot;a&quot; | &quot;b&quot;')&#x000A;# =&gt; #&lt;Citrus::Rule: ... &gt;</pre>
+                  <pre>Citrus.rule(&#39;&quot;a&quot; | &quot;b&quot;&#39;)&#x000A;# =&gt; #&lt;Citrus::Rule: ... &gt;</pre>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000004-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000003-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000004-source'>    <span class="ruby-comment cmt"># File lib/citrus.rb, line 56</span>&#x000A;56:   <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">rule</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">options</span>={})&#x000A;57:     <span class="ruby-identifier">eval</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">options</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">:root</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">:expression</span>))&#x000A;58:   <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000003-source'>    <span class="ruby-comment cmt"># File lib/citrus.rb, line 56</span>&#x000A;56:   <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">rule</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">options</span>={})&#x000A;57:     <span class="ruby-identifier">eval</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">options</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">:root</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">:expression</span>))&#x000A;58:   <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>
