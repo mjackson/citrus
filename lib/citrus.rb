@@ -199,7 +199,7 @@ module Citrus
 
     # Returns the 0-based offset of the given +pos+ in the input on the line
     # on which it is found. +pos+ defaults to the current pointer position.
-    def line_offset(pos=pos)
+    def line_offset(pos=pos())
       p = 0
       string.each_line do |line|
         len = line.length
@@ -211,7 +211,7 @@ module Citrus
 
     # Returns the 0-based number of the line that contains the character at the
     # given +pos+. +pos+ defaults to the current pointer position.
-    def line_index(pos=pos)
+    def line_index(pos=pos())
       p = n = 0
       string.each_line do |line|
         p += line.length
@@ -223,7 +223,7 @@ module Citrus
 
     # Returns the 1-based number of the line that contains the character at the
     # given +pos+. +pos+ defaults to the current pointer position.
-    def line_number(pos=pos)
+    def line_number(pos=pos())
       line_index(pos) + 1
     end
 
@@ -231,7 +231,7 @@ module Citrus
 
     # Returns the text of the line that contains the character at the given
     # +pos+. +pos+ defaults to the current pointer position.
-    def line(pos=pos)
+    def line(pos=pos())
       lines[line_index(pos)]
     end
 
