@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
     Dir['doc/**'] +
     Dir['extras/**'] +
     Dir['lib/**/*.rb'] +
+    Dir['lib/citrus/grammars/*.citrus'] +
     Dir['test/**/*'] +
     %w< citrus.gemspec Rakefile README.md CHANGES >
 

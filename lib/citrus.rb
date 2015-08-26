@@ -85,12 +85,11 @@ module Citrus
   end
 
   # Searches the <tt>$LOAD_PATH</tt> for a +file+ with the .citrus suffix and
-  # attempts to load it via #load. Returns the path to the file that was loaded
-  # on success, +nil+ on failure. Accepts the same +options+ as #load.
+  # attempts to load it via #load. Return the same as #load on success and
+  # raise LoadError if file not found
+  # Accepts the same +options+ as #load.
   #
   #     path = Citrus.require('mygrammar')
-  #     # => "/path/to/mygrammar.citrus"
-  #     Citrus.cache[path]
   #     # => [MyGrammar]
   #
   def self.require(file, options={})
@@ -105,12 +104,10 @@ module Citrus
     end
 
     if found
-      Citrus.load(found, options)
+      return Citrus.load(found, options)
     else
       raise LoadError, "Cannot find file #{file}"
     end
-
-    found
   end
 
   # A base class for all Citrus errors.
