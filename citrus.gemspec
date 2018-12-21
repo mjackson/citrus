@@ -15,12 +15,7 @@ Gem::Specification.new do |s|
 
   s.require_paths = %w< lib >
 
-  s.files = Dir['benchmark/**'] +
-    Dir['doc/**'] +
-    Dir['extras/**'] +
-    Dir['lib/**/*.rb'] +
-    Dir['test/**/*'] +
-    %w< citrus.gemspec Rakefile README.md CHANGES >
+  s.files =  Dir['lib/**/*.rb'] << "README.md"
 
   s.test_files = s.files.select {|path| path =~ /^test\/.*_test.rb/ }
 
