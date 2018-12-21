@@ -427,7 +427,7 @@ evaluate a raw string of grammar code), the return value is an array of all the
 grammars present in that file.
 
 Take a look at
-[calc.citrus](http://github.com/mjackson/citrus/blob/master/lib/citrus/grammars/calc.citrus)
+[calc.citrus](https://github.com/mjackson/citrus/blob/master/lib/citrus/grammars/calc.citrus)
 for an example of a calculator that is able to parse and evaluate more complex
 mathematical expressions.
 

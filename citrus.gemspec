@@ -29,6 +29,6 @@ Gem::Specification.new do |s|
   s.rdoc_options = %w< --line-numbers --inline-source --title Citrus --main Citrus >
   s.extra_rdoc_files = %w< README.md CHANGES >
 
-  s.homepage = 'http://mjackson.github.io/citrus'
+  s.homepage = 'https://mjackson.github.io/citrus'
   s.licenses = ['MIT']
 end
