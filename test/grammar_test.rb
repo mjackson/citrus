@@ -161,4 +161,28 @@ class GrammarTest < Test::Unit::TestCase
       grammar(:abc)
     end
   end
+
+  def test_options
+    grammer = Grammar.new {
+      rule(:number) { ext(/[0-9]+/) { @options } }
+    }
+    match = grammer.parse('1234', {test1: true, test2: "abc"})
+    options = match.value
+
+    assert_equal(true, options[:test1])
+    assert_equal('abc', options[:test2])
+  end
+
+  def test_optioin_upcase
+    grammer = Grammar.new {
+      rule(:alpha) do
+        ext(/[a-z]+/) { @options[:upcast] ? to_s.upcase : to_s }
+      end
+    }
+    match = grammer.parse('abc')
+    assert_equal('abc', match.value)
+
+    match = grammer.parse('abc', { upcast: true })
+    assert_equal('ABC', match.value)
+  end
 end

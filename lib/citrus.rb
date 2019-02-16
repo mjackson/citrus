@@ -637,14 +637,6 @@ module Citrus
     # The module this rule uses to extend new matches.
     attr_reader :extension
 
-    # The default set of options to use when calling #parse.
-    def default_options # :nodoc:
-      { :consume  => true,
-        :memoize  => false,
-        :offset   => 0
-      }
-    end
-
     # Attempts to parse the given +string+ and return a Match if any can be
     # made. +options+ may contain any of the following keys:
     #
@@ -656,20 +648,22 @@ module Citrus
     # offset::    The offset in +string+ at which to start parsing. Defaults
     #             to 0.
     def parse(source, options={})
-      opts = default_options.merge(options)
+      consume = options.delete(:consume)
+      consume = true if consume.nil?
+      memoize = options.delete(:memoize) || false
+      offset = options.delete(:offset) || 0
 
-      input = (opts[:memoize] ? MemoizedInput : Input).new(source)
+      input = (memoize ? MemoizedInput : Input).new(source)
       string = input.string
-      input.pos = opts[:offset] if opts[:offset] > 0
+      input.pos = offset if offset > 0
 
       events = input.exec(self)
       length = events[-1]
 
-      if !length || (opts[:consume] && length < (string.length - opts[:offset]))
+      if !length || (consume && length < (string.length - offset))
         raise ParseError, input
       end
-
-      Match.new(input, events, opts[:offset])
+      Match.new(input, events, offset, options)
     end
 
     # Tests whether or not this rule matches on the given +string+. Returns the
@@ -1272,11 +1266,12 @@ module Citrus
   # instantiated as needed. This class provides several convenient tree
   # traversal methods that help when examining and interpreting parse results.
   class Match
-    def initialize(input, events=[], offset=0)
+    def initialize(input, events=[], offset=0, options = {})
       @input = input
       @offset = offset
       @captures = nil
       @matches = nil
+      @options = options
 
       if events.length > 0
         elisions = []
@@ -1467,7 +1462,7 @@ module Citrus
             os = stack.pop
             start = stack.pop
 
-            match = Match.new(input, @events[start..index], @offset + os)
+            match = Match.new(input, @events[start..index], @offset + os, @options)
             capture!(rule, match)
 
             if stack.size == 1
