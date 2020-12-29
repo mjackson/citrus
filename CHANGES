@@ -1,3 +1,7 @@
+= 3.0.3
+
+  * Fix source code for ruby 2.7 compatibility.
+
 = 3.0.1 / 2014-03-14
 
   * Fixed bad 3.0.0 release.
