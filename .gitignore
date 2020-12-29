@@ -4,3 +4,4 @@
 api
 dist
 benchmark/*.dat
+Gemfile.lock
