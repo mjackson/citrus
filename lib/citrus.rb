@@ -1156,7 +1156,7 @@ module Citrus
         events << CLOSE
         events << length
       else
-        events.slice!(start, index)
+        events.slice!(start..index)
       end
 
       events
@@ -1213,7 +1213,7 @@ module Citrus
         events << CLOSE
         events << length
       else
-        events.slice!(start, index)
+        events.slice!(start..index)
       end
 
       events
@@ -1283,7 +1283,7 @@ module Citrus
 
         while events[0].elide?
           elisions.unshift(events.shift)
-          events.slice!(-2, events.length)
+          events.slice!(-2..events.length)
         end
 
         events[0].extend_match(self)
